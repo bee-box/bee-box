@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bee Sheet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: #f7f7f7;
+      color: #333;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 1em;
+    }
+    pre {
+      background: #fff;
+      padding: 1em;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐝 Latest Puzzle Metadata</h1>
+  <pre id="output">Loading latest puzzle data...</pre>
+
+  <script>
+    async function loadLatestPuzzle() {
+      const res = await fetch("xml/puzzles.xml");
+      const text = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, "application/xml");
+      const puzzles = Array.from(xml.getElementsByTagName("puzzle"));
+
+      if (puzzles.length === 0) {
+        document.getElementById("output").textContent = "No puzzles found.";
+        return;
+      }
+
+      // Sort by most recent date
+      puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
+      const latest = puzzles[0];
+      const obj = {};
+
+      // Puzzle attributes
+      Array.from(latest.attributes).forEach(attr => {
+        obj[attr.name] = attr.value;
+      });
+
+      // Word list with attributes
+      obj.words = Array.from(latest.getElementsByTagName("word")).map(word => {
+        const wordObj = { text: word.textContent };
+        Array.from(word.attributes).forEach(attr => {
+          wordObj[attr.name] = attr.value;
+        });
+        return wordObj;
+      });
+
+      document.getElementById("output").textContent = JSON.stringify(obj, null, 2);
+    }
+
+    loadLatestPuzzle();
+  </script>
+</body>
+</html>
