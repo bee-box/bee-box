@@ -33,24 +33,10 @@ import json
 from xml.dom import minidom
 from uuid import uuid4
 
-# Set up file and folder locations
+# ✅ Set up directories and file paths
 os.makedirs("xml", exist_ok=True)
+os.makedirs("logs", exist_ok=True)
 XML_FILE = os.path.join("xml", "bees.xml")
-
-NYT_URL = "https://www.nytimes.com/puzzles/spelling-bee"
-nyt_added = 0
-
-# [ ... rest of the script stays unchanged ... ]
-import requests
-from bs4 import BeautifulSoup
-import xml.etree.ElementTree as ET
-from datetime import date, datetime
-import os
-import json
-from xml.dom import minidom
-from uuid import uuid4
-
-XML_FILE = "bees.xml"
 NYT_URL = "https://www.nytimes.com/puzzles/spelling-bee"
 nyt_added = 0
 
@@ -169,9 +155,6 @@ def fetch_from_nyt():
 
             if new_letters == last_letters:
                 print("🚫 Today's puzzle isn't yet available.")
-
-                # ✅ Archive skipped dupe to logs
-                os.makedirs("logs", exist_ok=True)
                 log_path = os.path.join("logs", "skipped_dupes.log")
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 with open(log_path, "a", encoding="utf-8") as log_file:
