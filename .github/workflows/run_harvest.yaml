@@ -1,0 +1,27 @@
+name: Run Harvest
+
+on:
+  schedule:
+    # Runs daily at 2:02 AM Central Daylight Time (UTC-5 → 07:02 UTC)
+    - cron: '2 7 * * *'
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install requests bs4
+
+      - name: Run harvest.py
+        run: |
+          python harvest.py
