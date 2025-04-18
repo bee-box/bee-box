@@ -80,12 +80,37 @@
       gap: 0.25em;
       flex-wrap: nowrap;
     }
+    .instructions {
+      text-align: center;
+      max-width: 700px;
+      margin: 1.5em auto 0.5em;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
+      padding: 0 1rem;
+    }
     .puzzle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2em;
+      padding: 2em;
+    }
+    .group-label {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+    .word-group {
+      max-width: 700px;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    .word-grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.75em;
-      padding: 2em;
+      gap: 0.5em;
     }
     .word-box {
       padding: 0.75em;
@@ -123,6 +148,16 @@
     </div>
   </nav>
 
+  <div class="instructions">
+    <p>
+      <strong>Feeling stuck on today’s NYT Spelling Bee, but not ready to throw in the towel?</strong><br />
+      We’ve got your back — below are the valid words from the puzzle… but jumbled!<br /><br />
+      ✨ Tap a jumbled word below to reveal or hide the answer<br />
+      🖨️ Prefer pencil and paper? Hit our print button and take the Bee Jumble offline — perfect for solving on the go or going full retro.<br /><br />
+      <span><strong>The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for </strong><span id="puzzleDate"></span></span>
+    </p>
+  </div>
+
   <div class="meta" id="puzzle-meta"></div>
   <div class="meta" id="letters"></div>
   <div class="puzzle" id="words"></div>
@@ -146,32 +181,60 @@
       const letters = puzzle.getAttribute("letters");
       const id = puzzle.getAttribute("id");
 
+      const [yyyy, mm, dd] = date.split("-");
+      const fullDate = new Date(+yyyy, +mm - 1, +dd);
+      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+      const formattedDate = fullDate.toLocaleDateString("en-US", options);
+      document.getElementById("puzzleDate").textContent = formattedDate;
+
       document.getElementById("puzzle-meta").textContent = `Puzzle Date: ${date} — ID: ${id}`;
       document.getElementById("letters").textContent = `Letters: ${letters}`;
 
       const wordContainer = document.getElementById("words");
       wordContainer.innerHTML = "";
 
-      puzzle.querySelectorAll("word").forEach(word => {
-        const jumbled = word.getAttribute("jumbled");
-        const actual = word.textContent;
+      const words = Array.from(puzzle.querySelectorAll("word")).map(word => ({
+        text: word.textContent,
+        jumbled: word.getAttribute("jumbled"),
+        length: parseInt(word.getAttribute("length") || word.textContent.length),
+      }));
 
-        const div = document.createElement("div");
-        div.className = "word-box";
-        div.textContent = jumbled;
+      const groups = {};
+      words.forEach(word => {
+        if (!groups[word.length]) groups[word.length] = [];
+        groups[word.length].push(word);
+      });
 
-        div.addEventListener("click", () => {
-          div.textContent = div.textContent === jumbled ? actual : jumbled;
+      Object.keys(groups).sort((a, b) => a - b).forEach(length => {
+        const group = document.createElement("div");
+        group.className = "word-group";
+
+        const label = document.createElement("div");
+        label.className = "group-label";
+        label.textContent = `${length}-letter words`;
+        group.appendChild(label);
+
+        const grid = document.createElement("div");
+        grid.className = "word-grid";
+
+        groups[length].forEach(word => {
+          const div = document.createElement("div");
+          div.className = "word-box";
+          div.textContent = word.jumbled;
+          div.addEventListener("click", () => {
+            div.textContent = div.textContent === word.jumbled ? word.text : word.jumbled;
+          });
+          grid.appendChild(div);
         });
 
-        wordContainer.appendChild(div);
+        group.appendChild(grid);
+        wordContainer.appendChild(group);
       });
     }
 
     function populateDateSelector(puzzles, currentDate) {
       const selector = document.getElementById("dateSelector");
       puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-
       puzzles.forEach(p => {
         const dateStr = p.getAttribute("date");
         const option = document.createElement("option");
@@ -184,7 +247,6 @@
 
     function handleNavControls(puzzles, currentDate) {
       const selector = document.getElementById("dateSelector");
-
       document.getElementById("prevDayBtn").onclick = () => {
         const idx = selector.selectedIndex;
         if (idx < selector.options.length - 1) {
@@ -192,7 +254,6 @@
           window.location.href = `?date=${newDate}`;
         }
       };
-
       document.getElementById("nextDayBtn").onclick = () => {
         const idx = selector.selectedIndex;
         if (idx > 0) {
@@ -200,7 +261,6 @@
           window.location.href = `?date=${newDate}`;
         }
       };
-
       selector.onchange = () => {
         const newDate = selector.value;
         window.location.href = `?date=${newDate}`;
