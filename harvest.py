@@ -109,7 +109,7 @@ def append_puzzle(date_str, words):
         tree = ET.parse(XML_FILE)
         root = tree.getroot()
     else:
-        root = ET.Element("spelling_bees")
+        root = ET.Element("words")
         tree = ET.ElementTree(root)
 
     # Create and populate the puzzle element
