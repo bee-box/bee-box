@@ -13,7 +13,12 @@
     }
     h1 {
       font-size: 1.8em;
+      margin-bottom: 0.5em;
+    }
+    h2 {
+      font-size: 1.2em;
       margin-bottom: 1em;
+      color: #666;
     }
     pre {
       background: #fff;
@@ -26,7 +31,8 @@
   </style>
 </head>
 <body>
-  <h1>🐝 Latest Puzzle Metadata</h1>
+  <h1 id="title">🐝 Bee Sheet</h1>
+  <h2 id="subtitle"></h2>
   <pre id="output">Loading latest puzzle data...</pre>
 
   <script>
@@ -61,6 +67,18 @@
         return wordObj;
       });
 
+      // Set header content
+      const dateStr = obj.date;
+      const [yyyy, mm, dd] = dateStr.split("-");
+      const date = new Date(+yyyy, +mm - 1, +dd);
+      const formattedDate = date.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      const wordCount = obj.count || obj.words.length;
+      const pangrams = obj.pangrams || 0;
+      const perfect = obj.perfectpangrams || 0;
+
+      document.getElementById("title").textContent = `🐝 Bee Sheet for ${formattedDate}`;
+      document.getElementById("subtitle").textContent = `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect)`;
       document.getElementById("output").textContent = JSON.stringify(obj, null, 2);
     }
 
