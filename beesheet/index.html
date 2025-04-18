@@ -31,7 +31,7 @@
 
   <script>
     async function loadLatestPuzzle() {
-      const res = await fetch("xml/puzzles.xml");
+      const res = await fetch("../xml/puzzles.xml");
       const text = await res.text();
       const parser = new DOMParser();
       const xml = parser.parseFromString(text, "application/xml");
