@@ -2,296 +2,87 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bee Jumble</title>
+  <title>Bee Sheet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="bee.ico" type="image/x-icon" />
   <style>
-    html {
-      overflow-y: scroll;
-      scroll-behavior: smooth;
-    }
     body {
-      margin: 0;
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background: #fff;
-      color: #111;
-      padding: 0;
-      line-height: 1.6;
-    }
-    .navbar {
-      background-color: #000;
-      color: #FFD700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      flex-wrap: wrap;
-    }
-    .navbar-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    .navbar-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .nav-controls button,
-    .nav-controls select,
-    .navbar-button {
-      height: 40px;
-      font-size: 1em;
-      border: 2px solid #FFD700;
-      background-color: transparent;
-      color: #FFD700;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-      font-family: inherit;
-    }
-    .nav-controls button {
-      width: 40px;
-      padding: 0;
-      text-align: center;
-    }
-    .nav-controls select {
-      width: 200px;
-      min-width: 150px;
-      max-width: 200px;
-      padding: 0 0.75em;
-    }
-    .navbar-button {
-      padding: 0 0.75rem;
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-    }
-    .nav-controls button:hover,
-    .nav-controls select:hover,
-    .navbar-button:hover {
-      background-color: #FFD700;
-      color: #000;
-    }
-    .nav-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.25em;
-      flex-wrap: nowrap;
-    }
-    .instructions {
-      text-align: center;
-      max-width: 700px;
-      margin: 1.5em auto 0.5em;
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #333;
-      padding: 0 1rem;
-    }
-    .puzzle {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2em;
+      font-family: sans-serif;
       padding: 2em;
+      background: #f7f7f7;
+      color: #333;
     }
-    .group-label {
-      font-size: 1.25rem;
-      font-weight: bold;
+    h1 {
+      font-size: 1.8em;
       margin-bottom: 0.5em;
     }
-    .word-group {
-      max-width: 700px;
-      width: 100%;
-      margin-bottom: 2rem;
-    }
-    .word-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5em;
-    }
-    .word-box {
-      padding: 0.75em;
-      border: 1px solid #ccc;
-      text-align: center;
-      border-radius: 4px;
-      font-family: Georgia, serif;
-      background: #fdfdfd;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .word-box:hover {
-      background-color: #fffae0;
-    }
-    .meta {
-      text-align: center;
-      margin-top: 1em;
-      font-size: 1em;
+    h2 {
+      font-size: 1.2em;
+      margin-bottom: 1em;
       color: #666;
+    }
+    pre {
+      background: #fff;
+      padding: 1em;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="navbar-title">Bee Jumble</div>
-    <div class="navbar-buttons">
-      <div class="nav-controls">
-        <button id="prevDayBtn">←</button>
-        <select id="dateSelector"></select>
-        <button id="nextDayBtn">→</button>
-      </div>
-      <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
-      <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
-      <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
-    </div>
-  </nav>
-
-  <div class="instructions">
-    <p>
-      <strong>Feeling stuck on today’s NYT Spelling Bee, but not ready to throw in the towel?</strong><br />
-      We’ve got your back — below are the valid words from the puzzle… but jumbled!<br /><br />
-      ✨ Tap a jumbled word below to reveal or hide the answer<br />
-      🖨️ Prefer pencil and paper? Hit our print button and take the Bee Jumble offline — perfect for solving on the go or going full retro.<br /><br />
-      <span><strong>The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for </strong><span id="puzzleDate"></span></span>
-    </p>
-  </div>
-
-  <div class="meta" id="puzzle-meta"></div>
-  <div class="meta" id="letters"></div>
-  <div class="puzzle" id="words"></div>
+  <h1 id="title">🐝 Bee Sheet</h1>
+  <h2 id="subtitle"></h2>
+  <pre id="output">Loading latest puzzle data...</pre>
 
   <script>
-    function getQueryParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
-    }
-
-    async function loadPuzzles() {
+    async function loadLatestPuzzle() {
       const res = await fetch("../xml/puzzles.xml");
-      const xmlText = await res.text();
+      const text = await res.text();
       const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlText, "application/xml");
-      return Array.from(xml.getElementsByTagName("puzzle"));
-    }
+      const xml = parser.parseFromString(text, "application/xml");
+      const puzzles = Array.from(xml.getElementsByTagName("puzzle"));
 
-    function showPuzzle(puzzle) {
-      const date = puzzle.getAttribute("date");
-      const letters = puzzle.getAttribute("letters");
-      const id = puzzle.getAttribute("id");
+      if (puzzles.length === 0) {
+        document.getElementById("output").textContent = "No puzzles found.";
+        return;
+      }
 
-      const [yyyy, mm, dd] = date.split("-");
-      const fullDate = new Date(+yyyy, +mm - 1, +dd);
-      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-      const formattedDate = fullDate.toLocaleDateString("en-US", options);
-      document.getElementById("puzzleDate").textContent = formattedDate;
-
-      document.getElementById("puzzle-meta").textContent = `Puzzle Date: ${date} — ID: ${id}`;
-      document.getElementById("letters").textContent = `Letters: ${letters}`;
-
-      const wordContainer = document.getElementById("words");
-      wordContainer.innerHTML = "";
-
-      const words = Array.from(puzzle.querySelectorAll("word")).map(word => ({
-        text: word.textContent,
-        jumbled: word.getAttribute("jumbled"),
-        length: parseInt(word.getAttribute("length") || word.textContent.length),
-      }));
-
-      const groups = {};
-      words.forEach(word => {
-        if (!groups[word.length]) groups[word.length] = [];
-        groups[word.length].push(word);
-      });
-
-      Object.keys(groups).sort((a, b) => a - b).forEach(length => {
-        const group = document.createElement("div");
-        group.className = "word-group";
-
-        const label = document.createElement("div");
-        label.className = "group-label";
-        label.textContent = `${length}-letter words`;
-        group.appendChild(label);
-
-        const grid = document.createElement("div");
-        grid.className = "word-grid";
-
-        groups[length].forEach(word => {
-          const div = document.createElement("div");
-          div.className = "word-box";
-          div.textContent = word.jumbled;
-          div.addEventListener("click", () => {
-            div.textContent = div.textContent === word.jumbled ? word.text : word.jumbled;
-          });
-          grid.appendChild(div);
-        });
-
-        group.appendChild(grid);
-        wordContainer.appendChild(group);
-      });
-    }
-
-    function populateDateSelector(puzzles, currentDate) {
-      const selector = document.getElementById("dateSelector");
+      // Sort by most recent date
       puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-      puzzles.forEach(p => {
-        const dateStr = p.getAttribute("date");
-        const option = document.createElement("option");
-        option.value = dateStr;
-        option.textContent = dateStr;
-        if (dateStr === currentDate) option.selected = true;
-        selector.appendChild(option);
+      const latest = puzzles[0];
+      const obj = {};
+
+      // Puzzle attributes
+      Array.from(latest.attributes).forEach(attr => {
+        obj[attr.name] = attr.value;
       });
+
+      // Word list with attributes
+      obj.words = Array.from(latest.getElementsByTagName("word")).map(word => {
+        const wordObj = { text: word.textContent };
+        Array.from(word.attributes).forEach(attr => {
+          wordObj[attr.name] = attr.value;
+        });
+        return wordObj;
+      });
+
+      // Set header content
+      const dateStr = obj.date;
+      const [yyyy, mm, dd] = dateStr.split("-");
+      const date = new Date(+yyyy, +mm - 1, +dd);
+      const formattedDate = date.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      const wordCount = obj.count || obj.words.length;
+      const pangrams = obj.pangrams || 0;
+      const perfect = obj.perfectpangrams || 0;
+
+      document.getElementById("title").textContent = `🐝 Bee Sheet for ${formattedDate}`;
+      document.getElementById("subtitle").textContent = `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect)`;
+      document.getElementById("output").textContent = JSON.stringify(obj, null, 2);
     }
 
-    function handleNavControls(puzzles, currentDate) {
-      const selector = document.getElementById("dateSelector");
-      document.getElementById("prevDayBtn").onclick = () => {
-        const idx = selector.selectedIndex;
-        if (idx < selector.options.length - 1) {
-          const newDate = selector.options[idx + 1].value;
-          window.location.href = `?date=${newDate}`;
-        }
-      };
-      document.getElementById("nextDayBtn").onclick = () => {
-        const idx = selector.selectedIndex;
-        if (idx > 0) {
-          const newDate = selector.options[idx - 1].value;
-          window.location.href = `?date=${newDate}`;
-        }
-      };
-      selector.onchange = () => {
-        const newDate = selector.value;
-        window.location.href = `?date=${newDate}`;
-      };
-    }
-
-    async function init() {
-      const puzzles = await loadPuzzles();
-      const queryDate = getQueryParam("date");
-      const queryId = getQueryParam("id");
-
-      let selected = null;
-      if (queryId) {
-        selected = puzzles.find(p => p.getAttribute("id") === queryId);
-      } else if (queryDate) {
-        selected = puzzles.find(p => p.getAttribute("date") === queryDate);
-      } else {
-        puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-        selected = puzzles[0];
-      }
-
-      if (selected) {
-        showPuzzle(selected);
-        populateDateSelector(puzzles, selected.getAttribute("date"));
-        handleNavControls(puzzles, selected.getAttribute("date"));
-      } else {
-        document.getElementById("puzzle-meta").textContent = "Puzzle not found.";
-      }
-    }
-
-    init();
+    loadLatestPuzzle();
   </script>
 </body>
 </html>
