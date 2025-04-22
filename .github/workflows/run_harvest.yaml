@@ -1,0 +1,41 @@
+name: Run Harvest
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    # Runs daily at 2:02 AM Central Daylight Time (UTC-5 → 07:02 UTC)
+    - cron: '2 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true  # allow pushes with GITHUB_TOKEN
+          fetch-depth: 0            # full history for clean commits
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install requests bs4
+
+      - name: Run harvest.py
+        run: |
+          python harvest.py
+
+      - name: Commit and push updated words.xml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add xml/words.xml
+          git diff --quiet --cached || git commit -m "chore: append $(date +'%Y-%m-%d') puzzle"
+          git push
