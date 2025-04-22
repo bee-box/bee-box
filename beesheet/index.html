@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bee Sheet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: #f7f7f7;
+      color: #333;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 0.5em;
+    }
+    h2 {
+      font-size: 1.2em;
+      margin-bottom: 1em;
+      color: #666;
+    }
+    pre {
+      background: #fff;
+      padding: 1em;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">🐝 Bee Sheet</h1>
+  <h2 id="subtitle"></h2>
+  <pre id="output">Loading latest puzzle data...</pre>
+
+  <script>
+    async function loadLatestPuzzle() {
+      const res = await fetch("../xml/puzzles.xml");
+      const text = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, "application/xml");
+      const puzzles = Array.from(xml.getElementsByTagName("puzzle"));
+
+      if (puzzles.length === 0) {
+        document.getElementById("output").textContent = "No puzzles found.";
+        return;
+      }
+
+      // Sort by most recent date
+      puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
+      const latest = puzzles[0];
+      const obj = {};
+
+      // Puzzle attributes
+      Array.from(latest.attributes).forEach(attr => {
+        obj[attr.name] = attr.value;
+      });
+
+      // Word list with attributes
+      obj.words = Array.from(latest.getElementsByTagName("word")).map(word => {
+        const wordObj = { text: word.textContent };
+        Array.from(word.attributes).forEach(attr => {
+          wordObj[attr.name] = attr.value;
+        });
+        return wordObj;
+      });
+
+      // Set header content
+      const dateStr = obj.date;
+      const [yyyy, mm, dd] = dateStr.split("-");
+      const date = new Date(+yyyy, +mm - 1, +dd);
+      const formattedDate = date.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      const wordCount = obj.count || obj.words.length;
+      const pangrams = obj.pangrams || 0;
+      const perfect = obj.perfectpangrams || 0;
+
+      document.getElementById("title").textContent = `🐝 Bee Sheet for ${formattedDate}`;
+      document.getElementById("subtitle").textContent = `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect)`;
+      document.getElementById("output").textContent = JSON.stringify(obj, null, 2);
+    }
+
+    loadLatestPuzzle();
+  </script>
+</body>
+</html>

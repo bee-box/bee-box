@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bee Jumble</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="bee.ico" type="image/x-icon" />
+  <style>
+    html {
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .navbar {
+      background-color: #000;
+      color: #FFD700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      flex-wrap: wrap;
+    }
+    .navbar-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .navbar-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .nav-controls button,
+    .nav-controls select,
+    .navbar-button {
+      height: 40px;
+      font-size: 1em;
+      border: 2px solid #FFD700;
+      background-color: transparent;
+      color: #FFD700;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      font-family: inherit;
+    }
+    .nav-controls button {
+      width: 40px;
+      padding: 0;
+      text-align: center;
+    }
+    .nav-controls select {
+      width: 200px;
+      min-width: 150px;
+      max-width: 200px;
+      padding: 0 0.75em;
+    }
+    .navbar-button {
+      padding: 0 0.75rem;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .nav-controls button:hover,
+    .nav-controls select:hover,
+    .navbar-button:hover {
+      background-color: #FFD700;
+      color: #000;
+    }
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25em;
+      flex-wrap: nowrap;
+    }
+    .puzzle {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75em;
+      padding: 2em;
+    }
+    .word-box {
+      padding: 0.75em;
+      border: 1px solid #ccc;
+      text-align: center;
+      border-radius: 4px;
+      font-family: Georgia, serif;
+      background: #fdfdfd;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .word-box:hover {
+      background-color: #fffae0;
+    }
+    .meta {
+      text-align: center;
+      margin-top: 1em;
+      font-size: 1em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-title">Bee Jumble</div>
+    <div class="navbar-buttons">
+      <div class="nav-controls">
+        <button id="prevDayBtn">←</button>
+        <select id="dateSelector"></select>
+        <button id="nextDayBtn">→</button>
+      </div>
+      <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+      <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
+      <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
+    </div>
+  </nav>
+
+  <div class="meta" id="puzzle-meta"></div>
+  <div class="meta" id="letters"></div>
+  <div class="puzzle" id="words"></div>
+
+  <script>
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    async function loadPuzzles() {
+      const res = await fetch("../xml/puzzles.xml");
+      const xmlText = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "application/xml");
+      return Array.from(xml.getElementsByTagName("puzzle"));
+    }
+
+    function showPuzzle(puzzle) {
+      const date = puzzle.getAttribute("date");
+      const letters = puzzle.getAttribute("letters");
+      const id = puzzle.getAttribute("id");
+
+      document.getElementById("puzzle-meta").textContent = `Puzzle Date: ${date} — ID: ${id}`;
+      document.getElementById("letters").textContent = `Letters: ${letters}`;
+
+      const wordContainer = document.getElementById("words");
+      wordContainer.innerHTML = "";
+
+      puzzle.querySelectorAll("word").forEach(word => {
+        const jumbled = word.getAttribute("jumbled");
+        const actual = word.textContent;
+
+        const div = document.createElement("div");
+        div.className = "word-box";
+        div.textContent = jumbled;
+
+        div.addEventListener("click", () => {
+          div.textContent = div.textContent === jumbled ? actual : jumbled;
+        });
+
+        wordContainer.appendChild(div);
+      });
+    }
+
+    function populateDateSelector(puzzles, currentDate) {
+      const selector = document.getElementById("dateSelector");
+      puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
+
+      puzzles.forEach(p => {
+        const dateStr = p.getAttribute("date");
+        const option = document.createElement("option");
+        option.value = dateStr;
+        option.textContent = dateStr;
+        if (dateStr === currentDate) option.selected = true;
+        selector.appendChild(option);
+      });
+    }
+
+    function handleNavControls(puzzles, currentDate) {
+      const selector = document.getElementById("dateSelector");
+
+      document.getElementById("prevDayBtn").onclick = () => {
+        const idx = selector.selectedIndex;
+        if (idx < selector.options.length - 1) {
+          const newDate = selector.options[idx + 1].value;
+          window.location.href = `?date=${newDate}`;
+        }
+      };
+
+      document.getElementById("nextDayBtn").onclick = () => {
+        const idx = selector.selectedIndex;
+        if (idx > 0) {
+          const newDate = selector.options[idx - 1].value;
+          window.location.href = `?date=${newDate}`;
+        }
+      };
+
+      selector.onchange = () => {
+        const newDate = selector.value;
+        window.location.href = `?date=${newDate}`;
+      };
+    }
+
+    async function init() {
+      const puzzles = await loadPuzzles();
+      const queryDate = getQueryParam("date");
+      const queryId = getQueryParam("id");
+
+      let selected = null;
+      if (queryId) {
+        selected = puzzles.find(p => p.getAttribute("id") === queryId);
+      } else if (queryDate) {
+        selected = puzzles.find(p => p.getAttribute("date") === queryDate);
+      } else {
+        puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
+        selected = puzzles[0];
+      }
+
+      if (selected) {
+        showPuzzle(selected);
+        populateDateSelector(puzzles, selected.getAttribute("date"));
+        handleNavControls(puzzles, selected.getAttribute("date"));
+      } else {
+        document.getElementById("puzzle-meta").textContent = "Puzzle not found.";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

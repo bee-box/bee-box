@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bee Jumble</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="bee.ico" type="image/x-icon" />
+  <style>
+    html {
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .navbar {
+      background-color: #000;
+      color: #FFD700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      flex-wrap: wrap;
+    }
+    .navbar-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .navbar-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .nav-controls button,
+    .nav-controls select,
+    .navbar-button {
+      height: 40px;
+      font-size: 1em;
+      border: 2px solid #FFD700;
+      background-color: transparent;
+      color: #FFD700;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      font-family: inherit;
+    }
+    .nav-controls button {
+      width: 40px;
+      padding: 0;
+      text-align: center;
+    }
+    .nav-controls select {
+      width: 200px;
+      min-width: 150px;
+      max-width: 200px;
+      padding: 0 0.75em;
+    }
+    .navbar-button {
+      padding: 0 0.75rem;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .nav-controls button:hover,
+    .nav-controls select:hover,
+    .navbar-button:hover {
+      background-color: #FFD700;
+      color: #000;
+    }
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25em;
+      flex-wrap: nowrap;
+    }
+    .instructions {
+      max-width: 700px;
+      margin: 1.25em auto 0.75em;
+      font-size: 1rem;
+      color: #333;
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 1em;
+    }
+    .separator {
+      width: 800px;
+      margin: 1em auto;
+      border: 0;
+      border-top: 1px solid #ccc;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 1em;
+      margin: 0.5em auto 0.75em;
+      display: none;
+    }
+    header.main-header {
+      display: grid;
+      grid-template-columns: auto;
+      align-items: center;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0.5em 0;
+    }
+    .honeycomb-container {
+      display: flex;
+      justify-content: center;
+      min-height: 70px;
+    }
+    #honeycomb:empty::before {
+      content: "";
+      display: block;
+      width: 420px;
+      height: 60px;
+    }
+    .honeycomb {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .puzzle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2em;
+      padding: 1em;
+    }
+    .word-group {
+      max-width: 700px;
+      width: 100%;
+    }
+    .group-label {
+      font-weight: bold;
+      font-size: 1.25em;
+      margin: 1.5em 0 0.5em;
+      text-align: left;
+      color: #333;
+    }
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.5em;
+    }
+    .word-box {
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      text-align: center;
+      border-radius: 4px;
+      font-family: Georgia, serif;
+      background: #fdfdfd;
+      transition: background 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: auto;
+    }
+    .word-box[data-revealed="true"] {
+      background: #fffae0;
+    }
+    .blank-line {
+      height: 1.2em;
+      margin-top: 0.25em;
+      border-top: 1px dashed #ccc;
+      visibility: hidden;
+    }
+    @media (max-width: 480px) {
+      .nav-controls {
+        flex-direction: column;
+        gap: 0.5em;
+        align-items: stretch;
+      }
+      .nav-controls button,
+      .nav-controls select,
+      .navbar-button {
+        width: 100%;
+      }
+      .navbar-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+    @media print {
+      .navbar,
+      .instructions,
+      .separator,
+      .navbar-buttons,
+      .nav-controls,
+      .nav-controls select,
+      .navbar-button {
+        display: none !important;
+      }
+      .subtitle {
+        display: block !important;
+      }
+      body {
+        line-height: 1.4 !important;
+      }
+      .puzzle {
+        gap: 1em !important;
+        padding: 0.5em !important;
+      }
+      .word-group {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-top: 0 !important;
+        margin-bottom: 0.2em !important;
+      }
+      .group-label {
+        font-size: 1em !important;
+        font-weight: bold !important;
+        margin-top: 0.2em !important;
+        margin-bottom: 0.1em !important;
+      }
+      .word-grid {
+        gap: 0.3em !important;
+        row-gap: 0.2em !important;
+        margin-top: 0 !important;
+      }
+      .word-box {
+        padding: 0.3em !important;
+        min-height: 2.3em !important;
+        font-size: inherit !important;
+      }
+      .blank-line {
+        visibility: visible;
+        border-top: 1px solid #000;
+        height: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-title">Bee Jumble</div>
+    <div class="navbar-buttons">
+      <div class="nav-controls">
+        <button id="prevDayBtn">←</button>
+        <select id="dateSelector"></select>
+        <button id="nextDayBtn">→</button>
+      </div>
+      <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+      <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
+      <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
+    </div>
+  </nav>
+
+  <div class="instructions">
+    <p>
+      <strong>Feeling stuck on today’s NYT Spelling Bee, but not ready to throw in the towel?</strong><br />
+      We’ve got your back — below are the valid words from the puzzle… but jumbled!<br />
+      <hr class="separator" />
+      <strong>✨ Tap a jumbled word below to reveal or hide the answer</strong><br />
+      <strong>🖨️ Prefer pencil and paper? Hit our print button and take the Bee Jumble offline — perfect for solving on the go or going full retro.</strong>
+    </p>
+  </div>
+  <hr class="separator" />
+  <div class="subtitle" id="worksheetTitle">TheGameBureau.com presents the Bee Jumble for</div>
+  <header class="main-header">
+    <div class="honeycomb-container">
+      <div class="honeycomb" id="honeycomb"></div>
+    </div>
+  </header>
+  <div class="puzzle" id="puzzle"></div>
+
+  <script>
+    function formatFriendlyDate(dateStr) {
+      const [yyyy, mm, dd] = dateStr.split('-');
+      const d = new Date(+yyyy, +mm - 1, +dd);
+      return d.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year:    'numeric',
+        month:   'long',
+        day:     '2-digit'
+      });
+    }
+
+    function createHexSVG(letter, count, highlight = false) {
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg   = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", "60");
+      svg.setAttribute("height", "52");
+      svg.setAttribute("viewBox", "0 0 100 86");
+
+      const poly = document.createElementNS(svgNS, "polygon");
+      poly.setAttribute("points", "50,0 93,25 93,61 50,86 7,61 7,25");
+      poly.setAttribute("fill", highlight ? "#f7da21" : "#e0e0e0");
+      poly.setAttribute("stroke", highlight ? "#000" : "#999");
+      poly.setAttribute("stroke-width", highlight ? "3" : "1");
+      svg.appendChild(poly);
+
+      const txt = document.createElementNS(svgNS, "text");
+      txt.setAttribute("x", "50%");
+      txt.setAttribute("y", "50%");
+      txt.setAttribute("text-anchor", "middle");
+      txt.setAttribute("font-family", "Georgia");
+      txt.setAttribute("font-size", "32");
+      txt.setAttribute("font-weight", "bold");
+      txt.setAttribute("fill", "#000");
+      txt.setAttribute("dominant-baseline", "middle");
+      txt.innerHTML = `${letter}<tspan dx="4" dy="0" font-size="22">${count}</tspan>`;
+      svg.appendChild(txt);
+
+      return svg;
+    }
+
+    function populateDateSelector() {
+      fetch("xml/puzzles.xml")
+        .then(r => r.text())
+        .then(xmlText => {
+          const doc     = new DOMParser().parseFromString(xmlText, "application/xml");
+          const puzzles = Array.from(doc.getElementsByTagName("puzzle"));
+          const sel     = document.getElementById("dateSelector");
+
+          puzzles.sort((a,b)=>new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
+
+          puzzles.forEach(p => {
+            const dstr   = p.getAttribute("date");
+            const opt    = document.createElement("option");
+            opt.value     = dstr;
+            opt.textContent = new Date(dstr).toDateString();
+            sel.appendChild(opt);
+          });
+
+          const params    = new URLSearchParams(location.search);
+          let targetDate  = params.get("date")
+                          || puzzles.find(p=>p.getAttribute("id")===params.get("id"))?.getAttribute("date")
+                          || puzzles[0].getAttribute("date");
+
+          sel.value = targetDate;
+          loadPuzzle(targetDate);
+        });
+    }
+
+    function loadPuzzle(dateStr) {
+      fetch("xml/puzzles.xml")
+        .then(r=>r.text())
+        .then(xmlText=>{
+          const doc      = new DOMParser().parseFromString(xmlText, "application/xml");
+          const puzzles  = Array.from(doc.getElementsByTagName("puzzle"));
+          const puzzleEl = puzzles.find(p=>p.getAttribute("date")===dateStr);
+          if (!puzzleEl) return;
+
+          document.getElementById("worksheetTitle").textContent =
+            `TheGameBureau.com presents the Bee Jumble for ${formatFriendlyDate(dateStr)}`;
+
+          const letters   = puzzleEl.getAttribute("letters") || "";
+          const counts    = letters.split("").map((_,i)=>
+                            puzzleEl.getAttribute(`letter${i+1}count`)||"0");
+          const honeycomb = document.getElementById("honeycomb");
+          honeycomb.innerHTML = "";
+          letters.split("").forEach((l,i)=>
+            honeycomb.appendChild(createHexSVG(l,counts[i], i===0)));
+
+          const wordEls = Array.from(puzzleEl.getElementsByTagName("word"));
+          const words   = wordEls.map(w=>({
+            jumbled: w.getAttribute("jumbled"),
+            answer:  w.textContent.trim(),
+            length:  +w.getAttribute("length")
+          }));
+          words.sort((a,b)=>a.length-b.length || a.jumbled.localeCompare(b.jumbled));
+
+          const puzzleDiv = document.getElementById("puzzle");
+          puzzleDiv.innerHTML = "";
+          const groups = {};
+          words.forEach(w=> (groups[w.length]=groups[w.length]||[]).push(w));
+
+          Object.keys(groups).sort((a,b)=>a-b).forEach(len=>{
+            const grp = document.createElement("div");
+            grp.className = "word-group";
+            const lbl = document.createElement("div");
+            lbl.className = "group-label";
+            lbl.textContent = `${len}-letter words`;
+            grp.appendChild(lbl);
+
+            const grid = document.createElement("div");
+            grid.className = "word-grid";
+            groups[len].forEach(w=>{
+              const box = document.createElement("div");
+              box.className = "word-box";
+              box.dataset.jumbled = w.jumbled;
+              box.dataset.answer  = w.answer;
+              box.dataset.revealed = "false";
+              box.textContent = w.jumbled;
+              box.addEventListener("click", () => {
+                if (box.dataset.revealed === "true") {
+                  box.textContent = box.dataset.jumbled;
+                  box.dataset.revealed = "false";
+                } else {
+                  box.textContent = box.dataset.answer;
+                  box.dataset.revealed = "true";
+                }
+              });
+              grid.appendChild(box);
+            });
+            grp.appendChild(grid);
+            puzzleDiv.appendChild(grp);
+          });
+        });
+    }
+
+    document.getElementById("dateSelector").addEventListener("change", function(){
+      location.search = `?date=${this.value}`;
+    });
+    document.getElementById("prevDayBtn").addEventListener("click", () => {
+      const sel = document.getElementById("dateSelector");
+      if (sel.selectedIndex < sel.options.length - 1) {
+        location.search = `?date=${sel.options[sel.selectedIndex + 1].value}`;
+      }
+    });
+    document.getElementById("nextDayBtn").addEventListener("click", () => {
+      const sel = document.getElementById("dateSelector");
+      if (sel.selectedIndex > 0) {
+        location.search = `?date=${sel.options[sel.selectedIndex - 1].value}`;
+      }
+    });
+
+    window.addEventListener("beforeprint", () => {
+      document.querySelectorAll(".word-box").forEach(box => {
+        box.textContent = box.dataset.jumbled;
+        box.dataset.revealed = "false";
+      });
+    });
+
+    populateDateSelector();
+  </script>
+</body>
+</html>
