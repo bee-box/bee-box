@@ -239,7 +239,7 @@ def wax():
     print("🕯 Wax complete.")
     print(f"➕ New puzzles added:         {added_puzzles}")
     print(f"🆔 Puzzle IDs added:          {added_ids}")
-    print(f"#️⃣ Word counts added:        {added_counts}")
+    print(f"🔠 Word counts added:         {added_counts}")
     print(f"🔤 Letters strings added:     {added_letters}")
     print(f"🔢 Letter counts added:       {added_lettercounts}")
     print(f"🥚 Pangram counts added:      {added_pangrams}")

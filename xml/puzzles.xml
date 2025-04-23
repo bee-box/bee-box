@@ -107186,4 +107186,113 @@
     <word length="8" first="R" firsttwo="RI" jumbled="AINRPAIR">RIPARIAN</word>
     <word length="7" first="R" firsttwo="RI" jumbled="IIGPNRP">RIPPING</word>
   </puzzle>
+  <puzzle date="2025-04-22" id="20250422-9493c6" letters="TACENPX" count="51" letter1="T" letter1count="13" letter2="A" letter2count="7" letter3="C" letter3count="6" letter4="E" letter4count="11" letter5="N" letter5count="4" letter6="P" letter6count="10" letter7="X" letter7count="0" pangrams="1" perfectpangrams="0">
+    <word length="9" first="E" firsttwo="EX" jumbled="NCEEXPTAT" pangram="yes">EXPECTANT</word>
+    <word length="6" first="A" firsttwo="AC" jumbled="TNCCAE">ACCENT</word>
+    <word length="6" first="A" firsttwo="AC" jumbled="PCETAC">ACCEPT</word>
+    <word length="10" first="A" firsttwo="AC" jumbled="NETAACCPEC">ACCEPTANCE</word>
+    <word length="7" first="A" firsttwo="AC" jumbled="EEATATC">ACETATE</word>
+    <word length="4" first="A" firsttwo="AN" jumbled="NEAT">ANTE</word>
+    <word length="7" first="A" firsttwo="AN" jumbled="NANNETA">ANTENNA</word>
+    <word length="8" first="A" firsttwo="AN" jumbled="NTEANENA">ANTENNAE</word>
+    <word length="4" first="C" firsttwo="CA" jumbled="NATC">CANT</word>
+    <word length="7" first="C" firsttwo="CA" jumbled="TAACANT">CANTATA</word>
+    <word length="7" first="C" firsttwo="CA" jumbled="NACENTE">CANTEEN</word>
+    <word length="6" first="C" firsttwo="CA" jumbled="ATAPNC">CATNAP</word>
+    <word length="4" first="C" firsttwo="CE" jumbled="ETCN">CENT</word>
+    <word length="8" first="C" firsttwo="CE" jumbled="AECEACTN">CETACEAN</word>
+    <word length="5" first="E" firsttwo="EA" jumbled="ANEET">EATEN</word>
+    <word length="5" first="E" firsttwo="EN" jumbled="TNEAC">ENACT</word>
+    <word length="7" first="E" firsttwo="EN" jumbled="TETENEN">ENTENTE</word>
+    <word length="5" first="E" firsttwo="EX" jumbled="TEACX">EXACT</word>
+    <word length="6" first="E" firsttwo="EX" jumbled="XCATEA">EXACTA</word>
+    <word length="6" first="E" firsttwo="EX" jumbled="XECPTE">EXCEPT</word>
+    <word length="5" first="E" firsttwo="EX" jumbled="PATEX">EXPAT</word>
+    <word length="6" first="E" firsttwo="EX" jumbled="XTPCEE">EXPECT</word>
+    <word length="6" first="E" firsttwo="EX" jumbled="EAXTTN">EXTANT</word>
+    <word length="6" first="E" firsttwo="EX" jumbled="TXTENE">EXTENT</word>
+    <word length="6" first="N" firsttwo="NA" jumbled="NATNAT">NATANT</word>
+    <word length="4" first="N" firsttwo="NE" jumbled="ATNE">NEAT</word>
+    <word length="6" first="N" firsttwo="NE" jumbled="NNETEA">NEATEN</word>
+    <word length="4" first="N" firsttwo="NE" jumbled="ENTX">NEXT</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="ACPT">PACT</word>
+    <word length="8" first="P" firsttwo="PA" jumbled="AEPTTNAC">PANCETTA</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="TNPA">PANT</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="PETA">PATE</word>
+    <word length="6" first="P" firsttwo="PA" jumbled="TTNAPE">PATENT</word>
+    <word length="8" first="P" firsttwo="PA" jumbled="NAEPTEET">PATENTEE</word>
+    <word length="4" first="P" firsttwo="PE" jumbled="PATE">PEAT</word>
+    <word length="7" first="P" firsttwo="PE" jumbled="ANTPNNE">PENNANT</word>
+    <word length="4" first="P" firsttwo="PE" jumbled="TENP">PENT</word>
+    <word length="7" first="P" firsttwo="PE" jumbled="PENAENT">PENTANE</word>
+    <word length="5" first="T" firsttwo="TA" jumbled="ACETT">TACET</word>
+    <word length="4" first="T" firsttwo="TA" jumbled="ATCT">TACT</word>
+    <word length="4" first="T" firsttwo="TA" jumbled="APAT">TAPA</word>
+    <word length="4" first="T" firsttwo="TA" jumbled="TPEA">TAPE</word>
+    <word length="4" first="T" firsttwo="TA" jumbled="TXAA">TAXA</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="AETT">TEAT</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="EETN">TEEN</word>
+    <word length="6" first="T" firsttwo="TE" jumbled="PETEEE">TEEPEE</word>
+    <word length="6" first="T" firsttwo="TE" jumbled="NTEATN">TENANT</word>
+    <word length="5" first="T" firsttwo="TE" jumbled="ETENT">TENET</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="TTEN">TENT</word>
+    <word length="5" first="T" firsttwo="TE" jumbled="PETEE">TEPEE</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="XTTE">TEXT</word>
+  </puzzle>
+  <puzzle date="2025-04-23" id="20250423-05327c" letters="UCDEILT" count="54" letter1="U" letter1count="1" letter2="C" letter2count="16" letter3="D" letter3count="20" letter4="E" letter4count="5" letter5="I" letter5count="0" letter6="L" letter6count="7" letter7="T" letter7count="5" pangrams="1" perfectpangrams="1">
+    <word length="7" first="D" firsttwo="DU" jumbled="CDETULI" pangram="yes" perfectpangram="yes">DUCTILE</word>
+    <word length="7" first="C" firsttwo="CE" jumbled="CLLELEU">CELLULE</word>
+    <word length="9" first="C" firsttwo="CE" jumbled="ILELLECUT">CELLULITE</word>
+    <word length="4" first="C" firsttwo="CL" jumbled="ELCU">CLUE</word>
+    <word length="5" first="C" firsttwo="CL" jumbled="UCELD">CLUED</word>
+    <word length="6" first="C" firsttwo="CU" jumbled="DDCLUE">CUDDLE</word>
+    <word length="7" first="C" firsttwo="CU" jumbled="DDLUDEC">CUDDLED</word>
+    <word length="4" first="C" firsttwo="CU" jumbled="DCEU">CUED</word>
+    <word length="4" first="C" firsttwo="CU" jumbled="LCUL">CULL</word>
+    <word length="6" first="C" firsttwo="CU" jumbled="DCLULE">CULLED</word>
+    <word length="4" first="C" firsttwo="CU" jumbled="CTUL">CULT</word>
+    <word length="6" first="C" firsttwo="CU" jumbled="TCCLUI">CULTIC</word>
+    <word length="4" first="C" firsttwo="CU" jumbled="CTUE">CUTE</word>
+    <word length="7" first="C" firsttwo="CU" jumbled="CUEILCT">CUTICLE</word>
+    <word length="5" first="C" firsttwo="CU" jumbled="IEUCT">CUTIE</word>
+    <word length="6" first="C" firsttwo="CU" jumbled="CUTTEL">CUTLET</word>
+    <word length="6" first="C" firsttwo="CU" jumbled="TTCLEU">CUTTLE</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="DDUCEE">DEDUCE</word>
+    <word length="7" first="D" firsttwo="DE" jumbled="DDEUDEC">DEDUCED</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="TDCDEU">DEDUCT</word>
+    <word length="8" first="D" firsttwo="DE" jumbled="DDDCETEU">DEDUCTED</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="UELDED">DELUDE</word>
+    <word length="7" first="D" firsttwo="DE" jumbled="DLEUDED">DELUDED</word>
+    <word length="5" first="D" firsttwo="DE" jumbled="EEDCU">DEUCE</word>
+    <word length="6" first="D" firsttwo="DI" jumbled="LTIEUD">DILUTE</word>
+    <word length="7" first="D" firsttwo="DI" jumbled="DTEDIUL">DILUTED</word>
+    <word length="4" first="D" firsttwo="DU" jumbled="TUDC">DUCT</word>
+    <word length="6" first="D" firsttwo="DU" jumbled="TEUDCD">DUCTED</word>
+    <word length="4" first="D" firsttwo="DU" jumbled="DDEU">DUDE</word>
+    <word length="4" first="D" firsttwo="DU" jumbled="DULE">DUEL</word>
+    <word length="6" first="D" firsttwo="DU" jumbled="EEDUDL">DUELED</word>
+    <word length="4" first="D" firsttwo="DU" jumbled="DTUE">DUET</word>
+    <word length="7" first="D" firsttwo="DU" jumbled="DTETDEU">DUETTED</word>
+    <word length="6" first="D" firsttwo="DU" jumbled="LDUECT">DULCET</word>
+    <word length="4" first="D" firsttwo="DU" jumbled="LUDL">DULL</word>
+    <word length="6" first="D" firsttwo="DU" jumbled="LEULDD">DULLED</word>
+    <word length="5" first="E" firsttwo="ED" jumbled="UDECE">EDUCE</word>
+    <word length="6" first="E" firsttwo="ED" jumbled="UEECDD">EDUCED</word>
+    <word length="5" first="E" firsttwo="EL" jumbled="ULEED">ELUDE</word>
+    <word length="6" first="E" firsttwo="EL" jumbled="DLEUDE">ELUDED</word>
+    <word length="5" first="E" firsttwo="ET" jumbled="DTEEU">ETUDE</word>
+    <word length="7" first="L" firsttwo="LE" jumbled="TCEULET">LETTUCE</word>
+    <word length="4" first="L" firsttwo="LI" jumbled="ULIE">LIEU</word>
+    <word length="5" first="L" firsttwo="LU" jumbled="ULICD">LUCID</word>
+    <word length="4" first="L" firsttwo="LU" jumbled="LLUL">LULL</word>
+    <word length="6" first="L" firsttwo="LU" jumbled="EDLLUL">LULLED</word>
+    <word length="4" first="L" firsttwo="LU" jumbled="LLUU">LULU</word>
+    <word length="4" first="L" firsttwo="LU" jumbled="UTLE">LUTE</word>
+    <word length="5" first="T" firsttwo="TU" jumbled="ELUTL">TULLE</word>
+    <word length="5" first="T" firsttwo="TU" jumbled="EETUT">TUTEE</word>
+    <word length="6" first="T" firsttwo="TU" jumbled="DTEUTT">TUTTED</word>
+    <word length="5" first="T" firsttwo="TU" jumbled="TTTIU">TUTTI</word>
+    <word length="4" first="T" firsttwo="TU" jumbled="TTUU">TUTU</word>
+    <word length="5" first="U" firsttwo="UT" jumbled="LUTIE">UTILE</word>
+  </puzzle>
 </puzzles>
