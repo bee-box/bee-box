@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spelling Bee Grid</title>
+  <style>
+    body {
+      font-family: Georgia, Times, "Times New Roman", serif;
+      padding: 20px;
+      background: #fafafa;
+      text-transform: uppercase;
+    }
+    select {
+      font-size: 1rem;
+      padding: 5px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    table {
+      margin-bottom: 30px;
+      border-collapse: collapse;
+      background-color: #fff;
+      width: auto;
+      max-width: 100%;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    th {
+      border-bottom: 2px solid #000;
+      font-weight: bold;
+    }
+    tr:last-child td {
+      border-bottom: 2px solid #000;
+      font-weight: bold;
+    }
+    .two-letter-list {
+      font-size: 0.95rem;
+      margin-top: 20px;
+    }
+    .puzzle-summary {
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+    }
+    .letter-grid-label {
+      font-size: 0.9rem;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+    .letter-grid {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      text-transform: none;
+    }
+  </style>
+</head>
+<body>
+
+<select id="dateSelector"></select>
+
+<h1>Spelling Bee Grid</h1>
+
+<div class="puzzle-summary" id="puzzleSummary"></div>
+<div class="letter-grid-label">Center letter is in bold.</div>
+<div class="letter-grid" id="letterGrid"></div>
+
+<table id="gridTable"></table>
+
+<div class="two-letter-list" id="twoLetterList"></div>
+
+<script>
+async function loadPuzzles() {
+  const response = await fetch('xml/puzzles.xml');
+  const xmlText = await response.text();
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+  return Array.from(xmlDoc.getElementsByTagName('puzzle'));
+}
+
+function buildDropdown(puzzles) {
+  const selector = document.getElementById('dateSelector');
+
+  puzzles.sort((a, b) => new Date(b.getAttribute('date')) - new Date(a.getAttribute('date')));
+
+  puzzles.forEach(puzzle => {
+    const date = puzzle.getAttribute('date');
+    const option = document.createElement('option');
+    option.value = date;
+    option.textContent = date;
+    selector.appendChild(option);
+  });
+
+  selector.addEventListener('change', () => renderGrid(puzzles.find(p => p.getAttribute('date') === selector.value)));
+
+  if (puzzles.length > 0) {
+    selector.value = puzzles[0].getAttribute('date');
+    renderGrid(puzzles[0]);
+  }
+}
+
+function renderGrid(puzzle) {
+  const words = Array.from(puzzle.getElementsByTagName('word'));
+  const counts = {};  // First letter x length
+  const twoLetters = {};  // First two letters count
+  const allLengthsSet = new Set();
+
+  words.forEach(word => {
+    const length = word.getAttribute('length');
+    const first = word.getAttribute('first').toLowerCase();
+    const firsttwo = word.getAttribute('firsttwo').toLowerCase();
+
+    counts[first] = counts[first] || {};
+    counts[first][length] = (counts[first][length] || 0) + 1;
+
+    twoLetters[firsttwo] = (twoLetters[firsttwo] || 0) + 1;
+
+    allLengthsSet.add(length);
+  });
+
+  const lengths = Array.from(allLengthsSet).sort((a, b) => a - b);
+  const letters = Object.keys(counts).sort();
+
+  let html = '<tr><th></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
+
+  letters.forEach(letter => {
+    let sum = 0;
+    html += `<tr><td><b>${letter}</b>:</td>`;
+    lengths.forEach(length => {
+      const count = counts[letter][length] || '-';
+      sum += count === '-' ? 0 : count;
+      html += `<td>${count}</td>`;
+    });
+    html += `<td>${sum}</td></tr>`;
+  });
+
+  let totalRow = '<tr><td>Σ:</td>';
+  let totalWords = 0;
+  lengths.forEach(length => {
+    let colTotal = 0;
+    letters.forEach(letter => {
+      colTotal += counts[letter][length] || 0;
+    });
+    totalWords += colTotal;
+    totalRow += `<td>${colTotal}</td>`;
+  });
+  totalRow += `<td>${totalWords}</td></tr>`;
+
+  document.getElementById('gridTable').innerHTML = html + totalRow;
+
+  const points = puzzle.getAttribute('queenbee') || 0;
+  const pangrams = puzzle.getAttribute('pangrams') || 0;
+  document.getElementById('puzzleSummary').innerHTML = `WORDS: ${totalWords}, POINTS: ${points}, PANGRAMS: ${pangrams}`;
+
+  const fullLetters = (puzzle.getAttribute('letters') || '').toLowerCase().split('');
+  const centerLetterIndex = Math.floor(fullLetters.length / 2);
+  const formattedLetters = fullLetters.map((l, idx) => l).join(' ');
+  document.getElementById('letterGrid').innerHTML = formattedLetters;
+
+  const twoLetterArray = Object.keys(twoLetters).sort().map(key => `${key}-${twoLetters[key]}`);
+  document.getElementById('twoLetterList').innerHTML = '<strong>Two Letter List:</strong><br>' + twoLetterArray.join(' ');
+}
+
+(async function() {
+  const puzzles = await loadPuzzles();
+  buildDropdown(puzzles);
+})();
+</script>
+
+</body>
+</html>
