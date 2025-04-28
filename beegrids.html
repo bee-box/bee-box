@@ -71,7 +71,6 @@
 <h1>Spelling Bee Grid</h1>
 
 <div class="puzzle-summary" id="puzzleSummary"></div>
-<div class="letter-grid-label">Center letter is in bold.</div>
 <div class="letter-grid" id="letterGrid"></div>
 
 <table id="gridTable"></table>
@@ -110,8 +109,8 @@ function buildDropdown(puzzles) {
 
 function renderGrid(puzzle) {
   const words = Array.from(puzzle.getElementsByTagName('word'));
-  const counts = {};  // First letter x length
-  const twoLetters = {};  // First two letters count
+  const counts = {};  
+  const twoLetterCounts = {};  
   const allLengthsSet = new Set();
 
   words.forEach(word => {
@@ -122,7 +121,7 @@ function renderGrid(puzzle) {
     counts[first] = counts[first] || {};
     counts[first][length] = (counts[first][length] || 0) + 1;
 
-    twoLetters[firsttwo] = (twoLetters[firsttwo] || 0) + 1;
+    twoLetterCounts[firsttwo] = (twoLetterCounts[firsttwo] || 0) + 1;
 
     allLengthsSet.add(length);
   });
@@ -162,12 +161,22 @@ function renderGrid(puzzle) {
   document.getElementById('puzzleSummary').innerHTML = `WORDS: ${totalWords}, POINTS: ${points}, PANGRAMS: ${pangrams}`;
 
   const fullLetters = (puzzle.getAttribute('letters') || '').toLowerCase().split('');
-  const centerLetterIndex = Math.floor(fullLetters.length / 2);
-  const formattedLetters = fullLetters.map((l, idx) => l).join(' ');
+  const formattedLetters = fullLetters.join(' ');
   document.getElementById('letterGrid').innerHTML = formattedLetters;
 
-  const twoLetterArray = Object.keys(twoLetters).sort().map(key => `${key}-${twoLetters[key]}`);
-  document.getElementById('twoLetterList').innerHTML = '<strong>Two Letter List:</strong><br>' + twoLetterArray.join(' ');
+  const twoLetterKeys = Object.keys(twoLetterCounts).sort();
+  let grouped = {};
+  twoLetterKeys.forEach(item => {
+    const firstChar = item[0].toUpperCase();
+    if (!grouped[firstChar]) grouped[firstChar] = [];
+    grouped[firstChar].push(item.toUpperCase() + '-' + twoLetterCounts[item]);
+  });
+
+  let twoLetterHtml = '<strong>Two letter list:</strong><br>';
+  for (const letter in grouped) {
+    twoLetterHtml += grouped[letter].join(' ') + '<br>';
+  }
+  document.getElementById('twoLetterList').innerHTML = twoLetterHtml;
 }
 
 (async function() {
