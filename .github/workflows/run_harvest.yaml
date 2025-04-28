@@ -1,0 +1,60 @@
+name: Run Harvest  # 🛠️ Name of the GitHub Actions workflow
+
+permissions:
+  contents: write  # ✏️ Allow the workflow to push commits to the repo
+
+on:
+  schedule:
+    # ⏰ Run daily at 2:02 AM Central Time (currently CDT, UTC-5)
+    # Note: cron times are always written in UTC
+    # 2:02 AM Central = 7:02 AM UTC
+    - cron: '2 7 * * *'
+  workflow_dispatch:  # 🖐️ Allow manual triggering from GitHub UI
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest  # 🖥️ Use the latest Ubuntu runner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true  # 🔑 Keep GitHub token for pushing commits
+          fetch-depth: 0              # 📜 Fetch full Git history (needed for clean commit behavior)
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # 🐍 Use the latest available Python 3 version
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          # 📦 Install required Python libraries
+          pip install requests beautifulsoup4
+
+      - name: Run harvest.py
+        run: |
+          # ▶️ Run the harvesting script
+          python harvest.py
+
+      - name: Commit and push updated words.xml
+        run: |
+          # 📝 Configure Git for committing
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # ➕ Stage the updated words.xml file
+          git add xml/words.xml
+          
+          # 🔍 Only commit if there are actual changes
+          git diff --quiet --cached || git commit -m "chore: append $(date +'%Y-%m-%d') puzzle"
+          
+          # 🚀 Push changes back to the repository (non-blocking if push fails)
+          git push || echo "Nothing to push or push failed (non-blocking)."
