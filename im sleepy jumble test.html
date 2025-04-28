@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bee Jumble</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="bee.ico" type="image/x-icon" />
+  <style>
+    html {
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .navbar {
+      background-color: #000;
+      color: #FFD700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    .navbar-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .navbar-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-controls button,
+    .nav-controls select,
+    .navbar-button {
+      height: 40px;
+      font-size: 1em;
+      border: 2px solid #FFD700;
+      background-color: transparent;
+      color: #FFD700;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      font-family: inherit;
+    }
+
+    .nav-controls button {
+      width: 40px;
+      padding: 0;
+      text-align: center;
+    }
+
+    .nav-controls select {
+      width: 200px;
+      min-width: 150px;
+      max-width: 200px;
+      padding: 0 0.75em;
+    }
+
+    .navbar-button {
+      padding: 0 0.75rem;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .nav-controls button:hover,
+    .nav-controls select:hover,
+    .navbar-button:hover {
+      background-color: #FFD700;
+      color: #000;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25em;
+      flex-wrap: nowrap;
+    }
+
+    .instructions {
+      max-width: 700px;
+      margin: 1.25em auto 0.75em;
+      font-size: 1rem;
+      color: #333;
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 1em;
+    }
+
+    .separator {
+      width: 800px;
+      margin: 1em auto;
+      border: 0;
+      border-top: 1px solid #ccc;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1em;
+      margin: 0.5em auto 0.75em;
+    }
+
+    header.main-header {
+      display: grid;
+      grid-template-columns: auto;
+      align-items: center;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0.5em 0;
+    }
+
+    .honeycomb-container {
+      display: flex;
+      justify-content: center;
+      min-height: 70px;
+    }
+
+    .honeycomb {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .puzzle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2em;
+      padding: 1em;
+    }
+
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.5em;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .word-box {
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      text-align: center;
+      border-radius: 4px;
+      font-family: Georgia, serif;
+      background: #fdfdfd;
+      transition: background 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .word-box[data-revealed="true"] {
+      background: #fffae0;
+    }
+
+    .jumbled-text {
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-title">Bee Jumble</div>
+    <div class="navbar-buttons">
+      <div class="nav-controls">
+        <button id="prevDayBtn">←</button>
+        <select id="dateSelector"></select>
+        <button id="nextDayBtn">→</button>
+      </div>
+      <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </nav>
+
+  <div class="instructions">
+    <strong>Feeling stuck on today’s NYT Spelling Bee?</strong><br />
+    We’ve got your back — valid words from the puzzle… jumbled!<br />
+    <hr class="separator" />
+    <strong>✨ Tap a jumbled word below to reveal or hide the answer</strong>
+  </div>
+
+  <div class="subtitle" id="worksheetTitle"></div>
+
+  <div class="puzzle" id="puzzle"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", populateDateSelector);
+
+    function populateDateSelector() {
+      // Your JavaScript fetching logic goes here
+    }
+  </script>
+</body>
+</html>
