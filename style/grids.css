@@ -58,13 +58,13 @@ body {
   gap: 10px;
 }
 
-/* ─── Button Styling ─── */
+/* ─── Button Styling (Print + Home Match) ─── */
 .banner button {
   font-size: 18px;
   padding: 8px 20px;
-  background-color: #333;
-  color: #fff;
-  border: none;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #333;
   border-radius: 999px;
   cursor: pointer;
   text-transform: uppercase;
@@ -72,18 +72,6 @@ body {
 }
 
 .banner button:hover {
-  background-color: #555;
-}
-
-/* ─── Special Styling for Home Button ─── */
-.right-section button:last-child {
-  margin-left: 12px;
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #333;
-}
-
-.right-section button:last-child:hover {
   background-color: #eee;
 }
 
