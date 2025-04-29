@@ -58,7 +58,7 @@ body {
   gap: 10px;
 }
 
-/* ─── Button Styling (Print + Home Match) ─── */
+/* ─── Button Styling (Print + Home) ─── */
 .banner button {
   font-size: 18px;
   padding: 8px 20px;
@@ -75,12 +75,12 @@ body {
   background-color: #eee;
 }
 
-/* ─── Date Selector ─── */
+/* ─── Date Selector Styling (matching buttons) ─── */
 select#dateSelector {
   font-family: Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
-  padding: 6px 16px;
-  border: 1px solid #ccc;
+  padding: 8px 20px;
+  border: 1px solid #333;
   border-radius: 999px;
   background-color: #fff;
   color: #333;
@@ -88,6 +88,11 @@ select#dateSelector {
   text-transform: uppercase;
   appearance: none;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+select#dateSelector:hover {
+  background-color: #eee;
 }
 
 /* ─── Anti-Pop Initial State ─── */
