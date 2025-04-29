@@ -75,7 +75,7 @@ body {
   background-color: #eee;
 }
 
-/* ─── Date Selector Styling (matching buttons) ─── */
+/* ─── Date Selector Styling ─── */
 select#dateSelector {
   font-family: Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
@@ -145,6 +145,18 @@ tr td:last-child {
   font-weight: bold;
 }
 
+/* ─── Bee Header ─── */
+.bee-header {
+  width: 40px;
+}
+
+.bee-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: inline-block;
+}
+
 /* ─── Letter Grid ─── */
 .letter-grid {
   font-size: 20px;
@@ -184,16 +196,19 @@ tr td:last-child {
     background: #fff !important;
     color: #000 !important;
   }
+
   nav.banner {
     all: unset;
     display: block;
     margin-bottom: 20px;
   }
+
   .left-section {
     all: unset;
     display: block;
     margin-bottom: 10px;
   }
+
   .banner-title {
     font-family: 'Sorts Mill Goudy', Georgia, Times, "Times New Roman", serif;
     font-size: 32px;
@@ -203,18 +218,27 @@ tr td:last-child {
     color: #000 !important;
     margin-bottom: 2px;
   }
+
   .banner-date {
     font-size: 20px;
     text-align: left;
     color: #000 !important;
   }
+
   .right-section {
     display: none;
   }
+
   table, th, td {
     background: #fff !important;
     color: #000 !important;
     border-color: #000 !important;
+  }
+
+  .bee-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
   }
 }
 

@@ -2,46 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Spelling Bee Grids</title>
+  <title>Spelling Bee Grid</title>
   <link rel="stylesheet" href="style/grids.css">
   <link rel="icon" href="style/bee.ico" type="image/x-icon">
-  <style>
-    .banner-date,
-    .letter-grid,
-    .puzzle-summary,
-    #gridTable,
-    .two-letter-list {
-      min-height: 24px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .loaded .banner-date,
-    .loaded .letter-grid,
-    .loaded .puzzle-summary,
-    .loaded #gridTable,
-    .loaded .two-letter-list {
-      opacity: 1;
-    }
-  </style>
 </head>
 <body>
 
 <nav class="banner" id="banner">
   <div class="left-section">
-    <div class="banner-title">Spelling Bee Grids</div>
+    <div class="banner-title">Spelling Bee Grid</div>
     <div id="puzzleDate" class="banner-date"></div>
   </div>
 
   <div class="right-section">
     <select id="dateSelector"></select>
     <button onclick="window.print()" title="Print a clean black and white version">Print</button>
-    <button onclick="goHome()">Bee Box</button>
+    <button onclick="goHome()">Home</button>
   </div>
 </nav>
 
 <div class="letter-grid" id="letterGrid"></div>
 <div class="puzzle-summary" id="puzzleSummary"></div>
-<table id="gridTable"></table>
+
+<table id="gridTable">
+  <thead>
+    <tr>
+      <th class="bee-header">
+        <img src="style/beebw.png" alt="Bee" class="bee-icon">
+      </th>
+      <!-- other headers dynamically generated -->
+    </tr>
+  </thead>
+  <tbody>
+    <!-- table content injected dynamically -->
+  </tbody>
+</table>
+
 <div class="two-letter-list" id="twoLetterList"></div>
 
 <script>
@@ -93,7 +89,7 @@ function renderGrid(puzzle) {
   const lengths = Array.from(allLengthsSet).sort((a, b) => a - b);
   const letters = Object.keys(counts).sort();
 
-  let html = '<tr><th>🐝</th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
+  let html = '<tr><th class="bee-header"><img src="style/beebw.png" alt="Bee" class="bee-icon"></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
 
   letters.forEach(letter => {
     let sum = 0;
