@@ -107551,4 +107551,54 @@
     <word length="6" first="W" firsttwo="WH" jumbled="DEIWHN" points="6">WHINED</word>
     <word length="8" first="W" firsttwo="WH" jumbled="NIIEHNDW" points="8">WHINNIED</word>
   </puzzle>
+  <puzzle date="2025-04-29" id="20250429-4aaeaa" letters="EDFGITY" count="48" letter1="E" letter1count="14" letter2="D" letter2count="12" letter3="F" letter3count="12" letter4="G" letter4count="2" letter5="I" letter5count="0" letter6="T" letter6count="7" letter7="Y" letter7count="1" pangrams="1" perfectpangrams="1" queenbee="180">
+    <word length="7" first="F" firsttwo="FI" jumbled="YTEIFDG" pangram="yes" perfectpangram="yes" points="14">FIDGETY</word>
+    <word length="4" first="D" firsttwo="DE" jumbled="EEDD" points="1">DEED</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="EDEDDE" points="6">DEEDED</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="EDFIDE" points="6">DEFIED</word>
+    <word length="4" first="D" firsttwo="DE" jumbled="FETD" points="1">DEFT</word>
+    <word length="4" first="D" firsttwo="DE" jumbled="EFDY" points="1">DEFY</word>
+    <word length="7" first="D" firsttwo="DE" jumbled="EIEIDDF" points="7">DEIFIED</word>
+    <word length="5" first="D" firsttwo="DE" jumbled="EFYDI" points="5">DEIFY</word>
+    <word length="5" first="D" firsttwo="DE" jumbled="IYDET" points="5">DEITY</word>
+    <word length="4" first="D" firsttwo="DI" jumbled="EIDD" points="1">DIED</word>
+    <word length="4" first="D" firsttwo="DI" jumbled="TEID" points="1">DIET</word>
+    <word length="6" first="D" firsttwo="DI" jumbled="DDITEE" points="6">DIETED</word>
+    <word length="4" first="D" firsttwo="DY" jumbled="DEYD" points="1">DYED</word>
+    <word length="6" first="E" firsttwo="ED" jumbled="DEDIDE" points="6">EDDIED</word>
+    <word length="4" first="E" firsttwo="ED" jumbled="YEDD" points="1">EDDY</word>
+    <word length="4" first="E" firsttwo="ED" jumbled="DEGE" points="1">EDGE</word>
+    <word length="5" first="E" firsttwo="ED" jumbled="DDEGE" points="5">EDGED</word>
+    <word length="4" first="E" firsttwo="ED" jumbled="DYEG" points="1">EDGY</word>
+    <word length="7" first="E" firsttwo="ED" jumbled="IFDDEEI" points="7">EDIFIED</word>
+    <word length="5" first="E" firsttwo="ED" jumbled="EIYFD" points="5">EDIFY</word>
+    <word length="4" first="E" firsttwo="ED" jumbled="DETI" points="1">EDIT</word>
+    <word length="6" first="E" firsttwo="ED" jumbled="DITEDE" points="6">EDITED</word>
+    <word length="6" first="E" firsttwo="EF" jumbled="EEFTFE" points="6">EFFETE</word>
+    <word length="6" first="E" firsttwo="EF" jumbled="GIYEFF" points="6">EFFIGY</word>
+    <word length="5" first="E" firsttwo="EG" jumbled="GEGDE" points="5">EGGED</word>
+    <word length="4" first="E" firsttwo="EG" jumbled="EYGG" points="1">EGGY</word>
+    <word length="4" first="E" firsttwo="EY" jumbled="YEED" points="1">EYED</word>
+    <word length="4" first="F" firsttwo="FE" jumbled="EDEF" points="1">FEED</word>
+    <word length="4" first="F" firsttwo="FE" jumbled="FETE" points="1">FEET</word>
+    <word length="4" first="F" firsttwo="FE" jumbled="EFTE" points="1">FETE</word>
+    <word length="5" first="F" firsttwo="FE" jumbled="EFTDE" points="5">FETED</word>
+    <word length="5" first="F" firsttwo="FE" jumbled="EFIDT" points="5">FETID</word>
+    <word length="6" first="F" firsttwo="FI" jumbled="GDEFTI" points="6">FIDGET</word>
+    <word length="8" first="F" firsttwo="FI" jumbled="EDIEFGDT" points="8">FIDGETED</word>
+    <word length="4" first="F" firsttwo="FI" jumbled="IEFF" points="1">FIEF</word>
+    <word length="4" first="F" firsttwo="FI" jumbled="EIFF" points="1">FIFE</word>
+    <word length="5" first="F" firsttwo="FI" jumbled="FFEDI" points="5">FIFED</word>
+    <word length="6" first="F" firsttwo="FI" jumbled="FTEDTI" points="6">FITTED</word>
+    <word length="6" first="G" firsttwo="GI" jumbled="TFGIED" points="6">GIFTED</word>
+    <word length="6" first="G" firsttwo="GI" jumbled="GEGGDI" points="6">GIGGED</word>
+    <word length="5" first="T" firsttwo="TE" jumbled="DDYTE" points="5">TEDDY</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="EDET" points="1">TEED</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="FTEF" points="1">TEFF</word>
+    <word length="4" first="T" firsttwo="TI" jumbled="DTEI" points="1">TIDE</word>
+    <word length="5" first="T" firsttwo="TI" jumbled="DDETI" points="5">TIDED</word>
+    <word length="6" first="T" firsttwo="TI" jumbled="IETDDI" points="6">TIDIED</word>
+    <word length="4" first="T" firsttwo="TI" jumbled="DIET" points="1">TIED</word>
+    <word length="4" first="Y" firsttwo="YE" jumbled="IEYT" points="1">YETI</word>
+  </puzzle>
 </puzzles>
