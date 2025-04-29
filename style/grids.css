@@ -1,0 +1,226 @@
+/* ─── Load Custom Font ─── */
+@font-face {
+  font-family: 'Sorts Mill Goudy';
+  src: url('style/SortsMillGoudy-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ─── Base Styling ─── */
+body {
+  font-family: Georgia, Times, "Times New Roman", serif;
+  font-size: 20px;
+  padding: 20px;
+  background: #fafafa;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* ─── Banner Styling ─── */
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #F8DA22;
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 100px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.left-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+}
+
+.banner-title {
+  font-family: 'Sorts Mill Goudy', Georgia, Times, "Times New Roman", serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.05em;
+  text-transform: none;
+}
+
+.banner-date {
+  font-size: 1.2rem;
+  margin-top: 4px;
+  text-transform: none;
+}
+
+/* ─── Right Section ─── */
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ─── Button Styling ─── */
+.banner button {
+  font-size: 18px;
+  padding: 8px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.banner button:hover {
+  background-color: #555;
+}
+
+/* ─── Special Styling for Home Button ─── */
+.right-section button:last-child {
+  margin-left: 12px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #333;
+}
+
+.right-section button:last-child:hover {
+  background-color: #eee;
+}
+
+/* ─── Date Selector ─── */
+select#dateSelector {
+  font-family: Georgia, Times, "Times New Roman", serif;
+  font-size: 18px;
+  padding: 6px 16px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #333;
+  height: 40px;
+  text-transform: uppercase;
+  appearance: none;
+  cursor: pointer;
+}
+
+/* ─── Anti-Pop Initial State ─── */
+.banner-date,
+.letter-grid,
+.puzzle-summary,
+#gridTable,
+.two-letter-list {
+  min-height: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ─── Loaded State ─── */
+.loaded .banner-date,
+.loaded .letter-grid,
+.loaded .puzzle-summary,
+.loaded #gridTable,
+.loaded .two-letter-list {
+  opacity: 1;
+}
+
+/* ─── Table Styling ─── */
+table {
+  margin-bottom: 20px;
+  border-collapse: collapse;
+  background-color: #fff;
+  width: auto;
+  max-width: 100%;
+}
+
+th, td {
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+  font-size: 20px;
+  text-align: center;
+}
+
+th {
+  border-bottom: 2px solid #000;
+  font-weight: bold;
+}
+
+tr:last-child td {
+  border-bottom: 2px solid #000;
+  font-weight: bold;
+}
+
+tr td:last-child {
+  font-weight: bold;
+}
+
+/* ─── Letter Grid ─── */
+.letter-grid {
+  font-size: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.letter-grid b {
+  font-weight: bold;
+}
+
+/* ─── Puzzle Summary ─── */
+.puzzle-summary {
+  font-size: 20px;
+  font-weight: normal;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  letter-spacing: 0.03em;
+}
+
+/* ─── Two-Letter List ─── */
+.two-letter-list {
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+.two-letter-list strong {
+  text-transform: none;
+  display: inline-block;
+  margin-bottom: 10px;
+  font-weight: normal;
+}
+
+/* ─── Print Mode ─── */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  nav.banner {
+    all: unset;
+    display: block;
+    margin-bottom: 20px;
+  }
+  .left-section {
+    all: unset;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .banner-title {
+    font-family: 'Sorts Mill Goudy', Georgia, Times, "Times New Roman", serif;
+    font-size: 32px;
+    font-weight: normal;
+    letter-spacing: 0.05em;
+    text-align: left;
+    color: #000 !important;
+    margin-bottom: 2px;
+  }
+  .banner-date {
+    font-size: 20px;
+    text-align: left;
+    color: #000 !important;
+  }
+  .right-section {
+    display: none;
+  }
+  table, th, td {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #000 !important;
+  }
+}

@@ -3,78 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <title>Spelling Bee Grid</title>
+  <link rel="stylesheet" href="style/grids.css">
+  <link rel="icon" href="style/bee.ico" type="image/x-icon">
   <style>
-    body {
-      font-family: Georgia, Times, "Times New Roman", serif;
-      padding: 20px;
-      background: #fafafa;
-      text-transform: uppercase;
-    }
-    select {
-      font-size: 1rem;
-      padding: 5px;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-    }
-    table {
-      margin-bottom: 30px;
-      border-collapse: collapse;
-      background-color: #fff;
-      width: auto;
-      max-width: 100%;
-    }
-    th, td {
-      border-bottom: 1px solid #ddd;
-      padding: 8px 12px;
-      font-size: 0.95rem;
-      text-align: center;
-    }
-    th {
-      border-bottom: 2px solid #000;
-      font-weight: bold;
-    }
-    tr:last-child td {
-      border-bottom: 2px solid #000;
-      font-weight: bold;
-    }
+    .banner-date,
+    .letter-grid,
+    .puzzle-summary,
+    #gridTable,
     .two-letter-list {
-      font-size: 0.95rem;
-      margin-top: 20px;
+      min-height: 24px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
-    .puzzle-summary {
-      font-size: 1.05rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      letter-spacing: 0.03em;
-    }
-    .letter-grid-label {
-      font-size: 0.9rem;
-      margin-top: 10px;
-      margin-bottom: 5px;
-    }
-    .letter-grid {
-      font-size: 1.3rem;
-      margin-bottom: 15px;
-    }
-    h1 {
-      font-size: 2rem;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-      text-transform: none;
+    .loaded .banner-date,
+    .loaded .letter-grid,
+    .loaded .puzzle-summary,
+    .loaded #gridTable,
+    .loaded .two-letter-list {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
 
-<select id="dateSelector"></select>
+<nav class="banner" id="banner">
+  <div class="left-section">
+    <div class="banner-title">Spelling Bee Grid</div>
+    <div id="puzzleDate" class="banner-date"></div>
+  </div>
 
-<h1>Spelling Bee Grid</h1>
+  <div class="right-section">
+    <select id="dateSelector"></select>
+    <button onclick="window.print()" title="Print a clean black and white version">Print</button>
+    <button onclick="goHome()">Home</button>
+  </div>
+</nav>
 
-<div class="puzzle-summary" id="puzzleSummary"></div>
 <div class="letter-grid" id="letterGrid"></div>
-
+<div class="puzzle-summary" id="puzzleSummary"></div>
 <table id="gridTable"></table>
-
 <div class="two-letter-list" id="twoLetterList"></div>
 
 <script>
@@ -86,11 +53,18 @@ async function loadPuzzles() {
   return Array.from(xmlDoc.getElementsByTagName('puzzle'));
 }
 
+function findPuzzleByDate(puzzles, date) {
+  return puzzles.find(p => p.getAttribute('date') === date);
+}
+
+function getURLDate() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('date');
+}
+
 function buildDropdown(puzzles) {
   const selector = document.getElementById('dateSelector');
-
   puzzles.sort((a, b) => new Date(b.getAttribute('date')) - new Date(a.getAttribute('date')));
-
   puzzles.forEach(puzzle => {
     const date = puzzle.getAttribute('date');
     const option = document.createElement('option');
@@ -98,38 +72,28 @@ function buildDropdown(puzzles) {
     option.textContent = date;
     selector.appendChild(option);
   });
-
-  selector.addEventListener('change', () => renderGrid(puzzles.find(p => p.getAttribute('date') === selector.value)));
-
-  if (puzzles.length > 0) {
-    selector.value = puzzles[0].getAttribute('date');
-    renderGrid(puzzles[0]);
-  }
 }
 
 function renderGrid(puzzle) {
   const words = Array.from(puzzle.getElementsByTagName('word'));
-  const counts = {};  
-  const twoLetterCounts = {};  
+  const counts = {};
+  const twoLetterCounts = {};
   const allLengthsSet = new Set();
 
   words.forEach(word => {
     const length = word.getAttribute('length');
     const first = word.getAttribute('first').toLowerCase();
     const firsttwo = word.getAttribute('firsttwo').toLowerCase();
-
     counts[first] = counts[first] || {};
     counts[first][length] = (counts[first][length] || 0) + 1;
-
     twoLetterCounts[firsttwo] = (twoLetterCounts[firsttwo] || 0) + 1;
-
     allLengthsSet.add(length);
   });
 
   const lengths = Array.from(allLengthsSet).sort((a, b) => a - b);
   const letters = Object.keys(counts).sort();
 
-  let html = '<tr><th></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
+  let html = '<tr><th>🐝</th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
 
   letters.forEach(letter => {
     let sum = 0;
@@ -158,10 +122,16 @@ function renderGrid(puzzle) {
 
   const points = puzzle.getAttribute('queenbee') || 0;
   const pangrams = puzzle.getAttribute('pangrams') || 0;
-  document.getElementById('puzzleSummary').innerHTML = `WORDS: ${totalWords}, POINTS: ${points}, PANGRAMS: ${pangrams}`;
+  const perfect = puzzle.getAttribute('perfectpangrams') || 0;
+
+  let summaryText = `WORDS: ${totalWords}, POINTS: ${points}, PANGRAMS: ${pangrams}`;
+  if (parseInt(perfect) > 0) {
+    summaryText += ` (${perfect} Perfect)`;
+  }
+  document.getElementById('puzzleSummary').innerHTML = summaryText;
 
   const fullLetters = (puzzle.getAttribute('letters') || '').toLowerCase().split('');
-  const formattedLetters = fullLetters.join(' ');
+  const formattedLetters = fullLetters.map((letter, index) => index === 0 ? `<b>${letter.toUpperCase()}</b>` : letter.toUpperCase()).join(' ');
   document.getElementById('letterGrid').innerHTML = formattedLetters;
 
   const twoLetterKeys = Object.keys(twoLetterCounts).sort();
@@ -177,11 +147,43 @@ function renderGrid(puzzle) {
     twoLetterHtml += grouped[letter].join(' ') + '<br>';
   }
   document.getElementById('twoLetterList').innerHTML = twoLetterHtml;
+
+  const rawDate = puzzle.getAttribute('date');
+  const [year, month, day] = rawDate.split('-').map(Number);
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dateObj = new Date(year, month - 1, day);
+  const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+  const formattedDate = `${weekday}, ${monthNames[month - 1]} ${day}, ${year}`;
+  document.getElementById('puzzleDate').textContent = formattedDate;
+
+  document.body.classList.add('loaded');
+}
+
+function goHome() {
+  window.location.href = 'https://beebox.ghost.io';
 }
 
 (async function() {
   const puzzles = await loadPuzzles();
   buildDropdown(puzzles);
+
+  const urlDate = getURLDate();
+  let selectedPuzzle = urlDate ? findPuzzleByDate(puzzles, urlDate) : puzzles[0];
+
+  if (!selectedPuzzle) {
+    selectedPuzzle = puzzles[0];
+  }
+
+  document.getElementById('dateSelector').value = selectedPuzzle.getAttribute('date');
+  renderGrid(selectedPuzzle);
+
+  document.getElementById('dateSelector').addEventListener('change', (e) => {
+    const selected = findPuzzleByDate(puzzles, e.target.value);
+    if (selected) {
+      renderGrid(selected);
+      history.replaceState(null, '', `?date=${e.target.value}`);
+    }
+  });
 })();
 </script>
 
