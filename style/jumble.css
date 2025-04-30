@@ -12,6 +12,7 @@ body {
   line-height: 1.6;
 }
 
+/* ─── NAVBAR ─── */
 .navbar {
   background-color: #000;
   color: #FFD700;
@@ -32,6 +33,13 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  flex-wrap: nowrap;
 }
 
 .nav-controls button,
@@ -76,13 +84,61 @@ body {
   color: #000;
 }
 
-.nav-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.25em;
-  flex-wrap: nowrap;
+/* ─── Responsive Layouts ─── */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navbar-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .navbar-button,
+  .nav-controls button,
+  .nav-controls select {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+
+  .nav-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #dateSelector,
+  .nav-controls select {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .honeycomb {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .word-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  .word-grid .word-box {
+    word-break: break-word;
+    font-size: 1rem;
+  }
+
+  .word-box.long-word {
+    grid-column: span 2;
+    width: 100%;
+  }
 }
 
+/* ─── Layout ─── */
 .instructions {
   max-width: 700px;
   margin: 1.25em auto 0.75em;
@@ -195,28 +251,7 @@ svg {
   visibility: hidden;
 }
 
-/* Mobile Responsive */
-@media (max-width: 480px) {
-  .nav-controls {
-    flex-direction: column;
-    gap: 0.5em;
-    align-items: stretch;
-  }
-  .nav-controls button,
-  .nav-controls select,
-  .navbar-button {
-    width: 100%;
-  }
-  .navbar-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .navbar-button {
-    justify-content: center;
-  }
-}
-
-/* Print Styles */
+/* ─── Print Styles ─── */
 @media print {
   .navbar,
   .instructions,
@@ -236,14 +271,20 @@ svg {
     line-height: 1.4 !important;
   }
 
+  header.main-header {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+  }
+
   .puzzle {
-    gap: 1em !important;
-    padding: 0.5em !important;
+    page-break-before: avoid;
+    break-inside: avoid;
   }
 
   .word-group {
+    page-break-before: always;
     break-inside: avoid;
-    page-break-inside: avoid;
     margin-top: 0 !important;
     margin-bottom: 0.2em !important;
   }
@@ -253,6 +294,7 @@ svg {
     font-weight: bold !important;
     margin-top: 0.2em !important;
     margin-bottom: 0.1em !important;
+    page-break-after: avoid;
   }
 
   .word-grid {
@@ -274,7 +316,7 @@ svg {
   }
 }
 
-/* Popup Overlay */
+/* ─── Popup Overlay ─── */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -327,78 +369,4 @@ svg {
 
 .popup-box button.subscribe {
   background-color: #f7da21;
-}
-
-/* Enhanced Mobile Optimizations */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .navbar-buttons {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .navbar-button,
-  .nav-controls button,
-  .nav-controls select {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .honeycomb {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .word-grid {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  }
-}
-
-/* Improved Mobile Banner Layout */
-.nav-row {
-  display: flex;
-  gap: 0.25rem;
-}
-
-@media (max-width: 768px) {
-  .nav-row {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .nav-controls button,
-  .nav-controls select {
-    width: 100%;
-  }
-
-  .navbar-button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Word box sizing for long words on mobile */
-@media (max-width: 480px) {
-  .word-grid .word-box {
-    word-break: break-word;
-    font-size: 1rem;
-  }
-
-  .word-grid .word-box:has(:not([data-word='']):not([data-word=''])):not(:empty):not([data-word='']):not([data-word='']) {
-    width: 100% !important;
-  }
-
-  .word-box.long-word {
-    grid-column: span 2;
-    width: 100%;
-  }
-
-  #dateSelector {
-    width: 100% !important;
-  }
 }
