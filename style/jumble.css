@@ -12,6 +12,7 @@ body {
   line-height: 1.6;
 }
 
+/* ─── NAVBAR ─── */
 .navbar {
   background-color: #000;
   color: #FFD700;
@@ -32,6 +33,13 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  flex-wrap: nowrap;
 }
 
 .nav-controls button,
@@ -76,13 +84,61 @@ body {
   color: #000;
 }
 
-.nav-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.25em;
-  flex-wrap: nowrap;
+/* ─── Responsive Layouts ─── */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navbar-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .navbar-button,
+  .nav-controls button,
+  .nav-controls select {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+
+  .nav-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #dateSelector,
+  .nav-controls select {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .honeycomb {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .word-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  .word-grid .word-box {
+    word-break: break-word;
+    font-size: 1rem;
+  }
+
+  .word-box.long-word {
+    grid-column: span 2;
+    width: 100%;
+  }
 }
 
+/* ─── Layout ─── */
 .instructions {
   max-width: 700px;
   margin: 1.25em auto 0.75em;
@@ -188,28 +244,7 @@ svg {
   display: none;
 }
 
-/* Mobile Responsive */
-@media (max-width: 480px) {
-  .nav-controls {
-    flex-direction: column;
-    gap: 0.5em;
-    align-items: stretch;
-  }
-  .nav-controls button,
-  .nav-controls select,
-  .navbar-button {
-    width: 100%;
-  }
-  .navbar-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .navbar-button {
-    justify-content: center;
-  }
-}
-
-/* Print Styles */
+/* ─── Print Styles ─── */
 @media print {
   .navbar,
   .instructions,
@@ -229,12 +264,23 @@ svg {
     line-height: 1.4 !important;
   }
 
+  header.main-header {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+  }
+
   .puzzle {
-    gap: 1em !important;
-    padding: 0.5em !important;
+    page-break-before: avoid;
+    break-inside: avoid;
   }
 
   .word-group {
+<<<<<<< HEAD
+=======
+    page-break-before: always;
+    break-inside: avoid;
+>>>>>>> fc52fd3a2738e2e4718b69c18e7697bd14a95b13
     margin-top: 0 !important;
     margin-bottom: 1em !important;
   }
@@ -242,8 +288,14 @@ svg {
   .group-label {
     font-size: 1em !important;
     font-weight: bold !important;
+<<<<<<< HEAD
     margin-top: 0.5em !important;
     margin-bottom: 0.2em !important;
+=======
+    margin-top: 0.2em !important;
+    margin-bottom: 0.1em !important;
+    page-break-after: avoid;
+>>>>>>> fc52fd3a2738e2e4718b69c18e7697bd14a95b13
   }
 
   .word-grid {
@@ -265,4 +317,59 @@ svg {
   .print-only {
     display: none;
   }
+}
+
+/* ─── Popup Overlay ─── */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.popup-box {
+  background-color: #fff;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  font-family: Georgia, serif;
+}
+
+.popup-box h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.popup-box p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.popup-box button {
+  padding: 0.75rem;
+  font-size: 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+.popup-box button.continue {
+  background-color: #222;
+  color: white;
+}
+
+.popup-box button.subscribe {
+  background-color: #f7da21;
 }
