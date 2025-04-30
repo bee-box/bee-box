@@ -107548,4 +107548,70 @@
     <word length="4" first="T" firsttwo="TI" jumbled="DIET" points="1">TIED</word>
     <word length="4" first="Y" firsttwo="YE" jumbled="IEYT" points="1">YETI</word>
   </puzzle>
+  <puzzle date="2025-04-30" id="20250430-15184f" letters="DAGILNO" count="64" letter1="D" letter1count="28" letter2="A" letter2count="4" letter3="G" letter3count="14" letter4="I" letter4count="5" letter5="L" letter5count="8" letter6="N" letter6count="5" letter7="O" letter7count="0" pangrams="2" perfectpangrams="1" queenbee="334">
+    <word length="8" first="D" firsttwo="DI" jumbled="GOAANDIL" pangram="yes" points="15">DIAGONAL</word>
+    <word length="7" first="L" firsttwo="LO" jumbled="GODLNIA" pangram="yes" perfectpangram="yes" points="14">LOADING</word>
+    <word length="6" first="A" firsttwo="AD" jumbled="AOAGID" points="6">ADAGIO</word>
+    <word length="6" first="A" firsttwo="AD" jumbled="GDNADI" points="6">ADDING</word>
+    <word length="7" first="A" firsttwo="AD" jumbled="DDNIGAL" points="7">ADDLING</word>
+    <word length="6" first="A" firsttwo="AI" jumbled="ADIING" points="6">AIDING</word>
+    <word length="8" first="D" firsttwo="DA" jumbled="LIDNDNGA" points="8">DANDLING</word>
+    <word length="4" first="D" firsttwo="DA" jumbled="ANGD" points="1">DANG</word>
+    <word length="8" first="D" firsttwo="DA" jumbled="LIANGNGD" points="8">DANGLING</word>
+    <word length="4" first="D" firsttwo="DI" jumbled="ALID" points="1">DIAL</word>
+    <word length="7" first="D" firsttwo="DI" jumbled="AGLNIDI" points="7">DIALING</word>
+    <word length="6" first="D" firsttwo="DI" jumbled="IAOGLD" points="6">DIALOG</word>
+    <word length="8" first="D" firsttwo="DI" jumbled="GDDDLINI" points="8">DIDDLING</word>
+    <word length="7" first="D" firsttwo="DI" jumbled="NIGIDGG" points="7">DIGGING</word>
+    <word length="5" first="D" firsttwo="DI" jumbled="DDLIO" points="5">DILDO</word>
+    <word length="4" first="D" firsttwo="DI" jumbled="ILLD" points="1">DILL</word>
+    <word length="4" first="D" firsttwo="DI" jumbled="NIDG" points="1">DING</word>
+    <word length="7" first="D" firsttwo="DI" jumbled="IGNNGDI" points="7">DINGING</word>
+    <word length="5" first="D" firsttwo="DI" jumbled="NGIOD" points="5">DINGO</word>
+    <word length="6" first="D" firsttwo="DI" jumbled="DNNIGI" points="6">DINING</word>
+    <word length="4" first="D" firsttwo="DI" jumbled="DNIO" points="1">DINO</word>
+    <word length="7" first="D" firsttwo="DO" jumbled="GDOGDIN" points="7">DODGING</word>
+    <word length="4" first="D" firsttwo="DO" jumbled="OODD" points="1">DODO</word>
+    <word length="7" first="D" firsttwo="DO" jumbled="DOGGNIG" points="7">DOGGING</word>
+    <word length="5" first="D" firsttwo="DO" jumbled="GOODG" points="5">DOGGO</word>
+    <word length="5" first="D" firsttwo="DO" jumbled="OIDNG" points="5">DOING</word>
+    <word length="6" first="D" firsttwo="DO" jumbled="ODGNIL" points="6">DOLING</word>
+    <word length="4" first="D" firsttwo="DO" jumbled="ODLL" points="1">DOLL</word>
+    <word length="7" first="D" firsttwo="DO" jumbled="LOIDLGN" points="7">DOLLING</word>
+    <word length="4" first="D" firsttwo="DO" jumbled="GOND" points="1">DONG</word>
+    <word length="7" first="D" firsttwo="DO" jumbled="ODNNIGN" points="7">DONNING</word>
+    <word length="6" first="D" firsttwo="DO" jumbled="DDDOOA" points="6">DOODAD</word>
+    <word length="8" first="D" firsttwo="DO" jumbled="IOGDDNLO" points="8">DOODLING</word>
+    <word length="7" first="G" firsttwo="GA" jumbled="NIDGDAG" points="7">GADDING</word>
+    <word length="8" first="G" firsttwo="GA" jumbled="LGNAAGDN" points="8">GANGLAND</word>
+    <word length="4" first="G" firsttwo="GI" jumbled="GLDI" points="1">GILD</word>
+    <word length="7" first="G" firsttwo="GI" jumbled="GILIGDN" points="7">GILDING</word>
+    <word length="4" first="G" firsttwo="GL" jumbled="GLDA" points="1">GLAD</word>
+    <word length="8" first="G" firsttwo="GL" jumbled="IGOLDLAI" points="8">GLADIOLI</word>
+    <word length="5" first="G" firsttwo="GL" jumbled="LNDAG" points="5">GLAND</word>
+    <word length="7" first="G" firsttwo="GL" jumbled="IGILNGD" points="7">GLIDING</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="DGAO" points="1">GOAD</word>
+    <word length="7" first="G" firsttwo="GO" jumbled="ADGIONG" points="7">GOADING</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="GLOD" points="1">GOLD</word>
+    <word length="5" first="G" firsttwo="GO" jumbled="ANGOD" points="5">GONAD</word>
+    <word length="7" first="G" firsttwo="GO" jumbled="OLAOGDN" points="7">GONDOLA</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="DGOO" points="1">GOOD</word>
+    <word length="6" first="I" firsttwo="ID" jumbled="INGDLI" points="6">IDLING</word>
+    <word length="4" first="I" firsttwo="ID" jumbled="LDOI" points="1">IDOL</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="NDGIOI" points="6">INDIGO</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="DILNIA" points="6">INLAID</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="NLAIDN" points="6">INLAND</word>
+    <word length="6" first="L" firsttwo="LA" jumbled="LDINGA" points="6">LADING</word>
+    <word length="7" first="L" firsttwo="LA" jumbled="AGILLND" points="7">LADLING</word>
+    <word length="4" first="L" firsttwo="LA" jumbled="LDIA" points="1">LAID</word>
+    <word length="4" first="L" firsttwo="LA" jumbled="ALND" points="1">LAND</word>
+    <word length="7" first="L" firsttwo="LA" jumbled="GIDNLNA" points="7">LANDING</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="OALD" points="1">LOAD</word>
+    <word length="7" first="L" firsttwo="LO" jumbled="IGNGLOD" points="7">LODGING</word>
+    <word length="4" first="N" firsttwo="NA" jumbled="ADNA" points="1">NADA</word>
+    <word length="5" first="N" firsttwo="NA" jumbled="ANADI" points="5">NAIAD</word>
+    <word length="5" first="N" firsttwo="NO" jumbled="LNAOD" points="5">NODAL</word>
+    <word length="7" first="N" firsttwo="NO" jumbled="ODGNIND" points="7">NODDING</word>
+    <word length="8" first="N" firsttwo="NO" jumbled="ILDGNOON" points="8">NOODLING</word>
+  </puzzle>
 </puzzles>
