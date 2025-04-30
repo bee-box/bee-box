@@ -107239,59 +107239,6 @@
     <word length="5" first="T" firsttwo="TE" jumbled="TEEPE" points="5">TEPEE</word>
     <word length="4" first="T" firsttwo="TE" jumbled="TETX" points="1">TEXT</word>
   </puzzle>
-  <puzzle date="2025-04-22" id="20250422-9493c6" letters="TACENPX" count="51" letter1="T" letter1count="13" letter2="A" letter2count="7" letter3="C" letter3count="6" letter4="E" letter4count="11" letter5="N" letter5count="4" letter6="P" letter6count="10" letter7="X" letter7count="0" pangrams="1" perfectpangrams="0" queenbee="238">
-    <word length="9" first="E" firsttwo="EX" jumbled="NCEEXPTAT" pangram="yes" points="16">EXPECTANT</word>
-    <word length="6" first="A" firsttwo="AC" jumbled="TNCCAE" points="6">ACCENT</word>
-    <word length="6" first="A" firsttwo="AC" jumbled="PCETAC" points="6">ACCEPT</word>
-    <word length="10" first="A" firsttwo="AC" jumbled="NETAACCPEC" points="10">ACCEPTANCE</word>
-    <word length="7" first="A" firsttwo="AC" jumbled="EEATATC" points="7">ACETATE</word>
-    <word length="4" first="A" firsttwo="AN" jumbled="NEAT" points="1">ANTE</word>
-    <word length="7" first="A" firsttwo="AN" jumbled="NANNETA" points="7">ANTENNA</word>
-    <word length="8" first="A" firsttwo="AN" jumbled="NTEANENA" points="8">ANTENNAE</word>
-    <word length="4" first="C" firsttwo="CA" jumbled="NATC" points="1">CANT</word>
-    <word length="7" first="C" firsttwo="CA" jumbled="TAACANT" points="7">CANTATA</word>
-    <word length="7" first="C" firsttwo="CA" jumbled="NACENTE" points="7">CANTEEN</word>
-    <word length="6" first="C" firsttwo="CA" jumbled="ATAPNC" points="6">CATNAP</word>
-    <word length="4" first="C" firsttwo="CE" jumbled="ETCN" points="1">CENT</word>
-    <word length="8" first="C" firsttwo="CE" jumbled="AECEACTN" points="8">CETACEAN</word>
-    <word length="5" first="E" firsttwo="EA" jumbled="ANEET" points="5">EATEN</word>
-    <word length="5" first="E" firsttwo="EN" jumbled="TNEAC" points="5">ENACT</word>
-    <word length="7" first="E" firsttwo="EN" jumbled="TETENEN" points="7">ENTENTE</word>
-    <word length="5" first="E" firsttwo="EX" jumbled="TEACX" points="5">EXACT</word>
-    <word length="6" first="E" firsttwo="EX" jumbled="XCATEA" points="6">EXACTA</word>
-    <word length="6" first="E" firsttwo="EX" jumbled="XECPTE" points="6">EXCEPT</word>
-    <word length="5" first="E" firsttwo="EX" jumbled="PATEX" points="5">EXPAT</word>
-    <word length="6" first="E" firsttwo="EX" jumbled="XTPCEE" points="6">EXPECT</word>
-    <word length="6" first="E" firsttwo="EX" jumbled="EAXTTN" points="6">EXTANT</word>
-    <word length="6" first="E" firsttwo="EX" jumbled="TXTENE" points="6">EXTENT</word>
-    <word length="6" first="N" firsttwo="NA" jumbled="NATNAT" points="6">NATANT</word>
-    <word length="4" first="N" firsttwo="NE" jumbled="ATNE" points="1">NEAT</word>
-    <word length="6" first="N" firsttwo="NE" jumbled="NNETEA" points="6">NEATEN</word>
-    <word length="4" first="N" firsttwo="NE" jumbled="ENTX" points="1">NEXT</word>
-    <word length="4" first="P" firsttwo="PA" jumbled="ACPT" points="1">PACT</word>
-    <word length="8" first="P" firsttwo="PA" jumbled="AEPTTNAC" points="8">PANCETTA</word>
-    <word length="4" first="P" firsttwo="PA" jumbled="TNPA" points="1">PANT</word>
-    <word length="4" first="P" firsttwo="PA" jumbled="PETA" points="1">PATE</word>
-    <word length="6" first="P" firsttwo="PA" jumbled="TTNAPE" points="6">PATENT</word>
-    <word length="8" first="P" firsttwo="PA" jumbled="NAEPTEET" points="8">PATENTEE</word>
-    <word length="4" first="P" firsttwo="PE" jumbled="PATE" points="1">PEAT</word>
-    <word length="7" first="P" firsttwo="PE" jumbled="ANTPNNE" points="7">PENNANT</word>
-    <word length="4" first="P" firsttwo="PE" jumbled="TENP" points="1">PENT</word>
-    <word length="7" first="P" firsttwo="PE" jumbled="PENAENT" points="7">PENTANE</word>
-    <word length="5" first="T" firsttwo="TA" jumbled="ACETT" points="5">TACET</word>
-    <word length="4" first="T" firsttwo="TA" jumbled="ATCT" points="1">TACT</word>
-    <word length="4" first="T" firsttwo="TA" jumbled="APAT" points="1">TAPA</word>
-    <word length="4" first="T" firsttwo="TA" jumbled="TPEA" points="1">TAPE</word>
-    <word length="4" first="T" firsttwo="TA" jumbled="TXAA" points="1">TAXA</word>
-    <word length="4" first="T" firsttwo="TE" jumbled="AETT" points="1">TEAT</word>
-    <word length="4" first="T" firsttwo="TE" jumbled="EETN" points="1">TEEN</word>
-    <word length="6" first="T" firsttwo="TE" jumbled="PETEEE" points="6">TEEPEE</word>
-    <word length="6" first="T" firsttwo="TE" jumbled="NTEATN" points="6">TENANT</word>
-    <word length="5" first="T" firsttwo="TE" jumbled="ETENT" points="5">TENET</word>
-    <word length="4" first="T" firsttwo="TE" jumbled="TTEN" points="1">TENT</word>
-    <word length="5" first="T" firsttwo="TE" jumbled="PETEE" points="5">TEPEE</word>
-    <word length="4" first="T" firsttwo="TE" jumbled="XTTE" points="1">TEXT</word>
-  </puzzle>
   <puzzle date="2025-04-23" id="20250423-05327c" letters="UCDEILT" count="54" letter1="U" letter1count="1" letter2="C" letter2count="16" letter3="D" letter3count="20" letter4="E" letter4count="5" letter5="I" letter5count="0" letter6="L" letter6count="7" letter7="T" letter7count="5" pangrams="1" perfectpangrams="1" queenbee="259">
     <word length="7" first="D" firsttwo="DU" jumbled="CDETULI" pangram="yes" perfectpangram="yes" points="14">DUCTILE</word>
     <word length="7" first="C" firsttwo="CE" jumbled="CLLELEU" points="7">CELLULE</word>

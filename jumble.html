@@ -114,7 +114,7 @@ function loadPuzzle(puzzle) {
 
     for (let word of groups[len]) {
       const box = document.createElement("div");
-      box.className = "word-box";
+      box.className = "word-box" + (word.length >= 8 ? " long-word" : "");
       box.textContent = word.text;
       box.dataset.revealed = "false";
       box.dataset.word = word.original;

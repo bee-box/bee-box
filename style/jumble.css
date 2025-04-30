@@ -381,3 +381,24 @@ svg {
     justify-content: center;
   }
 }
+
+/* Word box sizing for long words on mobile */
+@media (max-width: 480px) {
+  .word-grid .word-box {
+    word-break: break-word;
+    font-size: 1rem;
+  }
+
+  .word-grid .word-box:has(:not([data-word='']):not([data-word=''])):not(:empty):not([data-word='']):not([data-word='']) {
+    width: 100% !important;
+  }
+
+  .word-box.long-word {
+    grid-column: span 2;
+    width: 100%;
+  }
+
+  #dateSelector {
+    width: 100% !important;
+  }
+}
