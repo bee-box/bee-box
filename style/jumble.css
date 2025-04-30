@@ -252,35 +252,34 @@ svg {
   .navbar-buttons,
   .nav-controls,
   .nav-controls select,
-  .navbar-button {
+  .navbar-button,
+  .popup-overlay {
     display: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;
+    line-height: 1.4 !important;
+  }
+
+  header.main-header,
+  .puzzle,
+  .word-group,
+  .group-label,
+  .word-grid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    page-break-before: auto;
+    page-break-after: auto;
   }
 
   .subtitle {
     display: block !important;
   }
 
-  body {
-    line-height: 1.4 !important;
-  }
-
-  header.main-header {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    page-break-after: avoid;
-  }
-
-  .puzzle {
-    page-break-before: avoid;
-    break-inside: avoid;
-  }
-
   .word-group {
-<<<<<<< HEAD
-=======
-    page-break-before: always;
-    break-inside: avoid;
->>>>>>> fc52fd3a2738e2e4718b69c18e7697bd14a95b13
     margin-top: 0 !important;
     margin-bottom: 1em !important;
   }
@@ -288,28 +287,27 @@ svg {
   .group-label {
     font-size: 1em !important;
     font-weight: bold !important;
-<<<<<<< HEAD
-    margin-top: 0.5em !important;
-    margin-bottom: 0.2em !important;
-=======
     margin-top: 0.2em !important;
     margin-bottom: 0.1em !important;
-    page-break-after: avoid;
->>>>>>> fc52fd3a2738e2e4718b69c18e7697bd14a95b13
   }
 
   .word-grid {
-    gap: 0.5em !important;
-    row-gap: 0.5em !important;
-    margin-top: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
   }
 
   .word-box {
-    padding: 0.5em !important;
-    font-size: 1em !important;
-    min-height: auto !important;
+    min-width: 60px !important;
+    margin: 2px !important;
+    padding: 4px !important;
+    font-size: 11pt !important;
     border: 1px solid #ccc !important;
     background: #fff !important;
+  }
+
+  @page {
+    margin: 0.5cm;
   }
 }
 
