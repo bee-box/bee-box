@@ -358,3 +358,26 @@ svg {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
 }
+
+/* Improved Mobile Banner Layout */
+.nav-row {
+  display: flex;
+  gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .nav-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-controls button,
+  .nav-controls select {
+    width: 100%;
+  }
+
+  .navbar-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
