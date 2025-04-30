@@ -17,7 +17,7 @@
       <select id="dateSelector"></select>
       <button id="nextDayBtn">→</button>
     </div>
-    <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+    <button class="navbar-button" onclick="window.print()">🖸️ Print</button>
     <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
     <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
   </div>
@@ -215,46 +215,29 @@ window.addEventListener('beforeprint', () => {
 
 function showWelcomePopup() {
   const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.top = 0;
-  overlay.style.left = 0;
-  overlay.style.width = "100vw";
-  overlay.style.height = "100vh";
-  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-  overlay.style.display = "flex";
-  overlay.style.alignItems = "center";
-  overlay.style.justifyContent = "center";
-  overlay.style.zIndex = 10000;
-  overlay.style.padding = "1rem";
+  overlay.className = "popup-overlay";
 
   const box = document.createElement("div");
-  box.style.backgroundColor = "#fff";
-  box.style.padding = "2rem";
-  box.style.width = "100%";
-  box.style.maxWidth = "400px";
-  box.style.textAlign = "center";
-  box.style.borderRadius = "12px";
-  box.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
-  box.style.fontFamily = "Georgia, serif";
+  box.className = "popup-box";
 
   box.innerHTML = `
-    <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Welcome to Bee Jumble!</h2>
-    <p style="font-size: 1rem; margin-bottom: 1.5rem;">
-      All previous Bee Jumbles are available to everyone right here, right now <strong>—except for today's</strong>.
-      Today's Jumble is only available to subscribers (it's free!).
+    <h2>Welcome to Bee Jumble!</h2>
+    <p>
+      All previous Bee Jumbles are available to everyone right here, right now
+      <strong>—except for today's</strong>. Today's Jumble is only available to
+      subscribers (it's free!).
     </p>
-    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-      <button id="continueBtn" style="padding: 0.75rem; font-size: 1rem; background-color: #222; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%;">Continue</button>
-      <a href="https://beebox.ghost.io/#/portal" target="_blank">
-        <button style="padding: 0.75rem; font-size: 1rem; background-color: #f7da21; border: none; border-radius: 6px; cursor: pointer; width: 100%;">Subscribe</button>
-      </a>
-    </div>
+    <button id="continueBtn" class="continue">Continue</button>
+    <a href="https://beebox.ghost.io/#/portal" target="_blank">
+      <button class="subscribe">Subscribe</button>
+    </a>
   `;
 
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 
   document.getElementById("continueBtn").onclick = () => overlay.remove();
+}
 }
 
 populateDateSelector();
