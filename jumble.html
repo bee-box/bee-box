@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Bee Jumble</title>
@@ -5,7 +7,6 @@
   <link rel="icon" href="style/bee.ico" type="image/x-icon" />
   <link rel="stylesheet" href="style/jumble.css" />
 </head>
-
 <body>
 
 <nav class="navbar">
@@ -39,14 +40,14 @@
     svg.setAttribute("width", "60");
     svg.setAttribute("height", "52");
     svg.setAttribute("viewBox", "0 0 100 86");
-  
+
     const polygon = document.createElementNS(svgNS, "polygon");
     polygon.setAttribute("points", "50,0 93,25 93,61 50,86 7,61 7,25");
     polygon.setAttribute("fill", isCenter ? "#f7da21" : "#e0e0e0");
     polygon.setAttribute("stroke", isCenter ? "#000" : "#999");
     polygon.setAttribute("stroke-width", isCenter ? "3" : "1");
     svg.appendChild(polygon);
-  
+
     const text = document.createElementNS(svgNS, "text");
     text.setAttribute("x", "50%");
     text.setAttribute("y", "50%");
@@ -58,10 +59,10 @@
     text.setAttribute("dominant-baseline", "middle");
     text.textContent = letter;
     svg.appendChild(text);
-  
+
     return svg;
   }
-  
+
   function loadPuzzle(puzzle) {
     const rawDate = puzzle.getAttribute("date");
     const [yyyy, mm, dd] = rawDate.split('-');
@@ -70,52 +71,53 @@
     const formatted = fullDate.toLocaleDateString('en-US', options);
     document.getElementById("worksheetTitle").textContent =
       `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for ${formatted}`;
-  
+
     const letters = puzzle.getAttribute("letters");
     const honeycomb = document.getElementById("honeycomb");
     const puzzleDiv = document.getElementById("puzzle");
     honeycomb.innerHTML = '';
     puzzleDiv.innerHTML = '';
-  
+
     for (let i = 0; i < letters.length; i++) {
       const hexSVG = createHexSVG(letters[i], i === 0);
       honeycomb.appendChild(hexSVG);
     }
-  
+
     const wordElements = Array.from(puzzle.getElementsByTagName("word"));
     const words = wordElements.map(w => ({
       text: w.getAttribute("jumbled") || w.textContent,
       original: w.textContent,
       length: (w.textContent || '').length
     }));
-  
+
     words.sort((a, b) => a.length - b.length || a.text.localeCompare(b.text));
-  
+
     const groups = {};
     for (let word of words) {
       if (!groups[word.length]) groups[word.length] = [];
       groups[word.length].push(word);
     }
-  
+
     for (const len of Object.keys(groups).sort((a, b) => a - b)) {
       const group = document.createElement("div");
       group.className = "word-group";
-  
+
       const label = document.createElement("div");
       label.className = "group-label";
       label.textContent = `${len}-letter words`;
       group.appendChild(label);
-  
+
       const grid = document.createElement("div");
       grid.className = "word-grid";
-  
+
       for (let word of groups[len]) {
         const box = document.createElement("div");
         box.className = "word-box";
         box.textContent = word.text;
         box.dataset.revealed = "false";
         box.dataset.word = word.original;
-  
+        box.dataset.jumbled = word.text;
+
         box.addEventListener("click", () => {
           if (box.dataset.revealed === "true") {
             box.textContent = word.text;
@@ -125,15 +127,15 @@
             box.dataset.revealed = "true";
           }
         });
-  
+
         grid.appendChild(box);
       }
-  
+
       group.appendChild(grid);
       puzzleDiv.appendChild(group);
     }
   }
-  
+
   function populateDateSelector() {
     fetch("xml/puzzles.xml")
       .then(response => response.text())
@@ -142,9 +144,9 @@
         const xmlDoc = parser.parseFromString(xmlText, "application/xml");
         const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
         const selector = document.getElementById("dateSelector");
-  
+
         puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-  
+
         puzzles.forEach(puzzle => {
           const dateStr = puzzle.getAttribute("date");
           const option = document.createElement("option");
@@ -153,13 +155,13 @@
           option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
           selector.appendChild(option);
         });
-  
+
         const params = new URLSearchParams(window.location.search);
         const puzzleid = params.get("puzzleid");
         const urlDate = params.get("date");
-  
+
         let targetPuzzle = null;
-  
+
         if (puzzleid) {
           targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
         }
@@ -167,20 +169,20 @@
           targetPuzzle = puzzles.find(p => p.getAttribute("date") === urlDate);
         }
         if (!targetPuzzle) {
-          targetPuzzle = puzzles[0]; // fallback to latest
+          targetPuzzle = puzzles[0];
         }
-  
+
         selector.value = targetPuzzle.getAttribute("date");
         loadPuzzle(targetPuzzle);
       });
   }
-  
+
   document.getElementById("dateSelector").addEventListener("change", function () {
     const date = this.value;
     const newUrl = `${window.location.pathname}?date=${date}`;
     window.location.href = newUrl;
   });
-  
+
   document.getElementById("prevDayBtn").addEventListener("click", () => {
     const selector = document.getElementById("dateSelector");
     if (selector.selectedIndex < selector.options.length - 1) {
@@ -188,7 +190,7 @@
       window.location.href = `${window.location.pathname}?date=${prevDate}`;
     }
   });
-  
+
   document.getElementById("nextDayBtn").addEventListener("click", () => {
     const selector = document.getElementById("dateSelector");
     if (selector.selectedIndex > 0) {
@@ -196,16 +198,16 @@
       window.location.href = `${window.location.pathname}?date=${nextDate}`;
     }
   });
-  
+
   window.addEventListener('beforeprint', () => {
-    document.querySelectorAll('.word-box[data-word]').forEach(box => {
-      box.textContent = box.dataset.word;
+    document.querySelectorAll('.word-box').forEach(box => {
+      box.textContent = box.dataset.jumbled || box.textContent;
       box.dataset.revealed = "false";
     });
   });
-  
+
   populateDateSelector();
-  </script>  
+</script>
 
 </body>
 </html>

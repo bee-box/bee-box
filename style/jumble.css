@@ -174,10 +174,6 @@ svg {
   background: #fdfdfd;
   transition: background 0.2s;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: auto;
 }
 
 .word-box[data-revealed="true"] {
@@ -189,10 +185,7 @@ svg {
 }
 
 .blank-line {
-  height: 1.2em;
-  margin-top: 0.25em;
-  border-top: 1px dashed #ccc;
-  visibility: hidden;
+  display: none;
 }
 
 /* Mobile Responsive */
@@ -242,34 +235,34 @@ svg {
   }
 
   .word-group {
-    break-inside: avoid;
-    page-break-inside: avoid;
     margin-top: 0 !important;
-    margin-bottom: 0.2em !important;
+    margin-bottom: 1em !important;
   }
 
   .group-label {
     font-size: 1em !important;
     font-weight: bold !important;
-    margin-top: 0.2em !important;
-    margin-bottom: 0.1em !important;
+    margin-top: 0.5em !important;
+    margin-bottom: 0.2em !important;
   }
 
   .word-grid {
-    gap: 0.3em !important;
-    row-gap: 0.2em !important;
+    gap: 0.5em !important;
+    row-gap: 0.5em !important;
     margin-top: 0 !important;
   }
 
   .word-box {
-    padding: 0.3em !important;
-    min-height: 2.3em !important;
-    font-size: inherit !important;
+    padding: 0.5em !important;
+    font-size: 1em !important;
+    min-height: auto !important;
+    border: 1px solid #ccc !important;
+    background: #fff !important;
   }
+}
 
-  .blank-line {
-    visibility: visible;
-    border-top: 1px solid #000;
-    height: 1em;
+@media screen {
+  .print-only {
+    display: none;
   }
 }
