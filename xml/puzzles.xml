@@ -107614,4 +107614,52 @@
     <word length="7" first="N" firsttwo="NO" jumbled="ODGNIND" points="7">NODDING</word>
     <word length="8" first="N" firsttwo="NO" jumbled="ILDGNOON" points="8">NOODLING</word>
   </puzzle>
+  <puzzle date="2025-05-01" id="20250501-80e7b0" letters="MCELOPT" count="46" letter1="M" letter1count="18" letter2="C" letter2count="8" letter3="E" letter3count="2" letter4="L" letter4count="2" letter5="O" letter5count="2" letter6="P" letter6count="6" letter7="T" letter7count="8" pangrams="1" perfectpangrams="0" queenbee="181">
+    <word length="8" first="C" firsttwo="CO" jumbled="MLTECEPO" pangram="yes" points="15">COMPLETE</word>
+    <word length="5" first="C" firsttwo="CL" jumbled="PLCOM" points="5">CLOMP</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="OCME" points="1">COME</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="TMOEC" points="5">COMET</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="MOPC" points="1">COMP</word>
+    <word length="6" first="C" firsttwo="CO" jumbled="COEMPL" points="6">COMPEL</word>
+    <word length="7" first="C" firsttwo="CO" jumbled="EEOTCPM" points="7">COMPETE</word>
+    <word length="7" first="C" firsttwo="CO" jumbled="MPOOTCE" points="7">COMPOTE</word>
+    <word length="5" first="E" firsttwo="EM" jumbled="EECME" points="5">EMCEE</word>
+    <word length="5" first="E" firsttwo="EM" jumbled="MTEOE" points="5">EMOTE</word>
+    <word length="8" first="L" firsttwo="LO" jumbled="ECTMOOLO" points="8">LOCOMOTE</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="OLMO" points="1">LOOM</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="EEMT" points="1">MEET</word>
+    <word length="5" first="M" firsttwo="ME" jumbled="EELME" points="5">MELEE</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="TELM" points="1">MELT</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="MEEM" points="1">MEME</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="EMOM" points="1">MEMO</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="EMTE" points="1">METE</word>
+    <word length="6" first="M" firsttwo="ME" jumbled="TTEELM" points="6">METTLE</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="LEOM" points="1">MOLE</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="MLOL" points="1">MOLL</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="OTML" points="1">MOLT</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="OTOM" points="1">MOOT</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="OMPE" points="1">MOPE</word>
+    <word length="6" first="M" firsttwo="MO" jumbled="MPETOP" points="6">MOPPET</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="MEOT" points="1">MOTE</word>
+    <word length="5" first="M" firsttwo="MO" jumbled="OMTEL" points="5">MOTEL</word>
+    <word length="5" first="M" firsttwo="MO" jumbled="TMETO" points="5">MOTET</word>
+    <word length="6" first="M" firsttwo="MO" jumbled="MTOELT" points="6">MOTTLE</word>
+    <word length="5" first="M" firsttwo="MO" jumbled="MOTOT" points="5">MOTTO</word>
+    <word length="6" first="O" firsttwo="OM" jumbled="EETOML" points="6">OMELET</word>
+    <word length="8" first="O" firsttwo="OM" jumbled="ETLOMTEE" points="8">OMELETTE</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="MPEO" points="1">POEM</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="EMOP" points="1">POME</word>
+    <word length="6" first="P" firsttwo="PO" jumbled="OMOELP" points="6">POMELO</word>
+    <word length="6" first="P" firsttwo="PO" jumbled="EMLPMO" points="6">POMMEL</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="PMOP" points="1">POMP</word>
+    <word length="6" first="P" firsttwo="PO" jumbled="MPOOPM" points="6">POMPOM</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="METE" points="1">TEEM</word>
+    <word length="7" first="T" firsttwo="TE" jumbled="MOCELET" points="7">TELECOM</word>
+    <word length="4" first="T" firsttwo="TE" jumbled="PETM" points="1">TEMP</word>
+    <word length="6" first="T" firsttwo="TE" jumbled="LEMETP" points="6">TEMPLE</word>
+    <word length="5" first="T" firsttwo="TE" jumbled="TEOMP" points="5">TEMPO</word>
+    <word length="5" first="T" firsttwo="TE" jumbled="TEMTP" points="5">TEMPT</word>
+    <word length="4" first="T" firsttwo="TO" jumbled="ETMO" points="1">TOME</word>
+    <word length="5" first="T" firsttwo="TO" jumbled="OMTET" points="5">TOTEM</word>
+  </puzzle>
 </puzzles>
