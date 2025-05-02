@@ -222,18 +222,29 @@ svg {
 }
 
 .word-box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: bold;
   padding: 0.5em;
   border: 1px solid #ccc;
-  text-align: center;
-  border-radius: 4px;
-  font-family: Georgia, serif;
-  background: #fdfdfd;
-  transition: background 0.2s;
+  border-radius: 6px;
+  background-color: #fdfdfd;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
-.word-box[data-revealed="true"] {
-  background: #fffae0;
+.word-box.revealed {
+  justify-content: flex-start;
+  text-align: left;
+  background-color: #fffae0;
+}
+
+.word-box.long-word {
+  grid-column: span 2;
 }
 
 .jumbled-text {
@@ -302,6 +313,9 @@ svg {
     margin: 2px !important;
     padding: 4px !important;
     font-size: 11pt !important;
+    font-family: Georgia, serif !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
     border: 1px solid #ccc !important;
     background: #fff !important;
   }
@@ -371,3 +385,39 @@ svg {
 .popup-box button.subscribe {
   background-color: #f7da21;
 }
+
+/* ─── Moved from inline HTML ─── */
+.word-box {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      text-align: left;
+      font-family: Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fdfdfd;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .word-box.revealed {
+      justify-content: flex-end;
+      text-align: right;
+      background-color: #fffae0;
+    }
+
+    @media print {
+      .word-box {
+        justify-content: flex-start !important;
+        text-align: left !important;
+        font-size: 11pt !important;
+      }
+
+      .word-box.revealed {
+        justify-content: flex-end !important;
+        text-align: right !important;
+      }
+    }

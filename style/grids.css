@@ -8,7 +8,7 @@
 /* ─── Base Styling ─── */
 body {
   font-family: Georgia, Times, "Times New Roman", serif;
-  font-size: clamp(18px, 3.5vw, 24px);
+  font-size: clamp(28px, 8vw, 36px);
   padding: 20px;
   background: #fafafa;
   text-transform: uppercase;

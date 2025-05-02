@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Spelling Bee Grid</title>
-  <link rel="stylesheet" href="style/grids.css">
-  <link rel="icon" href="style/bee.ico" type="image/x-icon">
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Spelling Bee Grid</title>
+    <link rel="stylesheet" href="style/grids.css">
+    <link rel="icon" href="style/bee.ico" type="image/x-icon">
+  </head>  
 <body>
 
 <nav class="banner" id="banner">
@@ -28,7 +29,6 @@
   <thead>
     <tr>
       <th class="bee-header">
-        <img src="style/beebw.png" alt="Bee" class="bee-icon">
       </th>
       <!-- other headers dynamically generated -->
     </tr>
@@ -89,7 +89,7 @@ function renderGrid(puzzle) {
   const lengths = Array.from(allLengthsSet).sort((a, b) => a - b);
   const letters = Object.keys(counts).sort();
 
-  let html = '<tr><th class="bee-header"><img src="style/beebw.png" alt="Bee" class="bee-icon"></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
+  let html = '<tr><th class="bee-header"></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
 
   letters.forEach(letter => {
     let sum = 0;
