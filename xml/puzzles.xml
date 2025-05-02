@@ -107662,4 +107662,35 @@
     <word length="4" first="T" firsttwo="TO" jumbled="ETMO" points="1">TOME</word>
     <word length="5" first="T" firsttwo="TO" jumbled="OMTET" points="5">TOTEM</word>
   </puzzle>
+  <puzzle date="2025-05-02" id="20250502-1a98a8" letters="LGIORVY" count="29" letter1="L" letter1count="6" letter2="G" letter2count="12" letter3="I" letter3count="2" letter4="O" letter4count="2" letter5="R" letter5count="3" letter6="V" letter6count="4" letter7="Y" letter7count="0" pangrams="1" perfectpangrams="0" queenbee="109">
+    <word length="8" first="V" firsttwo="VI" jumbled="VROIGLOY" pangram="yes" points="15">VIROLOGY</word>
+    <word length="6" first="G" firsttwo="GI" jumbled="IGGLYG" points="6">GIGGLY</word>
+    <word length="6" first="G" firsttwo="GI" jumbled="GIOOLG" points="6">GIGOLO</word>
+    <word length="4" first="G" firsttwo="GI" jumbled="LILG" points="1">GILL</word>
+    <word length="4" first="G" firsttwo="GI" jumbled="RILG" points="1">GIRL</word>
+    <word length="5" first="G" firsttwo="GI" jumbled="RGLIY" points="5">GIRLY</word>
+    <word length="5" first="G" firsttwo="GL" jumbled="LYRGO" points="5">GLORY</word>
+    <word length="6" first="G" firsttwo="GO" jumbled="YLGGGO" points="6">GOGGLY</word>
+    <word length="5" first="G" firsttwo="GO" jumbled="LOLYG" points="5">GOLLY</word>
+    <word length="6" first="G" firsttwo="GO" jumbled="GLOYOG" points="6">GOOGLY</word>
+    <word length="6" first="G" firsttwo="GO" jumbled="OGOLGO" points="6">GOOGOL</word>
+    <word length="5" first="G" firsttwo="GR" jumbled="RGLLI" points="5">GRILL</word>
+    <word length="8" first="G" firsttwo="GR" jumbled="GGRYOILG" points="8">GROGGILY</word>
+    <word length="5" first="I" firsttwo="IG" jumbled="IOLGO" points="5">IGLOO</word>
+    <word length="4" first="I" firsttwo="IL" jumbled="LIYL" points="1">ILLY</word>
+    <word length="4" first="L" firsttwo="LI" jumbled="YILL" points="1">LILY</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="OLOG" points="1">LOGO</word>
+    <word length="7" first="L" firsttwo="LO" jumbled="GLLOORL" points="7">LOGROLL</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="GOYL" points="1">LOGY</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="OLLL" points="1">LOLL</word>
+    <word length="5" first="L" firsttwo="LO" jumbled="LRORY" points="5">LORRY</word>
+    <word length="4" first="O" firsttwo="OI" jumbled="IOYL" points="1">OILY</word>
+    <word length="4" first="O" firsttwo="OL" jumbled="LOOI" points="1">OLIO</word>
+    <word length="4" first="R" firsttwo="RI" jumbled="LLIR" points="1">RILL</word>
+    <word length="4" first="R" firsttwo="RO" jumbled="LRIO" points="1">ROIL</word>
+    <word length="4" first="R" firsttwo="RO" jumbled="LOLR" points="1">ROLL</word>
+    <word length="5" first="V" firsttwo="VI" jumbled="IIVLG" points="5">VIGIL</word>
+    <word length="4" first="V" firsttwo="VI" jumbled="VLIO" points="1">VIOL</word>
+    <word length="4" first="V" firsttwo="VL" jumbled="LOVG" points="1">VLOG</word>
+  </puzzle>
 </puzzles>
