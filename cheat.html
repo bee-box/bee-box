@@ -1,43 +1,38 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bee Cheat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="style/cheat.css" />
-  
+<meta charset="utf-8"/>
+<title>Bee Cheat</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="style/bee.ico" rel="icon" type="image/x-icon"/>
+<link href="style/cheat.css" rel="stylesheet"/>
 </head>
 <body>
-
 <nav class="navbar">
-  <div class="navbar-title">Bee Cheat</div>
-  <div class="navbar-buttons">
-    <div class="nav-controls">
-      <div class="nav-row">
-        <button id="prevDayBtn">←</button>
-        <select id="dateSelector"></select>
-        <button id="nextDayBtn">→</button>
-      </div>
-    </div>
-    <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
-    <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
-    <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
-  </div>
+<div class="navbar-title">Bee Cheat</div>
+<div class="navbar-buttons">
+<div class="nav-controls">
+<div class="nav-row">
+<button id="prevDayBtn">←</button>
+<select id="dateSelector"></select>
+<button id="nextDayBtn">→</button>
+</div>
+</div>
+<button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+<a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
+<a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
+</div>
 </nav>
-
 <div class="subtitle" id="worksheetTitle">
   The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Cheat for
 </div>
-
 <header class="main-header">
-  <div class="honeycomb-container">
-    <div class="honeycomb" id="honeycomb"></div>
-  </div>
+<div class="honeycomb-container">
+<div class="honeycomb" id="honeycomb"></div>
+</div>
 </header>
-
 <div class="puzzle" id="puzzle"></div>
-
 <script>
 function createHexSVG(letter, isCenter = false) {
   const svgNS = "http://www.w3.org/2000/svg";
@@ -99,23 +94,26 @@ function loadPuzzle(puzzle) {
 
   const groups = {};
   for (let word of words) {
-    if (!groups[word.first]) groups[word.first] = [];
-    groups[word.first].push(word);
+    const groupKey = `${word.full.length}`;
+    if (!groups[groupKey]) groups[groupKey] = [];
+    groups[groupKey].push(word);
   }
 
-  for (const first of Object.keys(groups).sort()) {
+  const sortedKeys = Object.keys(groups).map(Number).sort((a, b) => a - b);
+
+  for (const key of sortedKeys) {
     const group = document.createElement("div");
     group.className = "word-group";
 
     const label = document.createElement("div");
     label.className = "group-label";
-    label.textContent = `${first}`;
+    label.textContent = `${key}-Letter Words`;
     group.appendChild(label);
 
     const grid = document.createElement("div");
     grid.className = "word-grid";
 
-    for (let word of groups[first]) {
+    for (let word of groups[key]) {
       const box = document.createElement("div");
       box.className = "word-box";
       box.textContent = word.clue;
@@ -245,6 +243,5 @@ function showWelcomePopup() {
 
 populateDateSelector();
 </script>
-
 </body>
 </html>

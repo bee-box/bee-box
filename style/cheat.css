@@ -129,7 +129,7 @@ body {
 
   .word-grid .word-box {
     word-break: break-word;
-    font-size: 1rem;
+    
   }
 
   .word-box.long-word {
@@ -227,7 +227,7 @@ svg {
   align-items: center;
   text-align: left;
   font-family: Georgia, serif;
-  font-size: 1.2rem;
+  
   font-weight: bold;
   padding: 0.5em;
   border: 1px solid #ccc;
@@ -312,7 +312,7 @@ svg {
     min-width: 60px !important;
     margin: 2px !important;
     padding: 4px !important;
-    font-size: 11pt !important;
+    
     font-family: Georgia, serif !important;
     text-align: left !important;
     justify-content: flex-start !important;
@@ -393,7 +393,7 @@ svg {
       align-items: center;
       text-align: left;
       font-family: Georgia, serif;
-      font-size: 1.2rem;
+      
       font-weight: bold;
       padding: 0.5em;
       border: 1px solid #ccc;
@@ -404,8 +404,8 @@ svg {
     }
 
     .word-box.revealed {
-      justify-content: flex-end;
-      text-align: right;
+      justify-content: flex-start;
+      text-align: left;
       background-color: #fffae0;
     }
 
@@ -413,7 +413,7 @@ svg {
       .word-box {
         justify-content: flex-start !important;
         text-align: left !important;
-        font-size: 11pt !important;
+        
       }
 
       .word-box.revealed {
@@ -421,3 +421,8 @@ svg {
         text-align: right !important;
       }
     }
+.word-box {
+  font-size: clamp(0.6rem, 1.2vw, 1.2rem);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
