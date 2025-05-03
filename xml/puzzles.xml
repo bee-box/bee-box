@@ -107693,4 +107693,77 @@
     <word length="4" first="V" firsttwo="VI" jumbled="VLIO" points="1">VIOL</word>
     <word length="4" first="V" firsttwo="VL" jumbled="LOVG" points="1">VLOG</word>
   </puzzle>
+  <puzzle date="2025-05-03" id="20250503-afceed" letters="IACEHNT" count="71" letter1="I" letter1count="10" letter2="A" letter2count="8" letter3="C" letter3count="17" letter4="E" letter4count="5" letter5="H" letter5count="4" letter6="N" letter6count="10" letter7="T" letter7count="17" pangrams="1" perfectpangrams="0" queenbee="356">
+    <word length="10" first="T" firsttwo="TE" jumbled="NCTINCAEIH" pangram="yes" points="17">TECHNICIAN</word>
+    <word length="6" first="A" firsttwo="AC" jumbled="IACACA" points="6">ACACIA</word>
+    <word length="4" first="A" firsttwo="AC" jumbled="CAIA" points="1">ACAI</word>
+    <word length="6" first="A" firsttwo="AC" jumbled="EACITC" points="6">ACETIC</word>
+    <word length="7" first="A" firsttwo="AN" jumbled="TECNAIN" points="7">ANCIENT</word>
+    <word length="4" first="A" firsttwo="AN" jumbled="INAT" points="1">ANTI</word>
+    <word length="5" first="A" firsttwo="AN" jumbled="CAITN" points="5">ANTIC</word>
+    <word length="6" first="A" firsttwo="AT" jumbled="AATINT" points="6">ATTAIN</word>
+    <word length="5" first="A" firsttwo="AT" jumbled="CTTIA" points="5">ATTIC</word>
+    <word length="5" first="C" firsttwo="CA" jumbled="CITAC" points="5">CACTI</word>
+    <word length="6" first="C" firsttwo="CA" jumbled="ENINCA" points="6">CANINE</word>
+    <word length="7" first="C" firsttwo="CA" jumbled="CANITNA" points="7">CANTINA</word>
+    <word length="4" first="C" firsttwo="CH" jumbled="IHCA" points="1">CHAI</word>
+    <word length="5" first="C" firsttwo="CH" jumbled="NACIH" points="5">CHAIN</word>
+    <word length="4" first="C" firsttwo="CH" jumbled="HAIC" points="1">CHIA</word>
+    <word length="7" first="C" firsttwo="CH" jumbled="CATIHNI" points="7">CHIANTI</word>
+    <word length="4" first="C" firsttwo="CH" jumbled="CCIH" points="1">CHIC</word>
+    <word length="5" first="C" firsttwo="CH" jumbled="ACICH" points="5">CHICA</word>
+    <word length="6" first="C" firsttwo="CH" jumbled="CIIHCH" points="6">CHICHI</word>
+    <word length="4" first="C" firsttwo="CH" jumbled="HNIC" points="1">CHIN</word>
+    <word length="5" first="C" firsttwo="CH" jumbled="AIHCN" points="5">CHINA</word>
+    <word length="4" first="C" firsttwo="CH" jumbled="ICHT" points="1">CHIT</word>
+    <word length="8" first="C" firsttwo="CH" jumbled="ATHIHCTC" points="8">CHITCHAT</word>
+    <word length="6" first="C" firsttwo="CH" jumbled="CTINIH" points="6">CHITIN</word>
+    <word length="5" first="C" firsttwo="CI" jumbled="NCCHI" points="5">CINCH</word>
+    <word length="4" first="C" firsttwo="CI" jumbled="TEIC" points="1">CITE</word>
+    <word length="9" first="E" firsttwo="EC" jumbled="CEHEAACNI" points="9">ECHINACEA</word>
+    <word length="7" first="E" firsttwo="EN" jumbled="CIHENAN" points="7">ENCHAIN</word>
+    <word length="6" first="E" firsttwo="EN" jumbled="TICNEE" points="6">ENTICE</word>
+    <word length="5" first="E" firsttwo="ET" jumbled="HCIET" points="5">ETHIC</word>
+    <word length="6" first="E" firsttwo="ET" jumbled="IETHNC" points="6">ETHNIC</word>
+    <word length="6" first="H" firsttwo="HE" jumbled="TICECH" points="6">HECTIC</word>
+    <word length="6" first="H" firsttwo="HE" jumbled="IHENEI" points="6">HEINIE</word>
+    <word length="4" first="H" firsttwo="HI" jumbled="TNIH" points="1">HINT</word>
+    <word length="5" first="H" firsttwo="HI" jumbled="THCIH" points="5">HITCH</word>
+    <word length="5" first="I" firsttwo="IN" jumbled="NAENI" points="5">INANE</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="NCINTA" points="6">INCANT</word>
+    <word length="4" first="I" firsttwo="IN" jumbled="IHCN" points="1">INCH</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="TIECIN" points="6">INCITE</word>
+    <word length="8" first="I" firsttwo="IN" jumbled="IIEAITNT" points="8">INITIATE</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="NNIAET" points="6">INNATE</word>
+    <word length="5" first="I" firsttwo="IN" jumbled="IINNE" points="5">INNIE</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="TATNIC" points="6">INTACT</word>
+    <word length="6" first="I" firsttwo="IN" jumbled="ITNNTE" points="6">INTENT</word>
+    <word length="4" first="I" firsttwo="IT" jumbled="ICHT" points="1">ITCH</word>
+    <word length="6" first="N" firsttwo="NI" jumbled="NNIICA" points="6">NIACIN</word>
+    <word length="4" first="N" firsttwo="NI" jumbled="ECIN" points="1">NICE</word>
+    <word length="5" first="N" firsttwo="NI" jumbled="ECNHI" points="5">NICHE</word>
+    <word length="5" first="N" firsttwo="NI" jumbled="ECNIE" points="5">NIECE</word>
+    <word length="4" first="N" firsttwo="NI" jumbled="NNIE" points="1">NINE</word>
+    <word length="8" first="N" firsttwo="NI" jumbled="NNNIEETE" points="8">NINETEEN</word>
+    <word length="10" first="N" firsttwo="NI" jumbled="EIHNNTTNEE" points="10">NINETEENTH</word>
+    <word length="9" first="N" firsttwo="NI" jumbled="ENETIINHT" points="9">NINETIETH</word>
+    <word length="5" first="N" firsttwo="NI" jumbled="IHTNN" points="5">NINTH</word>
+    <word length="4" first="N" firsttwo="NI" jumbled="ETNI" points="1">NITE</word>
+    <word length="5" first="T" firsttwo="TA" jumbled="TCITA" points="5">TACIT</word>
+    <word length="6" first="T" firsttwo="TA" jumbled="TACTCI" points="6">TACTIC</word>
+    <word length="9" first="T" firsttwo="TA" jumbled="CAINTAICT" points="9">TACTICIAN</word>
+    <word length="6" first="T" firsttwo="TA" jumbled="IANITH" points="6">TAHINI</word>
+    <word length="5" first="T" firsttwo="TA" jumbled="ITNAT" points="5">TAINT</word>
+    <word length="6" first="T" firsttwo="TA" jumbled="INCTNA" points="6">TANNIC</word>
+    <word length="6" first="T" firsttwo="TA" jumbled="TAINNN" points="6">TANNIN</word>
+    <word length="6" first="T" firsttwo="TE" jumbled="HTEEIC" points="6">TECHIE</word>
+    <word length="4" first="T" firsttwo="TH" jumbled="HINT" points="1">THIN</word>
+    <word length="5" first="T" firsttwo="TH" jumbled="HNIET" points="5">THINE</word>
+    <word length="5" first="T" firsttwo="TI" jumbled="ICTTN" points="5">TINCT</word>
+    <word length="4" first="T" firsttwo="TI" jumbled="IETN" points="1">TINE</word>
+    <word length="4" first="T" firsttwo="TI" jumbled="INTT" points="1">TINT</word>
+    <word length="5" first="T" firsttwo="TI" jumbled="ATITN" points="5">TITAN</word>
+    <word length="7" first="T" firsttwo="TI" jumbled="CITANTI" points="7">TITANIC</word>
+    <word length="5" first="T" firsttwo="TI" jumbled="HTIET" points="5">TITHE</word>
+  </puzzle>
 </puzzles>

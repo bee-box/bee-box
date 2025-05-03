@@ -1,17 +1,17 @@
 🕯 Wax complete.
-➕ New puzzles added:         0
-🆔 Puzzle IDs added:          0
-🔠 Word counts added:         0
-🔤 Letters strings added:     0
-🔢 Letter counts added:       0
-🥚 Pangram counts added:      0
-💎 Perfect pangrams added:    0
-🐝 Queenbee scores added:     0
+➕ New puzzles added:         1
+🆔 Puzzle IDs added:          1
+🔠 Word counts added:         1
+🔤 Letters strings added:     1
+🔢 Letter counts added:       1
+🥚 Pangram counts added:      1
+💎 Perfect pangrams added:    1
+🐝 Queenbee scores added:     1
 🔠 Word attributes newly added:
-    length: 0
-    first: 0
-    firsttwo: 0
-    jumbled: 0
-    points: 0
-    pangram: 0
+    length: 71
+    first: 71
+    firsttwo: 71
+    jumbled: 71
+    points: 71
+    pangram: 1
     perfectpangram: 0
