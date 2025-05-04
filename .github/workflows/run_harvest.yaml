@@ -31,16 +31,24 @@ jobs:
       - name: 📁 Create logs folder
         run: mkdir -p logs
 
+      - name: 🕒 Log workflow start time
+        run: |
+          echo "=== Workflow run at $(date -u) UTC ===" > logs/workflow-$(date +'%Y-%m-%d').log
+
       - name: 🐝 Run harvest.py and log output
         run: |
           LOGFILE="logs/harvest-$(date +'%Y-%m-%d').log"
-          python harvest.py > "$LOGFILE" 2>&1
+          cat logs/workflow-$(date +'%Y-%m-%d').log > "$LOGFILE"
+          echo "--- Running harvest.py ---" >> "$LOGFILE"
+          python harvest.py >> "$LOGFILE" 2>&1
 
       - name: 🕯️ Run waxer.py and log output
         if: success()
         run: |
           LOGFILE="logs/waxer-$(date +'%Y-%m-%d').log"
-          python waxer.py > "$LOGFILE" 2>&1
+          cat logs/workflow-$(date +'%Y-%m-%d').log > "$LOGFILE"
+          echo "--- Running waxer.py ---" >> "$LOGFILE"
+          python waxer.py >> "$LOGFILE" 2>&1
 
       - name: 🚀 Commit and push updated XML + logs
         run: |
