@@ -6,15 +6,14 @@ html {
 body {
   margin: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background: #fff;
-  color: #111;
+  background: #111;
+  color: #FFD700;
   padding: 0;
   line-height: 1.6;
 }
 
-/* ─── NAVBAR ─── */
 .navbar {
-  background-color: #000;
+  background-color: #222;
   color: #FFD700;
   display: flex;
   justify-content: space-between;
@@ -68,6 +67,7 @@ body {
   min-width: 150px;
   max-width: 200px;
   padding: 0 0.75em;
+  background-color: #111;
 }
 
 .navbar-button {
@@ -81,10 +81,9 @@ body {
 .nav-controls select:hover,
 .navbar-button:hover {
   background-color: #FFD700;
-  color: #000;
+  color: #111;
 }
 
-/* ─── Responsive Layouts ─── */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
@@ -127,23 +126,17 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
 
-  .word-grid .word-box {
-    word-break: break-word;
-    
-  }
-
   .word-box.long-word {
     grid-column: span 2;
     width: 100%;
   }
 }
 
-/* ─── Layout ─── */
 .instructions {
   max-width: 700px;
   margin: 1.25em auto 0.75em;
   font-size: 1rem;
-  color: #333;
+  color: #FFD700;
   text-align: center;
   line-height: 1.5;
   padding: 0 1em;
@@ -153,13 +146,14 @@ body {
   width: 800px;
   margin: 1em auto;
   border: 0;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #FFD700;
 }
 
 .subtitle {
   text-align: center;
   font-size: 1em;
-  margin: 0.5em auto 0.75em;
+  margin: 0.25em auto 0.5em;
+  color: #FFD700;
 }
 
 header.main-header {
@@ -205,14 +199,16 @@ svg {
 .word-group {
   max-width: 700px;
   width: 100%;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.25em;
 }
 
 .group-label {
   font-weight: bold;
-  font-size: 1.25em;
-  margin: 1.5em 0 0.5em;
+  font-size: 1rem;
+  margin: 0.25em 0 0.3em;
   text-align: left;
-  color: #333;
+  color: #FFD700;
 }
 
 .word-grid {
@@ -227,36 +223,68 @@ svg {
   align-items: center;
   text-align: left;
   font-family: Georgia, serif;
-  
   font-weight: bold;
   padding: 0.5em;
-  border: 1px solid #ccc;
+  border: 1px solid #FFD700;
   border-radius: 6px;
-  background-color: #fdfdfd;
+  background-color: #1b1b1b;
+  color: #FFD700;
   transition: all 0.2s ease;
   cursor: pointer;
+  font-size: clamp(0.6rem, 1.2vw, 1.2rem);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .word-box.revealed {
-  justify-content: flex-start;
-  text-align: left;
-  background-color: #fffae0;
+  background-color: #333300;
 }
 
 .word-box.long-word {
   grid-column: span 2;
 }
 
-.jumbled-text {
-  font-size: 1em;
-}
-
 .blank-line {
   display: none;
 }
 
-/* ─── Print Styles ─── */
 @media print {
+  body,
+  .word-box,
+  .group-label,
+  .subtitle {
+    color: #000 !important;
+    background: #fff !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .subtitle {
+    font-size: clamp(0.7rem, 1.5vw, 1rem) !important;
+    line-height: 1.2 !important;
+    margin: 0.25em auto 0.5em !important;
+    text-align: center !important;
+  }
+
+  .group-label {
+    font-size: 0.9rem !important;
+    margin: 0.1em 0 0.2em !important;
+  }
+
+  .word-group {
+    margin-bottom: 0.3em !important;
+    padding-bottom: 0.1em !important;
+  }
+
+  .word-box:first-child {
+    background: #eee !important;
+  }
+
+  svg polygon {
+    fill: #fff !important;
+    stroke: #000 !important;
+  }
+
   .navbar,
   .instructions,
   .separator,
@@ -264,7 +292,8 @@ svg {
   .nav-controls,
   .nav-controls select,
   .navbar-button,
-  .popup-overlay {
+  .popup-overlay,
+  .print-only {
     display: none !important;
   }
 
@@ -272,34 +301,7 @@ svg {
     margin: 0;
     padding: 0;
     font-size: 12pt;
-    line-height: 1.4 !important;
-  }
-
-  header.main-header,
-  .puzzle,
-  .word-group,
-  .group-label,
-  .word-grid {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    page-break-before: auto;
-    page-break-after: auto;
-  }
-
-  .subtitle {
-    display: block !important;
-  }
-
-  .word-group {
-    margin-top: 0 !important;
-    margin-bottom: 1em !important;
-  }
-
-  .group-label {
-    font-size: 1em !important;
-    font-weight: bold !important;
-    margin-top: 0.2em !important;
-    margin-bottom: 0.1em !important;
+    line-height: 1.4;
   }
 
   .word-grid {
@@ -312,33 +314,25 @@ svg {
     min-width: 60px !important;
     margin: 2px !important;
     padding: 4px !important;
-    
-    font-family: Georgia, serif !important;
     text-align: left !important;
     justify-content: flex-start !important;
-    border: 1px solid #ccc !important;
-    background: #fff !important;
+    font-family: Georgia, serif !important;
+    border: 1px solid #000 !important;
   }
 
   @page {
-    margin: 0.5cm;
+    margin: 1cm;
+    size: auto;
   }
 }
 
-@media screen {
-  .print-only {
-    display: none;
-  }
-}
-
-/* ─── Popup Overlay ─── */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,14 +341,15 @@ svg {
 }
 
 .popup-box {
-  background-color: #fff;
+  background-color: #1b1b1b;
   padding: 2rem;
   width: 100%;
   max-width: 400px;
   text-align: center;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 10px #FFD700;
   font-family: Georgia, serif;
+  color: #FFD700;
 }
 
 .popup-box h2 {
@@ -378,51 +373,11 @@ svg {
 }
 
 .popup-box button.continue {
-  background-color: #222;
-  color: white;
+  background-color: #FFD700;
+  color: #111;
 }
 
 .popup-box button.subscribe {
-  background-color: #f7da21;
-}
-
-/* ─── Moved from inline HTML ─── */
-.word-box {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      text-align: left;
-      font-family: Georgia, serif;
-      
-      font-weight: bold;
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fdfdfd;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .word-box.revealed {
-      justify-content: flex-start;
-      text-align: left;
-      background-color: #fffae0;
-    }
-
-    @media print {
-      .word-box {
-        justify-content: flex-start !important;
-        text-align: left !important;
-        
-      }
-
-      .word-box.revealed {
-        justify-content: flex-end !important;
-        text-align: right !important;
-      }
-    }
-.word-box {
-  font-size: clamp(0.6rem, 1.2vw, 1.2rem);
-  overflow-wrap: break-word;
-  word-break: break-word;
+  background-color: #111;
+  color: #FFD700;
 }
