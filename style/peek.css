@@ -276,8 +276,15 @@ svg {
     padding-bottom: 0.1em !important;
   }
 
-  .word-box:first-child {
+  /* Removed background from first word-box */
+  /* .word-box:first-child {
     background: #eee !important;
+  } */
+
+  /* Highlight first hex in honeycomb */
+  #honeycomb svg:first-child polygon {
+    fill: #ccc !important;
+    stroke: #000 !important;
   }
 
   svg polygon {
