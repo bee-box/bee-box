@@ -107766,4 +107766,56 @@
     <word length="7" first="T" firsttwo="TI" jumbled="CITANTI" points="7">TITANIC</word>
     <word length="5" first="T" firsttwo="TI" jumbled="HTIET" points="5">TITHE</word>
   </puzzle>
+  <puzzle date="2025-05-04" id="20250504-666840" letters="OCDEHTU" count="50" letter1="O" letter1count="4" letter2="C" letter2count="11" letter3="D" letter3count="13" letter4="E" letter4count="2" letter5="H" letter5count="7" letter6="T" letter6count="13" letter7="U" letter7count="0" pangrams="1" perfectpangrams="1" queenbee="206">
+    <word length="7" first="T" firsttwo="TO" jumbled="DHUOCET" pangram="yes" perfectpangram="yes" points="14">TOUCHED</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="CDEO" points="1">CODE</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="DDOCE" points="5">CODED</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="EOCD" points="1">COED</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="OOHC" points="1">COHO</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="CDOOE" points="5">COOED</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="CTOO" points="1">COOT</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="CTOE" points="1">COTE</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="UOCCH" points="5">COUCH</word>
+    <word length="7" first="C" firsttwo="CO" jumbled="HCOCDUE" points="7">COUCHED</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="OHTUC" points="5">COUTH</word>
+    <word length="6" first="C" firsttwo="CU" jumbled="UCTTUO" points="6">CUTOUT</word>
+    <word length="4" first="D" firsttwo="DE" jumbled="DCOE" points="1">DECO</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="EOCDCT" points="6">DECOCT</word>
+    <word length="8" first="D" firsttwo="DE" jumbled="CEDCEODT" points="8">DECOCTED</word>
+    <word length="6" first="D" firsttwo="DE" jumbled="EDCOED" points="6">DECODE</word>
+    <word length="7" first="D" firsttwo="DE" jumbled="ECDDODE" points="7">DECODED</word>
+    <word length="4" first="D" firsttwo="DO" jumbled="ODOD" points="1">DODO</word>
+    <word length="5" first="D" firsttwo="DO" jumbled="DEOTH" points="5">DOETH</word>
+    <word length="4" first="D" firsttwo="DO" jumbled="OTED" points="1">DOTE</word>
+    <word length="5" first="D" firsttwo="DO" jumbled="ODDET" points="5">DOTED</word>
+    <word length="4" first="D" firsttwo="DO" jumbled="TODH" points="1">DOTH</word>
+    <word length="6" first="D" firsttwo="DO" jumbled="TODETD" points="6">DOTTED</word>
+    <word length="6" first="D" firsttwo="DO" jumbled="OUHEDC" points="6">DOUCHE</word>
+    <word length="7" first="D" firsttwo="DO" jumbled="UDHODCE" points="7">DOUCHED</word>
+    <word length="4" first="E" firsttwo="EC" jumbled="EOCH" points="1">ECHO</word>
+    <word length="6" first="E" firsttwo="EC" jumbled="OEDCHE" points="6">ECHOED</word>
+    <word length="4" first="H" firsttwo="HO" jumbled="EHOD" points="1">HOED</word>
+    <word length="5" first="H" firsttwo="HO" jumbled="OCHHO" points="5">HOOCH</word>
+    <word length="4" first="H" firsttwo="HO" jumbled="DOOH" points="1">HOOD</word>
+    <word length="6" first="H" firsttwo="HO" jumbled="HODEOD" points="6">HOODED</word>
+    <word length="6" first="H" firsttwo="HO" jumbled="OOHODO" points="6">HOODOO</word>
+    <word length="4" first="H" firsttwo="HO" jumbled="THOO" points="1">HOOT</word>
+    <word length="6" first="H" firsttwo="HO" jumbled="TEDHOO" points="6">HOOTED</word>
+    <word length="5" first="O" firsttwo="OC" jumbled="OECTT" points="5">OCTET</word>
+    <word length="4" first="O" firsttwo="OU" jumbled="COHU" points="1">OUCH</word>
+    <word length="5" first="O" firsttwo="OU" jumbled="OTDUO" points="5">OUTDO</word>
+    <word length="5" first="O" firsttwo="OU" jumbled="EOTUD" points="5">OUTED</word>
+    <word length="4" first="T" firsttwo="TH" jumbled="OTHU" points="1">THOU</word>
+    <word length="4" first="T" firsttwo="TO" jumbled="ODTE" points="1">TOED</word>
+    <word length="4" first="T" firsttwo="TO" jumbled="OTTO" points="1">TOOT</word>
+    <word length="6" first="T" firsttwo="TO" jumbled="DTEOTO" points="6">TOOTED</word>
+    <word length="5" first="T" firsttwo="TO" jumbled="OHTOT" points="5">TOOTH</word>
+    <word length="7" first="T" firsttwo="TO" jumbled="OTOETDH" points="7">TOOTHED</word>
+    <word length="4" first="T" firsttwo="TO" jumbled="TOET" points="1">TOTE</word>
+    <word length="5" first="T" firsttwo="TO" jumbled="EOTTD" points="5">TOTED</word>
+    <word length="5" first="T" firsttwo="TO" jumbled="OUCTH" points="5">TOUCH</word>
+    <word length="6" first="T" firsttwo="TO" jumbled="TOHUEC" points="6">TOUCHE</word>
+    <word length="4" first="T" firsttwo="TO" jumbled="TUOT" points="1">TOUT</word>
+    <word length="6" first="T" firsttwo="TO" jumbled="TTEDUO" points="6">TOUTED</word>
+  </puzzle>
 </puzzles>
