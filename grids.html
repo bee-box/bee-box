@@ -121,9 +121,14 @@ function renderGrid(puzzle) {
   const perfect = puzzle.getAttribute('perfectpangrams') || 0;
 
   let summaryText = `WORDS: ${totalWords}, POINTS: ${points}, PANGRAMS: ${pangrams}`;
-  if (parseInt(perfect) > 0) {
-    summaryText += ` (${perfect} Perfect)`;
-  }
+if (parseInt(perfect) > 0) {
+  summaryText += ` (${perfect} Perfect)`;
+}
+const bingo = puzzle.getAttribute("bingo");
+if (bingo === "BINGO") {
+  summaryText += `, BINGO`;
+}
+
   document.getElementById('puzzleSummary').innerHTML = summaryText;
 
   const fullLetters = (puzzle.getAttribute('letters') || '').toLowerCase().split('');

@@ -5,15 +5,21 @@
 Processes Spelling Bee puzzles:
 - Appends unique puzzles from words.xml to puzzles.xml
 - Adds to each puzzle: id, count, letters, letter1–7, letter1count–7count,
-  pangrams, perfectpangrams, queenbee
+  pangrams, perfectpangrams, queenbee, bingo
 - Adds to each word: length, first, firsttwo, jumbled, points, pangram, perfectpangram
 
 Never modifies words.xml.
 """
 
 import os
-import os
 from datetime import date, datetime
+import xml.etree.ElementTree as ET
+from uuid import uuid4
+import random
+from collections import Counter
+
+WORDS_XML = "xml/words.xml"
+PUZZLES_XML = "xml/puzzles.xml"
 
 LOGFILE = f"logs/{date.today().strftime('%Y-%m-%d')}.log"
 os.makedirs("logs", exist_ok=True)
@@ -22,13 +28,6 @@ def log(msg):
     timestamp = datetime.now().strftime('%H:%M:%S')
     with open(LOGFILE, "a", encoding="utf-8") as f:
         f.write(f"[{timestamp}] [WAXER] {msg}\n")
-import xml.etree.ElementTree as ET
-from uuid import uuid4
-import random
-from collections import Counter
-
-WORDS_XML = "xml/words.xml"
-PUZZLES_XML = "xml/puzzles.xml"
 
 def indent(elem, level=0):
     i = "\n" + "  " * level
@@ -50,7 +49,7 @@ def get_existing_ids(root):
     return {p.attrib.get("id") for p in root.findall("puzzle") if "id" in p.attrib}
 
 def generate_id(date_str, existing_ids):
-    base = date_str.replace("-", "")  # YYYYMMDD
+    base = date_str.replace("-", "")
     while True:
         suffix = uuid4().hex[:6]
         new_id = f"{base}-{suffix}"
@@ -77,7 +76,6 @@ def add_word_attributes(word_el, letterset=None):
     if not text:
         return added
 
-    # Skip if already processed
     if "points" in word_el.attrib:
         return added
 
@@ -94,7 +92,6 @@ def add_word_attributes(word_el, letterset=None):
         word_el.set("jumbled", generate_jumble(text))
         added["jumbled"] += 1
 
-    # Pangram logic
     pangram = False
     if letterset:
         wordset = set(text)
@@ -107,7 +104,6 @@ def add_word_attributes(word_el, letterset=None):
                 word_el.set("perfectpangram", "yes")
                 added["perfectpangram"] += 1
 
-    # Points scoring
     base_points = 1 if len(text) == 4 else len(text)
     if pangram:
         base_points += 7
@@ -146,7 +142,6 @@ def update_puzzle_metadata(puzzle, existing_ids):
         existing_ids.add(new_id)
         id_added = True
 
-    # Letters
     letterset = None
     if "letters" not in puzzle.attrib:
         words = [w_el.text.strip().upper() for w_el in puzzle.findall("word") if w_el.text]
@@ -158,17 +153,14 @@ def update_puzzle_metadata(puzzle, existing_ids):
     if "letters" in puzzle.attrib:
         letterset = set(puzzle.attrib["letters"])
 
-    # Word-level attributes
     for word_el in puzzle.findall("word"):
         updates = add_word_attributes(word_el, letterset)
         word_attr_counts.update(updates)
 
-    # Count
     if "count" not in puzzle.attrib:
         puzzle.set("count", str(len(puzzle.findall("word"))))
         count_added = True
 
-    # letter1–7 and counts
     if "letters" in puzzle.attrib:
         letters = puzzle.attrib["letters"]
         if all(f"letter{i+1}" not in puzzle.attrib for i in range(7)):
@@ -182,7 +174,6 @@ def update_puzzle_metadata(puzzle, existing_ids):
                 puzzle.set(f"letter{i+1}count", str(starts[ch]))
             lettercounts_added = True
 
-    # Pangram counts
     if "letters" in puzzle.attrib and (
         "pangrams" not in puzzle.attrib or "perfectpangrams" not in puzzle.attrib
     ):
@@ -200,22 +191,27 @@ def update_puzzle_metadata(puzzle, existing_ids):
             puzzle.set("perfectpangrams", str(perfect_count))
             perfects_added = True
 
-    # Skip if queenbee already set
-    if "queenbee" in puzzle.attrib:
-        return (
-            id_added, count_added, word_attr_counts,
-            letters_added, lettercounts_added,
-            pangrams_added, perfects_added, queenbee_added
-        )
+    if "queenbee" not in puzzle.attrib:
+        total = 0
+        for w_el in puzzle.findall("word"):
+            pts = w_el.attrib.get("points")
+            if pts and pts.isdigit():
+                total += int(pts)
+        puzzle.set("queenbee", str(total))
+        queenbee_added = True
 
-    # Queenbee score
-    total = 0
-    for w_el in puzzle.findall("word"):
-        pts = w_el.attrib.get("points")
-        if pts and pts.isdigit():
-            total += int(pts)
-    puzzle.set("queenbee", str(total))
-    queenbee_added = True
+    # Always set bingo attribute
+    if "letters" in puzzle.attrib:
+        letters = puzzle.attrib["letters"]
+        starts = {ch: 0 for ch in letters}
+        for w_el in puzzle.findall("word"):
+            first = w_el.attrib.get("first")
+            if first in starts:
+                starts[first] += 1
+        if all(starts[ch] > 0 for ch in letters):
+            puzzle.set("bingo", "BINGO")
+        else:
+            puzzle.set("bingo", "")
 
     return (
         id_added, count_added, word_attr_counts,
@@ -246,6 +242,7 @@ def wax():
     added_pangrams = 0
     added_perfects = 0
     added_queenbees = 0
+    added_bingos = 0
     word_attr_totals = Counter()
 
     seen_dates = set()
@@ -268,6 +265,8 @@ def wax():
     for puzzle in puzzles_root.findall("puzzle"):
         result = update_puzzle_metadata(puzzle, existing_ids)
         id_added, count_added, word_attr_added, letters_added, lettercounts_added, pangrams_added, perfects_added, queenbee_added = result
+        if puzzle.attrib.get("bingo") == "BINGO":
+            added_bingos += 1
         if id_added: added_ids += 1
         if count_added: added_counts += 1
         if letters_added: added_letters += 1
@@ -289,10 +288,11 @@ def wax():
     print(f"🥚 Pangram counts added:      {added_pangrams}")
     print(f"💎 Perfect pangrams added:    {added_perfects}")
     print(f"🐝 Queenbee scores added:     {added_queenbees}")
+    print(f"🎰 BINGO puzzles added:        {added_bingos}")
     print(f"🔠 Word attributes newly added:")
     for key in ["length", "first", "firsttwo", "jumbled", "points", "pangram", "perfectpangram"]:
         print(f"    {key}: {word_attr_totals[key]}")
-    log(f"🕯 Wax complete: {added_puzzles} puzzles added, {added_ids} IDs, {added_queenbees} Queenbees.")
+    log(f"🕯 Wax complete: {added_puzzles} puzzles added, {added_ids} IDs, {added_queenbees} Queenbees, {added_bingos} BINGOs.")
 
 if __name__ == "__main__":
     wax()
