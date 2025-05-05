@@ -107818,4 +107818,52 @@
     <word length="4" first="T" firsttwo="TO" jumbled="TUOT" points="1">TOUT</word>
     <word length="6" first="T" firsttwo="TO" jumbled="TTEDUO" points="6">TOUTED</word>
   </puzzle>
+  <puzzle date="2025-05-05" id="20250505-7743cd" letters="PALMNOR" count="46" letter1="P" letter1count="34" letter2="A" letter2count="2" letter3="L" letter3count="4" letter4="M" letter4count="1" letter5="N" letter5count="2" letter6="O" letter6count="1" letter7="R" letter7count="2" pangrams="1" perfectpangrams="0" queenbee="184">
+    <word length="10" first="P" firsttwo="PA" jumbled="ARANLOAPMR" pangram="yes" points="17">PARANORMAL</word>
+    <word length="6" first="A" firsttwo="AP" jumbled="PLAPAL" points="6">APPALL</word>
+    <word length="5" first="A" firsttwo="AP" jumbled="POANR" points="5">APRON</word>
+    <word length="4" first="L" firsttwo="LA" jumbled="PLAM" points="1">LAMP</word>
+    <word length="7" first="L" firsttwo="LA" jumbled="AOOPNLM" points="7">LAMPOON</word>
+    <word length="6" first="L" firsttwo="LO" jumbled="OLLLPO" points="6">LOLLOP</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="PLOO" points="1">LOOP</word>
+    <word length="8" first="M" firsttwo="MA" jumbled="LROAPAMP" points="8">MALAPROP</word>
+    <word length="6" first="N" firsttwo="NA" jumbled="PANALM" points="6">NAPALM</word>
+    <word length="8" first="N" firsttwo="NO" jumbled="LOONPNAR" points="8">NONPOLAR</word>
+    <word length="4" first="O" firsttwo="OP" jumbled="APOL" points="1">OPAL</word>
+    <word length="6" first="P" firsttwo="PA" jumbled="APPALA" points="6">PALAPA</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="LALP" points="1">PALL</word>
+    <word length="6" first="P" firsttwo="PA" jumbled="ORLAPL" points="6">PALLOR</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="PLMA" points="1">PALM</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="APLP" points="1">PALP</word>
+    <word length="5" first="P" firsttwo="PA" jumbled="PAAPM" points="5">PAMPA</word>
+    <word length="6" first="P" firsttwo="PA" jumbled="AMANAP" points="6">PANAMA</word>
+    <word length="8" first="P" firsttwo="PA" jumbled="PAMAONRA" points="8">PANORAMA</word>
+    <word length="4" first="P" firsttwo="PA" jumbled="PAAP" points="1">PAPA</word>
+    <word length="5" first="P" firsttwo="PA" jumbled="APLPA" points="5">PAPAL</word>
+    <word length="6" first="P" firsttwo="PA" jumbled="PORALR" points="6">PARLOR</word>
+    <word length="5" first="P" firsttwo="PA" jumbled="OALRP" points="5">PAROL</word>
+    <word length="4" first="P" firsttwo="PL" jumbled="ANPL" points="1">PLAN</word>
+    <word length="6" first="P" firsttwo="PL" jumbled="AANRPL" points="6">PLANAR</word>
+    <word length="4" first="P" firsttwo="PL" jumbled="PPOL" points="1">PLOP</word>
+    <word length="5" first="P" firsttwo="PO" jumbled="ORALP" points="5">POLAR</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="LPOL" points="1">POLL</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="OPOL" points="1">POLO</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="MOPP" points="1">POMP</word>
+    <word length="7" first="P" firsttwo="PO" jumbled="OPPOAMN" points="7">POMPANO</word>
+    <word length="6" first="P" firsttwo="PO" jumbled="MPOOPM" points="6">POMPOM</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="OOLP" points="1">POOL</word>
+    <word length="8" first="P" firsttwo="PO" jumbled="OPORLOOM" points="8">POOLROOM</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="POPO" points="1">POOP</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="PROO" points="1">POOR</word>
+    <word length="6" first="P" firsttwo="PO" jumbled="AOPRPL" points="6">POPLAR</word>
+    <word length="5" first="P" firsttwo="PO" jumbled="POPAP" points="5">POPPA</word>
+    <word length="4" first="P" firsttwo="PO" jumbled="ORNP" points="1">PORN</word>
+    <word length="5" first="P" firsttwo="PO" jumbled="PORON" points="5">PORNO</word>
+    <word length="4" first="P" firsttwo="PR" jumbled="APRM" points="1">PRAM</word>
+    <word length="4" first="P" firsttwo="PR" jumbled="ORMP" points="1">PROM</word>
+    <word length="5" first="P" firsttwo="PR" jumbled="PROOM" points="5">PROMO</word>
+    <word length="4" first="P" firsttwo="PR" jumbled="RPPO" points="1">PROP</word>
+    <word length="4" first="R" firsttwo="RA" jumbled="RPMA" points="1">RAMP</word>
+    <word length="4" first="R" firsttwo="RO" jumbled="OMRP" points="1">ROMP</word>
+  </puzzle>
 </puzzles>
