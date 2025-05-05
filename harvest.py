@@ -22,6 +22,18 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 from datetime import date, datetime, timedelta
 import argparse
+
+import os
+from datetime import date, datetime
+
+LOGFILE = f"logs/{date.today().strftime('%Y-%m-%d')}.log"
+os.makedirs("logs", exist_ok=True)
+
+def log(msg):
+    timestamp = datetime.now().strftime('%H:%M:%S')
+    with open(LOGFILE, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] [HARVEST] {msg}\n")
+
 import sys
 
 # ─── Configuration ─────────────────────────────────────────────────────────────
@@ -211,19 +223,23 @@ def main():
 
     if date_str in existing_dates:
         print(colored(f"🛑 Puzzle for {date_str} already exists. No action taken.", "33"))
+        log(f"🛑 Puzzle for {date_str} already exists. No action taken.")
         return
     if not words:
         print(colored(f"⚠️ No words fetched for {date_str}.", "33"))
+        log(f"⚠️ No words fetched for {date_str}.")
         return
 
     # 🛠️ (New) Check if today's words are identical to yesterday's
     latest_words = load_latest_words()
     if sorted(words) == latest_words:
         print(colored(f"🛑 Today's puzzle ({date_str}) is identical to the most recent puzzle. No action taken.", "31"))
+        log(f"🛑 Puzzle for {date_str} is identical to the latest one. Skipping.")
         sys.exit(1)
 
     append_puzzle(date_str, words)
     print(colored(f"✅ Appended puzzle for {date_str} with {len(words)} words.", "32"))
+    log(f"✅ Appended puzzle for {date_str} with {len(words)} words.")
 
 # ─── Entrypoint ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":

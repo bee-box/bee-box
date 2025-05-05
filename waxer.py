@@ -12,6 +12,16 @@ Never modifies words.xml.
 """
 
 import os
+import os
+from datetime import date, datetime
+
+LOGFILE = f"logs/{date.today().strftime('%Y-%m-%d')}.log"
+os.makedirs("logs", exist_ok=True)
+
+def log(msg):
+    timestamp = datetime.now().strftime('%H:%M:%S')
+    with open(LOGFILE, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] [WAXER] {msg}\n")
 import xml.etree.ElementTree as ET
 from uuid import uuid4
 import random
@@ -282,6 +292,7 @@ def wax():
     print(f"🔠 Word attributes newly added:")
     for key in ["length", "first", "firsttwo", "jumbled", "points", "pangram", "perfectpangram"]:
         print(f"    {key}: {word_attr_totals[key]}")
+    log(f"🕯 Wax complete: {added_puzzles} puzzles added, {added_ids} IDs, {added_queenbees} Queenbees.")
 
 if __name__ == "__main__":
     wax()
