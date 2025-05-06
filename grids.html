@@ -9,6 +9,7 @@
 </head>
 <body>
 
+<!-- Header and Controls -->
 <nav class="banner" id="banner">
   <div class="left-section">
     <div class="banner-title">Spelling Bee Grid</div>
@@ -16,22 +17,31 @@
   </div>
   <div class="right-section">
     <select id="dateSelector"></select>
-    <button onclick="window.print()" title="Print a clean black and white version">Print</button>
+    <button onclick="window.print()">Print</button>
     <button onclick="goHome()">Home</button>
   </div>
 </nav>
 
+<!-- Letter wheel and metadata -->
 <div class="letter-grid" id="letterGrid"></div>
 <div class="puzzle-summary" id="puzzleSummary"></div>
 
+<!-- Main grid table -->
 <table id="gridTable">
   <thead><tr><th class="bee-header"></th></tr></thead>
   <tbody></tbody>
 </table>
 
+<!-- Two-letter breakdown -->
 <div class="two-letter-list" id="twoLetterList"></div>
 
 <script>
+// ───── One-Time Refresh Logic ─────
+if (!window.location.href.includes('refreshed=true')) {
+  window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'refreshed=true';
+}
+
+// ───── Load and parse puzzles.xml ─────
 async function loadPuzzles() {
   const response = await fetch('xml/puzzles.xml');
   const xmlText = await response.text();
@@ -49,6 +59,7 @@ function getURLDate() {
   return params.get('date');
 }
 
+// ───── Build dropdown (newest at top) ─────
 function buildDropdown(puzzles) {
   const selector = document.getElementById('dateSelector');
   selector.innerHTML = '';
@@ -63,10 +74,12 @@ function buildDropdown(puzzles) {
   }
 }
 
+// ───── Render main stats and grid ─────
 function renderGrid(puzzle) {
   const words = Array.from(puzzle.getElementsByTagName('word'));
   const counts = {}, twoLetterCounts = {}, allLengthsSet = new Set();
 
+  // Count occurrences
   words.forEach(word => {
     const length = word.getAttribute('length');
     const first = word.getAttribute('first').toLowerCase();
@@ -80,7 +93,10 @@ function renderGrid(puzzle) {
   const lengths = Array.from(allLengthsSet).sort((a, b) => a - b);
   const letters = Object.keys(counts).sort();
 
+  // Table Header
   let html = '<tr><th class="bee-header"></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
+
+  // Per-letter row
   letters.forEach(letter => {
     let sum = 0;
     html += `<tr><td><b>${letter}</b>:</td>`;
@@ -92,6 +108,7 @@ function renderGrid(puzzle) {
     html += `<td>${sum}</td></tr>`;
   });
 
+  // Totals
   let totalRow = '<tr><td>Σ:</td>';
   let totalWords = 0;
   lengths.forEach(length => {
@@ -103,23 +120,23 @@ function renderGrid(puzzle) {
     totalRow += `<td>${colTotal}</td>`;
   });
   totalRow += `<td>${totalWords}</td></tr>`;
-
   document.getElementById('gridTable').innerHTML = html + totalRow;
 
+  // Summary: Words, Points, Pangrams, etc.
   const points = puzzle.getAttribute('queenbee') || 0;
   const pangrams = puzzle.getAttribute('pangrams') || 0;
   const perfect = puzzle.getAttribute('perfectpangrams') || 0;
-
   let summaryText = `WORDS: ${totalWords}, POINTS: ${points}, PANGRAMS: ${pangrams}`;
   if (parseInt(perfect) > 0) summaryText += ` (${perfect} Perfect)`;
   if (puzzle.getAttribute("bingo") === "BINGO") summaryText += `, BINGO`;
-
   document.getElementById('puzzleSummary').innerHTML = summaryText;
 
+  // Letter Grid
   const fullLetters = (puzzle.getAttribute('letters') || '').toLowerCase().split('');
   const formattedLetters = fullLetters.map((l, i) => i === 0 ? `<b>${l.toUpperCase()}</b>` : l.toUpperCase()).join(' ');
   document.getElementById('letterGrid').innerHTML = formattedLetters;
 
+  // Two-letter counts grouped
   const twoLetterKeys = Object.keys(twoLetterCounts).sort();
   const grouped = {};
   twoLetterKeys.forEach(item => {
@@ -127,41 +144,43 @@ function renderGrid(puzzle) {
     if (!grouped[firstChar]) grouped[firstChar] = [];
     grouped[firstChar].push(item.toUpperCase() + '-' + twoLetterCounts[item]);
   });
-
   let twoLetterHtml = '<strong>Two letter list:</strong><br>';
   for (const letter in grouped) {
     twoLetterHtml += grouped[letter].join(' ') + '<br>';
   }
   document.getElementById('twoLetterList').innerHTML = twoLetterHtml;
 
+  // Format puzzle date
   const rawDate = puzzle.getAttribute('date');
   const [year, month, day] = rawDate.split('-').map(Number);
   const dateObj = new Date(year, month - 1, day);
   const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
   const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
   document.getElementById('puzzleDate').textContent = `${weekday}, ${monthName} ${day}, ${year}`;
-
   document.body.classList.add('loaded');
 }
 
+// ───── External button navigation ─────
 function goHome() {
   window.location.href = 'https://beebox.ghost.io';
 }
 
+// ───── Main loader ─────
 (async function() {
   const allPuzzles = await loadPuzzles();
-  const puzzles = allPuzzles.filter(p => p.getElementsByTagName("word").length > 0);
+  const puzzles = allPuzzles.filter(p => p.getElementsByTagName("word").length > 0); // Only puzzles with words
 
   buildDropdown(puzzles);
 
   const urlDate = getURLDate();
   let selectedPuzzle = urlDate
     ? puzzles.find(p => p.getAttribute("date") === urlDate)
-    : puzzles[puzzles.length - 1]; // ✅ most recent puzzle with words
+    : puzzles[puzzles.length - 1];
 
   document.getElementById('dateSelector').value = selectedPuzzle.getAttribute('date');
   renderGrid(selectedPuzzle);
 
+  // Handle dropdown change
   document.getElementById('dateSelector').addEventListener('change', (e) => {
     const selected = findPuzzleByDate(puzzles, e.target.value);
     if (selected) {

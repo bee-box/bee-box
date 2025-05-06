@@ -2,231 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bee Plus</title>
+  <title>Bee Plus Comparison</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="style/jumble.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .letters {
+      font-size: 1.5em;
+      margin-bottom: 1em;
+    }
+    .letters b {
+      color: #000;
+      background: #f7da21;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+    }
+    .word {
+      display: inline-block;
+      margin: 4px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .puzzle-word {
+      background-color: #fff176;
+    }
+    .extra-word {
+      background-color: #e0e0e0;
+    }
+  </style>
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="navbar-title">Bee Plus</div>
-  <div class="navbar-buttons">
-    <div class="nav-controls">
-      <div class="nav-row">
-        <button id="prevDayBtn">←</button>
-        <select id="dateSelector"></select>
-        <button id="nextDayBtn">→</button>
-      </div>
-    </div>
-    <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
-    <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
-    <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
-  </div>
-</nav>
-
-<div class="subtitle" id="worksheetTitle">The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Plus for</div>
-
-<header class="main-header">
-  <div class="honeycomb-container">
-    <div class="honeycomb" id="honeycomb"></div>
-  </div>
-</header>
-
-<div class="puzzle" id="puzzle"></div>
+<h1>🐝 Bee Plus Comparison</h1>
+<div id="output"></div>
 
 <script>
-function createHexSVG(letter, isCenter = false) {
-  const svgNS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("width", "60");
-  svg.setAttribute("height", "52");
-  svg.setAttribute("viewBox", "0 0 100 86");
-
-  const polygon = document.createElementNS(svgNS, "polygon");
-  polygon.setAttribute("points", "50,0 93,25 93,61 50,86 7,61 7,25");
-  polygon.setAttribute("fill", isCenter ? "#f7da21" : "#e0e0e0");
-  polygon.setAttribute("stroke", isCenter ? "#000" : "#999");
-  polygon.setAttribute("stroke-width", isCenter ? "3" : "1");
-  svg.appendChild(polygon);
-
-  const text = document.createElementNS(svgNS, "text");
-  text.setAttribute("x", "50%");
-  text.setAttribute("y", "50%");
-  text.setAttribute("text-anchor", "middle");
-  text.setAttribute("font-family", "Georgia");
-  text.setAttribute("font-size", "32");
-  text.setAttribute("font-weight", "bold");
-  text.setAttribute("fill", "#000");
-  text.setAttribute("dominant-baseline", "middle");
-  text.textContent = letter;
-  svg.appendChild(text);
-
-  return svg;
+async function loadXML(url) {
+  const response = await fetch(url);
+  const text = await response.text();
+  return new window.DOMParser().parseFromString(text, "application/xml");
 }
 
-function loadPuzzle(puzzle) {
-  const rawDate = puzzle.getAttribute("date");
-  const [yyyy, mm, dd] = rawDate.split('-');
-  const fullDate = new Date(+yyyy, +mm - 1, +dd);
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' };
-  const formatted = fullDate.toLocaleDateString('en-US', options);
-  document.getElementById("worksheetTitle").textContent =
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Plus for ${formatted}`;
-
-  const letters = puzzle.getAttribute("letters");
-  const centerLetter = letters[0];
-  const honeycomb = document.getElementById("honeycomb");
-  const puzzleDiv = document.getElementById("puzzle");
-  honeycomb.innerHTML = '';
-  puzzleDiv.innerHTML = '';
-
-  for (let i = 0; i < letters.length; i++) {
-    const hexSVG = createHexSVG(letters[i], i === 0);
-    honeycomb.appendChild(hexSVG);
-  }
-
-  fetch("xml/dictionary.txt")
-    .then(response => response.text())
-    .then(text => {
-      const dictionary = text
-        .split('\n')
-        .map(w => w.trim().toUpperCase())
-        .filter(w => w.length >= 4);
-
-      const validWords = dictionary.filter(word =>
-        word.includes(centerLetter) &&
-        [...word].every(ch => letters.includes(ch))
-      );
-
-      validWords.sort((a, b) => a.length - b.length || a.localeCompare(b));
-
-      const groups = {};
-      for (let word of validWords) {
-        const len = word.length;
-        if (!groups[len]) groups[len] = [];
-        groups[len].push(word);
-      }
-
-      for (const len of Object.keys(groups).sort((a, b) => a - b)) {
-        const group = document.createElement("div");
-        group.className = "word-group";
-
-        const label = document.createElement("div");
-        label.className = "group-label";
-        label.textContent = `${len}-letter words`;
-        group.appendChild(label);
-
-        const grid = document.createElement("div");
-        grid.className = "word-grid";
-
-        for (let word of groups[len]) {
-          const box = document.createElement("div");
-          box.className = "word-box" + (word.length >= 8 ? " long-word" : "");
-          box.textContent = word;
-          grid.appendChild(box);
-        }
-
-        group.appendChild(grid);
-        puzzleDiv.appendChild(group);
-      }
-    });
+async function loadText(url) {
+  const response = await fetch(url);
+  return response.text();
 }
 
-function populateDateSelector() {
+function getQueryDate() {
   const params = new URLSearchParams(window.location.search);
-  const puzzleid = params.get("puzzleid");
-  const urlDate = params.get("date");
-  fetch("xml/puzzles.xml")
-    .then(response => response.text())
-    .then(xmlText => {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-      const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
-      const selector = document.getElementById("dateSelector");
-
-      puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-
-      const allowMostRecent = Boolean(puzzleid);
-
-      for (let i = allowMostRecent ? 0 : 1; i < puzzles.length; i++) {
-        const dateStr = puzzles[i].getAttribute("date");
-        const option = document.createElement("option");
-        option.value = dateStr;
-        const [yyyy, mm, dd] = dateStr.split('-');
-        option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
-        selector.appendChild(option);
-      }
-
-      let targetPuzzle = null;
-
-      if (puzzleid) {
-        targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
-      }
-
-      if (!targetPuzzle && urlDate && urlDate !== puzzles[0].getAttribute("date")) {
-        targetPuzzle = puzzles.find(p => p.getAttribute("date") === urlDate);
-      }
-
-      if (!targetPuzzle) {
-        targetPuzzle = puzzles[1];
-        showWelcomePopup();
-      }
-
-      selector.value = targetPuzzle.getAttribute("date");
-      loadPuzzle(targetPuzzle);
-    });
+  return params.get("date");
 }
 
-document.getElementById("dateSelector").addEventListener("change", function () {
-  const date = this.value;
-  const newUrl = `${window.location.pathname}?date=${date}`;
-  window.location.href = newUrl;
-});
+function renderLetters(letters) {
+  return letters
+    .split('')
+    .map((ch, i) => i === 0 ? `<b>${ch}</b>` : ch.toUpperCase())
+    .join(' ');
+}
 
-document.getElementById("prevDayBtn").addEventListener("click", () => {
-  const selector = document.getElementById("dateSelector");
-  if (selector.selectedIndex < selector.options.length - 1) {
-    const prevDate = selector.options[selector.selectedIndex + 1].value;
-    window.location.href = `${window.location.pathname}?date=${prevDate}`;
-  }
-});
+async function displayWords() {
+  const xmlDoc = await loadXML('xml/puzzles.xml');
+  const puzzles = Array.from(xmlDoc.getElementsByTagName('puzzle')).filter(p => p.getAttribute("letters"));
 
-document.getElementById("nextDayBtn").addEventListener("click", () => {
-  const selector = document.getElementById("dateSelector");
-  if (selector.selectedIndex > 0) {
-    const nextDate = selector.options[selector.selectedIndex - 1].value;
-    window.location.href = `${window.location.pathname}?date=${nextDate}`;
-  }
-});
+  if (!puzzles.length) return;
 
-function showWelcomePopup() {
-  const overlay = document.createElement("div");
-  overlay.className = "popup-overlay";
+  const queryDate = getQueryDate();
+  let targetPuzzle = puzzles.find(p => p.getAttribute("date") === queryDate);
+  if (!targetPuzzle) targetPuzzle = puzzles[puzzles.length - 1];
 
-  const box = document.createElement("div");
-  box.className = "popup-box";
+  const puzzleDate = targetPuzzle.getAttribute('date');
+  const letters = targetPuzzle.getAttribute('letters').toUpperCase();
+  const center = letters[0];
 
-  box.innerHTML = `
-    <h2>Welcome to Bee Plus!</h2>
-    <p>
-      All previous Bee Pluses are available to everyone right here, right now
-      <strong>—except for today's</strong>. Today's Plus is only available to
-      subscribers (it's free!).
-    </p>
-    <button id="continueBtn" class="continue">Continue</button>
-    <a href="https://beebox.ghost.io/#/portal" target="_blank">
-      <button class="subscribe">Subscribe</button>
-    </a>
+  const puzzleWords = new Set(
+    Array.from(targetPuzzle.getElementsByTagName('word'))
+      .map(w => w.textContent.trim().toUpperCase())
+  );
+
+  const dictionaryText = await loadText('xml/dictionary.txt');
+  const dictionaryWords = dictionaryText
+    .split('\n')
+    .map(w => w.trim().toUpperCase())
+    .filter(w =>
+      w.length >= 4 &&
+      w.includes(center) &&
+      [...w].every(ch => letters.includes(ch))
+    );
+
+  const extraWords = dictionaryWords.filter(w => !puzzleWords.has(w));
+
+  const allWords = [
+    ...Array.from(puzzleWords).map(w => ({ word: w, className: 'puzzle-word' })),
+    ...extraWords.map(w => ({ word: w, className: 'extra-word' }))
+  ].sort((a, b) => a.word.localeCompare(b.word));
+
+  const output = document.getElementById('output');
+  output.innerHTML = `
+    <h2>Puzzle Date: ${puzzleDate}</h2>
+    <div class="letters">${renderLetters(letters)}</div>
+    <div><strong>Center Letter:</strong> ${center}</div>
+    <h3>Bee Words (${puzzleWords.size})</h3>
   `;
 
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  const container = document.createElement('div');
+  allWords.forEach(({ word, className }) => {
+    const span = document.createElement('span');
+    span.className = `word ${className}`;
+    span.textContent = word;
+    container.appendChild(span);
+  });
 
-  document.getElementById("continueBtn").onclick = () => overlay.remove();
+  output.appendChild(container);
+  output.innerHTML += `<h3>Plus Words (${extraWords.length})</h3>`;
 }
-
-populateDateSelector();
+displayWords();
 </script>
 
 </body>
