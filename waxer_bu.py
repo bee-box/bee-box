@@ -12,7 +12,7 @@ Never modifies words.xml.
 """
 
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 import xml.etree.ElementTree as ET
 from uuid import uuid4
 import random
@@ -23,6 +23,7 @@ PUZZLES_XML = "xml/puzzles.xml"
 
 LOGFILE = f"logs/{date.today().strftime('%Y-%m-%d')}.log"
 os.makedirs("logs", exist_ok=True)
+
 def log(msg):
     timestamp = datetime.now().strftime('%H:%M:%S')
     with open(LOGFILE, "a", encoding="utf-8") as f:
@@ -54,6 +55,7 @@ def generate_id(date_str, existing_ids):
         new_id = f"{base}-{suffix}"
         if new_id not in existing_ids:
             return new_id
+
 def generate_jumble(word):
     if len(word) < 2:
         return word
@@ -109,6 +111,7 @@ def add_word_attributes(word_el, letterset=None):
     added["points"] += 1
 
     return added
+
 def get_letters_from_words(words):
     sets = [set(w) for w in words]
     if not sets:
@@ -133,8 +136,8 @@ def update_puzzle_metadata(puzzle, existing_ids):
     word_attr_counts = Counter()
 
     if "id" not in puzzle.attrib:
-        date_str = puzzle.attrib.get("date", "unknown")
-        new_id = generate_id(date_str, existing_ids)
+        date = puzzle.attrib.get("date", "unknown")
+        new_id = generate_id(date, existing_ids)
         puzzle.set("id", new_id)
         existing_ids.add(new_id)
         id_added = True
@@ -197,6 +200,7 @@ def update_puzzle_metadata(puzzle, existing_ids):
         puzzle.set("queenbee", str(total))
         queenbee_added = True
 
+    # Always set bingo attribute
     if "letters" in puzzle.attrib:
         letters = puzzle.attrib["letters"]
         starts = {ch: 0 for ch in letters}
@@ -214,22 +218,7 @@ def update_puzzle_metadata(puzzle, existing_ids):
         letters_added, lettercounts_added,
         pangrams_added, perfects_added, queenbee_added
     )
-def add_blank_puzzles_to_end_of_year_plus_3(root, existing_ids):
-    today = date.today()
-    end_date = date(today.year, 12, 31) + timedelta(days=3)
-    existing_dates = get_puzzle_dates(root)
-    added = 0
 
-    for delta in range((end_date - today).days + 1):
-        target_date = today + timedelta(days=delta)
-        target_str = target_date.isoformat()
-        if target_str not in existing_dates:
-            new_puzzle = ET.SubElement(root, "puzzle", attrib={"date": target_str})
-            new_id = generate_id(target_str, existing_ids)
-            new_puzzle.set("id", new_id)
-            existing_ids.add(new_id)
-            added += 1
-    return added
 def wax():
     if not os.path.exists(WORDS_XML):
         raise FileNotFoundError(f"{WORDS_XML} not found.")
@@ -259,10 +248,10 @@ def wax():
     seen_dates = set()
 
     for puzzle in words_root.findall("puzzle"):
-        date_str = puzzle.attrib.get("date")
-        if not date_str or date_str in existing_dates or date_str in seen_dates:
+        date = puzzle.attrib.get("date")
+        if not date or date in existing_dates or date in seen_dates:
             continue
-        seen_dates.add(date_str)
+        seen_dates.add(date)
 
         new_puzzle = ET.Element("puzzle", attrib=dict(puzzle.attrib))
         for word_el in puzzle.findall("word"):
@@ -273,12 +262,7 @@ def wax():
         puzzles_root.append(new_puzzle)
         added_puzzles += 1
 
-    added_blank_puzzles = add_blank_puzzles_to_end_of_year_plus_3(puzzles_root, existing_ids)
-
     for puzzle in puzzles_root.findall("puzzle"):
-        has_words = len(puzzle.findall("word")) > 0
-        if not has_words and "id" in puzzle.attrib:
-            continue  # Don't modify metadata for blank puzzles with no words
         result = update_puzzle_metadata(puzzle, existing_ids)
         id_added, count_added, word_attr_added, letters_added, lettercounts_added, pangrams_added, perfects_added, queenbee_added = result
         if puzzle.attrib.get("bingo") == "BINGO":
@@ -297,7 +281,6 @@ def wax():
 
     print("🕯 Wax complete.")
     print(f"➕ New puzzles added:         {added_puzzles}")
-    print(f"📅 Blank puzzles added:      {added_blank_puzzles}")
     print(f"🆔 Puzzle IDs added:          {added_ids}")
     print(f"🔠 Word counts added:         {added_counts}")
     print(f"🔤 Letters strings added:     {added_letters}")
@@ -305,11 +288,11 @@ def wax():
     print(f"🥚 Pangram counts added:      {added_pangrams}")
     print(f"💎 Perfect pangrams added:    {added_perfects}")
     print(f"🐝 Queenbee scores added:     {added_queenbees}")
-    print(f"🎰 BINGO puzzles added:       {added_bingos}")
+    print(f"🎰 BINGO puzzles added:        {added_bingos}")
     print(f"🔠 Word attributes newly added:")
     for key in ["length", "first", "firsttwo", "jumbled", "points", "pangram", "perfectpangram"]:
         print(f"    {key}: {word_attr_totals[key]}")
-    log(f"🕯 Wax complete: {added_puzzles} puzzles added, {added_blank_puzzles} blank puzzles, {added_ids} IDs, {added_queenbees} Queenbees, {added_bingos} BINGOs.")
+    log(f"🕯 Wax complete: {added_puzzles} puzzles added, {added_ids} IDs, {added_queenbees} Queenbees, {added_bingos} BINGOs.")
 
 if __name__ == "__main__":
     wax()
