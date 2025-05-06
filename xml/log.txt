@@ -1,0 +1,10 @@
+[2025-05-06 00:15:57] ✅ Wax complete.
+
+[2025-05-06 00:15:56] Added 0 blank puzzles through Jan 3.
+[2025-05-06 00:15:56] Imported 0 new puzzles from words.xml.
+[2025-05-06 00:15:55] 🕯 Starting waxer process...
+[2025-05-06 00:15:54] ⚠️ Puzzle for 2025-05-05 already exists. Skipping.
+[2025-05-06 00:15:53] 📅 Puzzle for 2025-05-05 fetched with 46 words.
+[2025-05-06 00:15:53] Attempt 1...
+[2025-05-06 00:15:53] 📡 Fetching Spelling Bee puzzle from NYT...
+[2025-05-06 00:15:53] 🚀 Starting Spelling Bee harvest.
