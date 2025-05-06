@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bee Jumble</title>
+  <title>Bee Plus</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="style/bee.ico" type="image/x-icon" />
   <link rel="stylesheet" href="style/jumble.css" />
@@ -10,7 +10,7 @@
 <body>
 
 <nav class="navbar">
-  <div class="navbar-title">Bee Jumble</div>
+  <div class="navbar-title">Bee Plus</div>
   <div class="navbar-buttons">
     <div class="nav-controls">
       <div class="nav-row">
@@ -25,7 +25,7 @@
   </div>
 </nav>
 
-<div class="subtitle" id="worksheetTitle">The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for</div>
+<div class="subtitle" id="worksheetTitle">The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Plus for</div>
 
 <header class="main-header">
   <div class="honeycomb-container">
@@ -72,9 +72,10 @@ function loadPuzzle(puzzle) {
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' };
   const formatted = fullDate.toLocaleDateString('en-US', options);
   document.getElementById("worksheetTitle").textContent =
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for ${formatted}`;
+    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Plus for ${formatted}`;
 
   const letters = puzzle.getAttribute("letters");
+  const centerLetter = letters[0];
   const honeycomb = document.getElementById("honeycomb");
   const puzzleDiv = document.getElementById("puzzle");
   honeycomb.innerHTML = '';
@@ -85,64 +86,57 @@ function loadPuzzle(puzzle) {
     honeycomb.appendChild(hexSVG);
   }
 
-  const wordElements = Array.from(puzzle.getElementsByTagName("word"));
-  const words = wordElements.map(w => ({
-    text: w.getAttribute("jumbled") || w.textContent,
-    original: w.textContent,
-    length: (w.textContent || '').length
-  }));
+  fetch("xml/dictionary.txt")
+    .then(response => response.text())
+    .then(text => {
+      const dictionary = text
+        .split('\n')
+        .map(w => w.trim().toUpperCase())
+        .filter(w => w.length >= 4);
 
-  words.sort((a, b) => a.length - b.length || a.text.localeCompare(b.text));
+      const validWords = dictionary.filter(word =>
+        word.includes(centerLetter) &&
+        [...word].every(ch => letters.includes(ch))
+      );
 
-  const groups = {};
-  for (let word of words) {
-    if (!groups[word.length]) groups[word.length] = [];
-    groups[word.length].push(word);
-  }
+      validWords.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
-  for (const len of Object.keys(groups).sort((a, b) => a - b)) {
-    const group = document.createElement("div");
-    group.className = "word-group";
+      const groups = {};
+      for (let word of validWords) {
+        const len = word.length;
+        if (!groups[len]) groups[len] = [];
+        groups[len].push(word);
+      }
 
-    const label = document.createElement("div");
-    label.className = "group-label";
-    label.textContent = `${len}-letter words`;
-    group.appendChild(label);
+      for (const len of Object.keys(groups).sort((a, b) => a - b)) {
+        const group = document.createElement("div");
+        group.className = "word-group";
 
-    const grid = document.createElement("div");
-    grid.className = "word-grid";
+        const label = document.createElement("div");
+        label.className = "group-label";
+        label.textContent = `${len}-letter words`;
+        group.appendChild(label);
 
-    for (let word of groups[len]) {
-      const box = document.createElement("div");
-      box.className = "word-box" + (word.length >= 8 ? " long-word" : "");
-      box.textContent = word.text;
-      box.dataset.revealed = "false";
-      box.dataset.word = word.original;
-      box.dataset.jumbled = word.text;
+        const grid = document.createElement("div");
+        grid.className = "word-grid";
 
-      box.addEventListener("click", () => {
-        if (box.dataset.revealed === "true") {
-          box.textContent = word.text;
-          box.dataset.revealed = "false";
-        } else {
-          box.textContent = word.original;
-          box.dataset.revealed = "true";
+        for (let word of groups[len]) {
+          const box = document.createElement("div");
+          box.className = "word-box" + (word.length >= 8 ? " long-word" : "");
+          box.textContent = word;
+          grid.appendChild(box);
         }
-      });
 
-      grid.appendChild(box);
-    }
-
-    group.appendChild(grid);
-    puzzleDiv.appendChild(group);
-  }
+        group.appendChild(grid);
+        puzzleDiv.appendChild(group);
+      }
+    });
 }
 
 function populateDateSelector() {
   const params = new URLSearchParams(window.location.search);
   const puzzleid = params.get("puzzleid");
   const urlDate = params.get("date");
-
   fetch("xml/puzzles.xml")
     .then(response => response.text())
     .then(xmlText => {
@@ -151,14 +145,12 @@ function populateDateSelector() {
       const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
       const selector = document.getElementById("dateSelector");
 
-      const validPuzzles = puzzles
-        .filter(p => p.getElementsByTagName("word").length > 0)
-        .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+      puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
 
-        for (let i = validPuzzles.length - 1; i >= 0; i--) {
-  const p = validPuzzles[i];
+      const allowMostRecent = Boolean(puzzleid);
 
-        const dateStr = p.getAttribute("date");
+      for (let i = allowMostRecent ? 0 : 1; i < puzzles.length; i++) {
+        const dateStr = puzzles[i].getAttribute("date");
         const option = document.createElement("option");
         option.value = dateStr;
         const [yyyy, mm, dd] = dateStr.split('-');
@@ -172,12 +164,12 @@ function populateDateSelector() {
         targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
       }
 
-      if (!targetPuzzle && urlDate) {
-        targetPuzzle = validPuzzles.find(p => p.getAttribute("date") === urlDate);
+      if (!targetPuzzle && urlDate && urlDate !== puzzles[0].getAttribute("date")) {
+        targetPuzzle = puzzles.find(p => p.getAttribute("date") === urlDate);
       }
 
       if (!targetPuzzle) {
-        targetPuzzle = validPuzzles[validPuzzles.length - 1]; // 🟢 Most recent puzzle with words
+        targetPuzzle = puzzles[1];
         showWelcomePopup();
       }
 
@@ -208,13 +200,6 @@ document.getElementById("nextDayBtn").addEventListener("click", () => {
   }
 });
 
-window.addEventListener('beforeprint', () => {
-  document.querySelectorAll('.word-box[data-jumbled]').forEach(box => {
-    box.textContent = box.dataset.jumbled;
-    box.dataset.revealed = "false";
-  });
-});
-
 function showWelcomePopup() {
   const overlay = document.createElement("div");
   overlay.className = "popup-overlay";
@@ -223,10 +208,10 @@ function showWelcomePopup() {
   box.className = "popup-box";
 
   box.innerHTML = `
-    <h2>Welcome to Bee Jumble!</h2>
+    <h2>Welcome to Bee Plus!</h2>
     <p>
-      All previous Bee Jumbles are available to everyone right here, right now
-      <strong>—except for today's</strong>. Today's Jumble is only available to
+      All previous Bee Pluses are available to everyone right here, right now
+      <strong>—except for today's</strong>. Today's Plus is only available to
       subscribers (it's free!).
     </p>
     <button id="continueBtn" class="continue">Continue</button>

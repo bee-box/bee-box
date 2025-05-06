@@ -67,6 +67,54 @@
       return svg;
     }
 
+    function populateDateSelector() {
+      const params = new URLSearchParams(window.location.search);
+      const puzzleid = params.get("puzzleid");
+      const urlDate = params.get("date");
+
+      fetch("xml/puzzles.xml")
+        .then(response => response.text())
+        .then(xmlText => {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+          const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
+          const selector = document.getElementById("dateSelector");
+
+          puzzles.sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+          const validPuzzles = puzzles.filter(p => p.getElementsByTagName("word").length > 0);
+
+          for (let i = validPuzzles.length - 1; i >= 0; i--) {
+            const p = validPuzzles[i];
+            const dateStr = p.getAttribute("date");
+            const option = document.createElement("option");
+            option.value = dateStr;
+            const [yyyy, mm, dd] = dateStr.split('-');
+            option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
+            selector.appendChild(option);
+          }
+
+          let targetPuzzle = null;
+
+          if (puzzleid) {
+            targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
+          }
+
+          if (!targetPuzzle && urlDate) {
+            targetPuzzle = puzzles.find(p =>
+              p.getAttribute("date") === urlDate && p.getElementsByTagName("word").length > 0
+            );
+          }
+
+          if (!targetPuzzle) {
+            targetPuzzle = validPuzzles[validPuzzles.length - 1];
+            showWelcomePopup();
+          }
+
+          selector.value = targetPuzzle.getAttribute("date");
+          loadPuzzle(targetPuzzle);
+        });
+    }
+
     function loadPuzzle(puzzle) {
       const rawDate = puzzle.getAttribute("date");
       const [yyyy, mm, dd] = rawDate.split('-');
@@ -143,7 +191,6 @@
         puzzleDiv.appendChild(group);
       }
 
-      // 🔄 Print Reveal + Restore
       window.addEventListener('beforeprint', () => {
         document.querySelectorAll('.word-box').forEach(box => {
           box.textContent = box.dataset.word;
@@ -161,52 +208,6 @@
       });
     }
 
-    function populateDateSelector() {
-      const params = new URLSearchParams(window.location.search);
-      const puzzleid = params.get("puzzleid");
-      const urlDate = params.get("date");
-      fetch("xml/puzzles.xml")
-        .then(response => response.text())
-        .then(xmlText => {
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-          const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
-          const selector = document.getElementById("dateSelector");
-
-          puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-
-          const allowMostRecent = Boolean(puzzleid);
-
-          for (let i = allowMostRecent ? 0 : 1; i < puzzles.length; i++) {
-            const dateStr = puzzles[i].getAttribute("date");
-            const option = document.createElement("option");
-            option.value = dateStr;
-            const [yyyy, mm, dd] = dateStr.split('-');
-            option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
-            selector.appendChild(option);
-          }
-
-          let targetPuzzle = null;
-
-          if (puzzleid) {
-            targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
-          }
-
-          if (!targetPuzzle && urlDate && urlDate !== puzzles[0].getAttribute("date")) {
-            targetPuzzle = puzzles.find(p => p.getAttribute("date") === urlDate);
-          }
-
-          if (!targetPuzzle) {
-            targetPuzzle = puzzles[1];
-            showWelcomePopup();
-          }
-
-          selector.value = targetPuzzle.getAttribute("date");
-          loadPuzzle(targetPuzzle);
-        });
-    }
-
-    // Toggle Reveal Button 🔁
     document.getElementById("toggleRevealBtn").addEventListener("click", () => {
       const boxes = document.querySelectorAll('.word-box');
       const anyHidden = Array.from(boxes).some(box => box.dataset.revealed !== "true");
