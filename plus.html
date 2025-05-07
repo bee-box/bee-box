@@ -2,41 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bee Plus Comparison</title>
+  <title>Bee Plus</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    .letters {
-      font-size: 1.5em;
-      margin-bottom: 1em;
-    }
-    .letters b {
-      color: #000;
-      background: #f7da21;
-      padding: 0.2em 0.4em;
-      border-radius: 4px;
-    }
-    .word {
-      display: inline-block;
-      margin: 4px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    .puzzle-word {
-      background-color: #fff176;
-    }
-    .extra-word {
-      background-color: #e0e0e0;
-    }
-  </style>
+  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style/plus.css" />
 </head>
 <body>
 
-<h1>🐝 Bee Plus Comparison</h1>
+<nav class="navbar">
+  <div class="navbar-title">Bee Plus</div>
+  <div class="navbar-buttons">
+    <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+    <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
+    <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
+  </div>
+</nav>
+
 <div id="output"></div>
 
 <script>
@@ -51,11 +32,6 @@ async function loadText(url) {
   return response.text();
 }
 
-function getQueryDate() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("date");
-}
-
 function renderLetters(letters) {
   return letters
     .split('')
@@ -66,12 +42,9 @@ function renderLetters(letters) {
 async function displayWords() {
   const xmlDoc = await loadXML('xml/puzzles.xml');
   const puzzles = Array.from(xmlDoc.getElementsByTagName('puzzle')).filter(p => p.getAttribute("letters"));
+  if (puzzles.length < 2) return;
 
-  if (!puzzles.length) return;
-
-  const queryDate = getQueryDate();
-  let targetPuzzle = puzzles.find(p => p.getAttribute("date") === queryDate);
-  if (!targetPuzzle) targetPuzzle = puzzles[puzzles.length - 1];
+  const targetPuzzle = puzzles[puzzles.length - 2]; // Second most recent puzzle
 
   const puzzleDate = targetPuzzle.getAttribute('date');
   const letters = targetPuzzle.getAttribute('letters').toUpperCase();
@@ -101,23 +74,24 @@ async function displayWords() {
 
   const output = document.getElementById('output');
   output.innerHTML = `
-    <h2>Puzzle Date: ${puzzleDate}</h2>
+    <div class="subtitle">Puzzle Date: ${puzzleDate}</div>
     <div class="letters">${renderLetters(letters)}</div>
-    <div><strong>Center Letter:</strong> ${center}</div>
     <h3>Bee Words (${puzzleWords.size})</h3>
+    <h3>Plus Words (${extraWords.length})</h3>
   `;
 
   const container = document.createElement('div');
   allWords.forEach(({ word, className }) => {
     const span = document.createElement('span');
-    span.className = `word ${className}`;
+    span.className = `word-box ${className}`;
     span.textContent = word;
     container.appendChild(span);
   });
 
+  container.classList.add("word-grid");
   output.appendChild(container);
-  output.innerHTML += `<h3>Plus Words (${extraWords.length})</h3>`;
 }
+
 displayWords();
 </script>
 

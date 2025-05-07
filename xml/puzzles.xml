@@ -107866,4 +107866,46 @@
     <word length="4" first="R" firsttwo="RA" jumbled="APRM" points="1">RAMP</word>
     <word length="4" first="R" firsttwo="RO" jumbled="MRPO" points="1">ROMP</word>
   </puzzle>
+  <puzzle date="2025-05-06" id="20250506-48c50d" count="40" letters="OEGIMNW" letter1="O" letter1count="6" letter2="E" letter2count="1" letter3="G" letter3count="9" letter4="I" letter4count="0" letter5="M" letter5count="12" letter6="N" letter6count="6" letter7="W" letter7count="6" pangrams="1" perfectpangrams="1" queenbee="175" bingo="">
+    <word length="7" first="M" firsttwo="ME" jumbled="MGOINEW" pangram="yes" perfectpangram="yes" points="14">MEOWING</word>
+    <word length="6" first="E" firsttwo="EG" jumbled="OGNEGG" points="6">EGGNOG</word>
+    <word length="6" first="G" firsttwo="GE" jumbled="MNEOEG" points="6">GENOME</word>
+    <word length="5" first="G" firsttwo="GN" jumbled="MOGEN" points="5">GNOME</word>
+    <word length="5" first="G" firsttwo="GO" jumbled="IGOGN" points="5">GOING</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="ONEG" points="1">GONE</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="GOGN" points="1">GONG</word>
+    <word length="7" first="G" firsttwo="GO" jumbled="GGGNION" points="7">GONGING</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="GONO" points="1">GOON</word>
+    <word length="4" first="G" firsttwo="GO" jumbled="ONGW" points="1">GOWN</word>
+    <word length="7" first="G" firsttwo="GO" jumbled="IONGNWG" points="7">GOWNING</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="MOME" points="1">MEMO</word>
+    <word length="4" first="M" firsttwo="ME" jumbled="EWMO" points="1">MEOW</word>
+    <word length="5" first="M" firsttwo="MI" jumbled="MMIEO" points="5">MIMEO</word>
+    <word length="6" first="M" firsttwo="MI" jumbled="NNOIIM" points="6">MINION</word>
+    <word length="6" first="M" firsttwo="MI" jumbled="IWOMNN" points="6">MINNOW</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="OOMN" points="1">MONO</word>
+    <word length="6" first="M" firsttwo="MO" jumbled="ONMOIG" points="6">MOOING</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="MONO" points="1">MOON</word>
+    <word length="7" first="M" firsttwo="MO" jumbled="NINOGMO" points="7">MOONING</word>
+    <word length="6" first="M" firsttwo="MO" jumbled="OGIMWN" points="6">MOWING</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="NMOW" points="1">MOWN</word>
+    <word length="4" first="N" firsttwo="NE" jumbled="NNOE" points="1">NEON</word>
+    <word length="6" first="N" firsttwo="NO" jumbled="IGNOGN" points="6">NOGGIN</word>
+    <word length="7" first="N" firsttwo="NO" jumbled="MIEENNO" points="7">NOMINEE</word>
+    <word length="4" first="N" firsttwo="NO" jumbled="ONEN" points="1">NONE</word>
+    <word length="6" first="N" firsttwo="NO" jumbled="OOEGNI" points="6">NOOGIE</word>
+    <word length="4" first="N" firsttwo="NO" jumbled="ONON" points="1">NOON</word>
+    <word length="4" first="O" firsttwo="OG" jumbled="OEEG" points="1">OGEE</word>
+    <word length="4" first="O" firsttwo="OM" jumbled="NEMO" points="1">OMEN</word>
+    <word length="7" first="O" firsttwo="ON" jumbled="ONGNIOG" points="7">ONGOING</word>
+    <word length="5" first="O" firsttwo="ON" jumbled="NIOON" points="5">ONION</word>
+    <word length="5" first="O" firsttwo="OW" jumbled="ONWGI" points="5">OWING</word>
+    <word length="6" first="O" firsttwo="OW" jumbled="NOWING" points="6">OWNING</word>
+    <word length="6" first="W" firsttwo="WI" jumbled="NWIOWN" points="6">WINNOW</word>
+    <word length="9" first="W" firsttwo="WI" jumbled="NWNONWIGI" points="9">WINNOWING</word>
+    <word length="4" first="W" firsttwo="WI" jumbled="OINW" points="1">WINO</word>
+    <word length="5" first="W" firsttwo="WO" jumbled="OWMNE" points="5">WOMEN</word>
+    <word length="6" first="W" firsttwo="WO" jumbled="WNIGOO" points="6">WOOING</word>
+    <word length="6" first="W" firsttwo="WO" jumbled="WGWOIN" points="6">WOWING</word>
+  </puzzle>
 </puzzles>

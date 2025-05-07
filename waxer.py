@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-🐝 Waxer – waxer.py
+🏈 Waxer – waxer.py
 
 Processes Spelling Bee puzzles:
-- Adds new puzzles from words.xml into puzzles.xml
-- Ensures each puzzle has a unique ID and full metadata
-- Appends blank puzzles through Jan 3 of next year
-- Logs all activity to xml/log.txt (newest entries first)
+- Adds new puzzles from words.xml into puzzles.xml (like recruiting rookies to the team)
+- Ensures each puzzle has a unique ID and full metadata (contract signed!)
+- Appends blank puzzles through Jan 3 of next year (depth chart padding)
+- Logs all activity to xml/log.txt (play-by-play commentary)
 """
 
 import os
@@ -16,13 +16,15 @@ from uuid import uuid4
 import random
 from collections import Counter
 
-# ─── Config ────────────────────────────────────────────────────────────────────
-WORDS_XML = "xml/words.xml"
-PUZZLES_XML = "xml/puzzles.xml"
-LOG_FILE = "xml/log.txt"
+# ─── KICKOFF CONFIG ───────────────────────────────────────────────────────────
+# We're setting the field for the game here: defining file paths and making sure the XML folder exists.
+WORDS_XML = "xml/words.xml"       # Playbook with word formations
+PUZZLES_XML = "xml/puzzles.xml"   # The season schedule
+LOG_FILE = "log/log.txt"          # Sideline commentary (aka logs)
 os.makedirs("xml", exist_ok=True)
 
-# ─── Logging (Newest Entries First) ────────────────────────────────────────────
+# ─── PLAY-BY-PLAY LOGGER ──────────────────────────────────────────────────────
+# Logs messages like a game recap, putting the latest plays at the top of the scroll.
 def log(message):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     new_entry = f"[{timestamp}] {message}\n"
@@ -35,7 +37,8 @@ def log(message):
         with open(LOG_FILE, "w", encoding="utf-8") as f:
             f.write(new_entry)
 
-# ─── XML Formatter ─────────────────────────────────────────────────────────────
+# ─── HUDDLE UP: MAKE THE XML PRETTY ───────────────────────────────────────────
+# We’re calling a timeout to make the playbook readable — properly indented XML.
 def indent(elem, level=0):
     i = "\n" + "  " * level
     j = "\n" + "  " * (level + 1)
@@ -49,13 +52,15 @@ def indent(elem, level=0):
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
 
-# ─── Utilities ─────────────────────────────────────────────────────────────────
+# ─── SCOUTING REPORT ──────────────────────────────────────────────────────────
+# These help us track the dates and IDs already on the roster.
 def get_puzzle_dates(root):
     return {p.attrib.get("date") for p in root.findall("puzzle")}
 
 def get_existing_ids(root):
     return {p.attrib.get("id") for p in root.findall("puzzle") if "id" in p.attrib}
 
+# Think of this as issuing a jersey number: make it unique.
 def generate_id(date_str, existing_ids):
     base = date_str.replace("-", "")
     while True:
@@ -64,6 +69,7 @@ def generate_id(date_str, existing_ids):
         if new_id not in existing_ids:
             return new_id
 
+# Trick play: scramble the letters (but don’t fumble the original).
 def generate_jumble(word):
     if len(word) < 2:
         return word
@@ -77,7 +83,8 @@ def generate_jumble(word):
         attempts += 1
     return word[::-1] if word[::-1] != word else word
 
-# ─── Word Attributes ───────────────────────────────────────────────────────────
+# ─── STATS DEPARTMENT ─────────────────────────────────────────────────────────
+# Adds all the extra info to each word — kind of like tracking a player's speed, yards, and fantasy points.
 def add_word_attributes(word_el, letterset=None):
     added = Counter()
     text = word_el.text.strip().upper() if word_el.text else ""
@@ -121,6 +128,7 @@ def add_word_attributes(word_el, letterset=None):
 
     return added
 
+# This finds the "center letter" and the supporting squad.
 def get_letters_from_words(words):
     sets = [set(w) for w in words]
     if not sets:
@@ -133,7 +141,8 @@ def get_letters_from_words(words):
     rest = sorted(all_letters - {first})
     return first + ''.join(rest)
 
-# ─── Puzzle Metadata ───────────────────────────────────────────────────────────
+# ─── COACHING STRATEGY (PUZZLE METADATA) ──────────────────────────────────────
+# Add all the calculated metrics — we’re prepping for game day.
 def update_puzzle_metadata(puzzle, existing_ids):
     if "id" not in puzzle.attrib:
         date_str = puzzle.attrib.get("date", "unknown")
@@ -193,7 +202,8 @@ def update_puzzle_metadata(puzzle, existing_ids):
                 starts[first] += 1
         puzzle.set("bingo", "BINGO" if all(starts[ch] > 0 for ch in letters) else "")
 
-# ─── Add Blank Puzzles ─────────────────────────────────────────────────────────
+# ─── DEPTH CHART: FILL OUT THE SCHEDULE ───────────────────────────────────────
+# We don’t want to run out of puzzles, so this adds blank ones into the future — think of it as building the season schedule.
 def add_blank_puzzles_to_end_of_year_plus_3(root, existing_ids):
     today = date.today()
     end_date = date(today.year, 12, 31) + timedelta(days=3)
@@ -212,7 +222,7 @@ def add_blank_puzzles_to_end_of_year_plus_3(root, existing_ids):
     log(f"Added {added} blank puzzles through Jan 3.")
     return added
 
-# ─── Main Function ─────────────────────────────────────────────────────────────
+# ─── GAME TIME – MAIN FUNCTION ────────────────────────────────────────────────
 def wax():
     log("🕯 Starting waxer process...")
 
@@ -257,6 +267,6 @@ def wax():
     puzzles_tree.write(PUZZLES_XML, encoding="utf-8", xml_declaration=True)
     log("✅ Wax complete.\n")
 
-# ─── Entrypoint ────────────────────────────────────────────────────────────────
+# ─── TWO-MINUTE WARNING: ENTRYPOINT ───────────────────────────────────────────
 if __name__ == "__main__":
     wax()
