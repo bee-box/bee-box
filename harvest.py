@@ -5,7 +5,7 @@
 Fetches today's NYT Spelling Bee puzzle (date + words only) and
 appends it to `xml/words.xml` if that date isn't already present.
 
-All events are logged (newest first) to xml/log.txt
+All events are logged (newest first) to log/log.txt
 and also printed to the screen.
 """
 
@@ -21,17 +21,19 @@ from datetime import date, datetime
 
 # ─── Configuration ─────────────────────────────────────────────────────────────
 XML_DIR = "xml"
+LOG_DIR = "log"
 XML_FILE = os.path.join(XML_DIR, "words.xml")
-LOG_FILE = os.path.join(XML_DIR, "log.txt")
+LOG_FILE = os.path.join(LOG_DIR, "log.txt")
 NYT_URL = "https://www.nytimes.com/puzzles/spelling-bee"
 
 os.makedirs(XML_DIR, exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
 
 # ─── Logging (to file + console) ───────────────────────────────────────────────
 def log(message):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     full_msg = f"[{timestamp}] {message}"
-    print(full_msg)  # Print to screen
+    print(full_msg)
     new_entry = full_msg + "\n"
 
     if os.path.exists(LOG_FILE):
@@ -86,7 +88,6 @@ def fetch_puzzle():
             if not script_tag:
                 raise RuntimeError("Cannot find gameData in page source.")
 
-            # Isolate gameData JSON
             start = script_tag.find("{")
             brace_count = 0
             for i in range(start, len(script_tag)):
@@ -168,7 +169,7 @@ def main():
         return
 
     append_puzzle(date_str, words)
-    log("✅ Harvest complete.")  # ✅ Only appears at the very top if everything else succeeds
+    log("✅ Harvest complete.")
 
 # ─── Entrypoint ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
