@@ -40,7 +40,7 @@ jobs:
           LOGFILE="logs/harvest-$(date +'%Y-%m-%d').log"
           cat logs/workflow-$(date +'%Y-%m-%d').log > "$LOGFILE"
           echo "--- Running harvest.py ---" >> "$LOGFILE"
-          python harvest.py >> "$LOGFILE" 2>&1
+          python code/harvest.py >> "$LOGFILE" 2>&1
 
       - name: 🕯️ Run waxer.py and log output
         if: success()
@@ -48,7 +48,7 @@ jobs:
           LOGFILE="logs/waxer-$(date +'%Y-%m-%d').log"
           cat logs/workflow-$(date +'%Y-%m-%d').log > "$LOGFILE"
           echo "--- Running waxer.py ---" >> "$LOGFILE"
-          python waxer.py >> "$LOGFILE" 2>&1
+          python code/waxer.py >> "$LOGFILE" 2>&1
 
       - name: 🚀 Commit and push updated XML + logs
         run: |
