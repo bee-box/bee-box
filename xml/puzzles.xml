@@ -107908,4 +107908,290 @@
     <word length="6" first="W" firsttwo="WO" jumbled="WNIGOO" points="6">WOOING</word>
     <word length="6" first="W" firsttwo="WO" jumbled="WGWOIN" points="6">WOWING</word>
   </puzzle>
+  <puzzle date="2025-05-07" id="20250507-b43c2c" count="43" letters="NCILMOT" letter1="N" letter1count="4" letter2="C" letter2count="12" letter3="I" letter3count="4" letter4="L" letter4count="7" letter5="M" letter5count="9" letter6="O" letter6count="3" letter7="T" letter7count="4" pangrams="1" perfectpangrams="0" queenbee="202" bingo="BINGO">
+    <word length="10" first="L" firsttwo="LO" jumbled="TMOOLOONCI" pangram="yes" points="17">LOCOMOTION</word>
+    <word length="6" first="C" firsttwo="CL" jumbled="LNICIC" points="6">CLINIC</word>
+    <word length="6" first="C" firsttwo="CO" jumbled="OCNOOC" points="6">COCOON</word>
+    <word length="4" first="C" firsttwo="CO" jumbled="ICON" points="1">COIN</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="ONOLC" points="5">COLON</word>
+    <word length="7" first="C" firsttwo="CO" jumbled="OCCNOLI" points="7">COLONIC</word>
+    <word length="6" first="C" firsttwo="CO" jumbled="MOCOMN" points="6">COMMON</word>
+    <word length="9" first="C" firsttwo="CO" jumbled="OITNMOMOC" points="9">COMMOTION</word>
+    <word length="7" first="C" firsttwo="CO" jumbled="TCONOCC" points="7">CONCOCT</word>
+    <word length="10" first="C" firsttwo="CO" jumbled="OCNNOIOTCC" points="10">CONCOCTION</word>
+    <word length="5" first="C" firsttwo="CO" jumbled="OCNIC" points="5">CONIC</word>
+    <word length="9" first="C" firsttwo="CO" jumbled="LOITCNLIO" points="9">COTILLION</word>
+    <word length="6" first="C" firsttwo="CO" jumbled="TNCOOT" points="6">COTTON</word>
+    <word length="4" first="I" firsttwo="IC" jumbled="CNIO" points="1">ICON</word>
+    <word length="6" first="I" firsttwo="IC" jumbled="IOCINC" points="6">ICONIC</word>
+    <word length="4" first="I" firsttwo="IN" jumbled="INOT" points="1">INTO</word>
+    <word length="5" first="I" firsttwo="IO" jumbled="IOCNI" points="5">IONIC</word>
+    <word length="4" first="L" firsttwo="LI" jumbled="ILMN" points="1">LIMN</word>
+    <word length="4" first="L" firsttwo="LI" jumbled="LNTI" points="1">LINT</word>
+    <word length="4" first="L" firsttwo="LI" jumbled="ILNO" points="1">LION</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="ILNO" points="1">LOIN</word>
+    <word length="4" first="L" firsttwo="LO" jumbled="OLNO" points="1">LOON</word>
+    <word length="6" first="L" firsttwo="LO" jumbled="ONOLTI" points="6">LOTION</word>
+    <word length="7" first="M" firsttwo="MI" jumbled="OINIMLL" points="7">MILLION</word>
+    <word length="4" first="M" firsttwo="MI" jumbled="MIIN" points="1">MINI</word>
+    <word length="5" first="M" firsttwo="MI" jumbled="MIIMN" points="5">MINIM</word>
+    <word length="6" first="M" firsttwo="MI" jumbled="IMONNI" points="6">MINION</word>
+    <word length="4" first="M" firsttwo="MI" jumbled="TIMN" points="1">MINT</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="MOON" points="1">MONO</word>
+    <word length="4" first="M" firsttwo="MO" jumbled="OMNO" points="1">MOON</word>
+    <word length="7" first="M" firsttwo="MO" jumbled="INLTOOM" points="7">MOONLIT</word>
+    <word length="6" first="M" firsttwo="MO" jumbled="ONOTMI" points="6">MOTION</word>
+    <word length="6" first="N" firsttwo="NO" jumbled="NCMNOO" points="6">NONCOM</word>
+    <word length="9" first="N" firsttwo="NO" jumbled="NLIOILONN" points="9">NONILLION</word>
+    <word length="4" first="N" firsttwo="NO" jumbled="NNOO" points="1">NOON</word>
+    <word length="6" first="N" firsttwo="NO" jumbled="ONONTI" points="6">NOTION</word>
+    <word length="9" first="O" firsttwo="OC" jumbled="OOLILITCN" points="9">OCTILLION</word>
+    <word length="5" first="O" firsttwo="ON" jumbled="OONIN" points="5">ONION</word>
+    <word length="4" first="O" firsttwo="ON" jumbled="TNOO" points="1">ONTO</word>
+    <word length="5" first="T" firsttwo="TI" jumbled="TNICT" points="5">TINCT</word>
+    <word length="4" first="T" firsttwo="TI" jumbled="NITT" points="1">TINT</word>
+    <word length="5" first="T" firsttwo="TO" jumbled="IOCTN" points="5">TONIC</word>
+    <word length="4" first="T" firsttwo="TO" jumbled="TONO" points="1">TOON</word>
+  </puzzle>
+  <puzzle date="2025-05-08" id="20250508-202af3" />
+  <puzzle date="2025-05-09" id="20250509-bade30" />
+  <puzzle date="2025-05-10" id="20250510-6805b8" />
+  <puzzle date="2025-05-11" id="20250511-df2bd1" />
+  <puzzle date="2025-05-12" id="20250512-d2363f" />
+  <puzzle date="2025-05-13" id="20250513-d9465f" />
+  <puzzle date="2025-05-14" id="20250514-3a89a2" />
+  <puzzle date="2025-05-15" id="20250515-707231" />
+  <puzzle date="2025-05-16" id="20250516-dddda2" />
+  <puzzle date="2025-05-17" id="20250517-6c1973" />
+  <puzzle date="2025-05-18" id="20250518-23764b" />
+  <puzzle date="2025-05-19" id="20250519-f0eb01" />
+  <puzzle date="2025-05-20" id="20250520-c09fd3" />
+  <puzzle date="2025-05-21" id="20250521-a12b45" />
+  <puzzle date="2025-05-22" id="20250522-b97040" />
+  <puzzle date="2025-05-23" id="20250523-a2d82b" />
+  <puzzle date="2025-05-24" id="20250524-63213e" />
+  <puzzle date="2025-05-25" id="20250525-f958b6" />
+  <puzzle date="2025-05-26" id="20250526-2daf69" />
+  <puzzle date="2025-05-27" id="20250527-295dbf" />
+  <puzzle date="2025-05-28" id="20250528-1f0805" />
+  <puzzle date="2025-05-29" id="20250529-9ccc78" />
+  <puzzle date="2025-05-30" id="20250530-e96d70" />
+  <puzzle date="2025-05-31" id="20250531-b606da" />
+  <puzzle date="2025-06-01" id="20250601-9d24f6" />
+  <puzzle date="2025-06-02" id="20250602-024fe5" />
+  <puzzle date="2025-06-03" id="20250603-6cb913" />
+  <puzzle date="2025-06-04" id="20250604-6d186e" />
+  <puzzle date="2025-06-05" id="20250605-5963e3" />
+  <puzzle date="2025-06-06" id="20250606-56cd46" />
+  <puzzle date="2025-06-07" id="20250607-7d068a" />
+  <puzzle date="2025-06-08" id="20250608-f014e4" />
+  <puzzle date="2025-06-09" id="20250609-8e80a9" />
+  <puzzle date="2025-06-10" id="20250610-1aca62" />
+  <puzzle date="2025-06-11" id="20250611-92f644" />
+  <puzzle date="2025-06-12" id="20250612-74c38e" />
+  <puzzle date="2025-06-13" id="20250613-4ce3da" />
+  <puzzle date="2025-06-14" id="20250614-6c0794" />
+  <puzzle date="2025-06-15" id="20250615-314643" />
+  <puzzle date="2025-06-16" id="20250616-146c50" />
+  <puzzle date="2025-06-17" id="20250617-0d2a20" />
+  <puzzle date="2025-06-18" id="20250618-1df434" />
+  <puzzle date="2025-06-19" id="20250619-dcb041" />
+  <puzzle date="2025-06-20" id="20250620-7e1c14" />
+  <puzzle date="2025-06-21" id="20250621-159e17" />
+  <puzzle date="2025-06-22" id="20250622-754c27" />
+  <puzzle date="2025-06-23" id="20250623-efd600" />
+  <puzzle date="2025-06-24" id="20250624-06508a" />
+  <puzzle date="2025-06-25" id="20250625-077711" />
+  <puzzle date="2025-06-26" id="20250626-924dc9" />
+  <puzzle date="2025-06-27" id="20250627-ba916e" />
+  <puzzle date="2025-06-28" id="20250628-6b88e0" />
+  <puzzle date="2025-06-29" id="20250629-c515c4" />
+  <puzzle date="2025-06-30" id="20250630-7a300d" />
+  <puzzle date="2025-07-01" id="20250701-c58740" />
+  <puzzle date="2025-07-02" id="20250702-482fca" />
+  <puzzle date="2025-07-03" id="20250703-171022" />
+  <puzzle date="2025-07-04" id="20250704-050f44" />
+  <puzzle date="2025-07-05" id="20250705-16f4df" />
+  <puzzle date="2025-07-06" id="20250706-5a5e7f" />
+  <puzzle date="2025-07-07" id="20250707-929714" />
+  <puzzle date="2025-07-08" id="20250708-4714fa" />
+  <puzzle date="2025-07-09" id="20250709-79d1f2" />
+  <puzzle date="2025-07-10" id="20250710-444915" />
+  <puzzle date="2025-07-11" id="20250711-178170" />
+  <puzzle date="2025-07-12" id="20250712-134672" />
+  <puzzle date="2025-07-13" id="20250713-99c0eb" />
+  <puzzle date="2025-07-14" id="20250714-8b5db0" />
+  <puzzle date="2025-07-15" id="20250715-e9152b" />
+  <puzzle date="2025-07-16" id="20250716-421f76" />
+  <puzzle date="2025-07-17" id="20250717-4e15a6" />
+  <puzzle date="2025-07-18" id="20250718-3373e2" />
+  <puzzle date="2025-07-19" id="20250719-8de0fc" />
+  <puzzle date="2025-07-20" id="20250720-70d71c" />
+  <puzzle date="2025-07-21" id="20250721-c19b8e" />
+  <puzzle date="2025-07-22" id="20250722-b4fd81" />
+  <puzzle date="2025-07-23" id="20250723-50eb49" />
+  <puzzle date="2025-07-24" id="20250724-1ca5f5" />
+  <puzzle date="2025-07-25" id="20250725-a744b5" />
+  <puzzle date="2025-07-26" id="20250726-392b34" />
+  <puzzle date="2025-07-27" id="20250727-1247bf" />
+  <puzzle date="2025-07-28" id="20250728-36e6a7" />
+  <puzzle date="2025-07-29" id="20250729-eab012" />
+  <puzzle date="2025-07-30" id="20250730-f166bd" />
+  <puzzle date="2025-07-31" id="20250731-5f7e6a" />
+  <puzzle date="2025-08-01" id="20250801-c88f2b" />
+  <puzzle date="2025-08-02" id="20250802-2dde00" />
+  <puzzle date="2025-08-03" id="20250803-90f7b7" />
+  <puzzle date="2025-08-04" id="20250804-ec6382" />
+  <puzzle date="2025-08-05" id="20250805-efaab3" />
+  <puzzle date="2025-08-06" id="20250806-ecf9bc" />
+  <puzzle date="2025-08-07" id="20250807-2a80de" />
+  <puzzle date="2025-08-08" id="20250808-63a444" />
+  <puzzle date="2025-08-09" id="20250809-020e87" />
+  <puzzle date="2025-08-10" id="20250810-1a1c58" />
+  <puzzle date="2025-08-11" id="20250811-971941" />
+  <puzzle date="2025-08-12" id="20250812-d5413a" />
+  <puzzle date="2025-08-13" id="20250813-37e7a8" />
+  <puzzle date="2025-08-14" id="20250814-aca829" />
+  <puzzle date="2025-08-15" id="20250815-3be9d5" />
+  <puzzle date="2025-08-16" id="20250816-362057" />
+  <puzzle date="2025-08-17" id="20250817-eb4f5d" />
+  <puzzle date="2025-08-18" id="20250818-df8b04" />
+  <puzzle date="2025-08-19" id="20250819-734f35" />
+  <puzzle date="2025-08-20" id="20250820-98c30f" />
+  <puzzle date="2025-08-21" id="20250821-3812be" />
+  <puzzle date="2025-08-22" id="20250822-d77b90" />
+  <puzzle date="2025-08-23" id="20250823-915f21" />
+  <puzzle date="2025-08-24" id="20250824-25f3ea" />
+  <puzzle date="2025-08-25" id="20250825-03c600" />
+  <puzzle date="2025-08-26" id="20250826-339fe4" />
+  <puzzle date="2025-08-27" id="20250827-e857ce" />
+  <puzzle date="2025-08-28" id="20250828-727a51" />
+  <puzzle date="2025-08-29" id="20250829-5cec37" />
+  <puzzle date="2025-08-30" id="20250830-bd47be" />
+  <puzzle date="2025-08-31" id="20250831-522584" />
+  <puzzle date="2025-09-01" id="20250901-7f37f0" />
+  <puzzle date="2025-09-02" id="20250902-cf5fa8" />
+  <puzzle date="2025-09-03" id="20250903-060227" />
+  <puzzle date="2025-09-04" id="20250904-26362d" />
+  <puzzle date="2025-09-05" id="20250905-d93977" />
+  <puzzle date="2025-09-06" id="20250906-942732" />
+  <puzzle date="2025-09-07" id="20250907-7b9235" />
+  <puzzle date="2025-09-08" id="20250908-32c806" />
+  <puzzle date="2025-09-09" id="20250909-a0cef8" />
+  <puzzle date="2025-09-10" id="20250910-9c1301" />
+  <puzzle date="2025-09-11" id="20250911-821b75" />
+  <puzzle date="2025-09-12" id="20250912-1924dd" />
+  <puzzle date="2025-09-13" id="20250913-186854" />
+  <puzzle date="2025-09-14" id="20250914-ed6d1b" />
+  <puzzle date="2025-09-15" id="20250915-949df2" />
+  <puzzle date="2025-09-16" id="20250916-7691d4" />
+  <puzzle date="2025-09-17" id="20250917-f73232" />
+  <puzzle date="2025-09-18" id="20250918-a67ee7" />
+  <puzzle date="2025-09-19" id="20250919-87aa61" />
+  <puzzle date="2025-09-20" id="20250920-2b8db2" />
+  <puzzle date="2025-09-21" id="20250921-fdc457" />
+  <puzzle date="2025-09-22" id="20250922-99e441" />
+  <puzzle date="2025-09-23" id="20250923-266ac7" />
+  <puzzle date="2025-09-24" id="20250924-ec980e" />
+  <puzzle date="2025-09-25" id="20250925-77875b" />
+  <puzzle date="2025-09-26" id="20250926-9b503a" />
+  <puzzle date="2025-09-27" id="20250927-db6568" />
+  <puzzle date="2025-09-28" id="20250928-0f0136" />
+  <puzzle date="2025-09-29" id="20250929-acf4f5" />
+  <puzzle date="2025-09-30" id="20250930-513660" />
+  <puzzle date="2025-10-01" id="20251001-a8e8f6" />
+  <puzzle date="2025-10-02" id="20251002-859cc0" />
+  <puzzle date="2025-10-03" id="20251003-fc6054" />
+  <puzzle date="2025-10-04" id="20251004-78bad2" />
+  <puzzle date="2025-10-05" id="20251005-860e52" />
+  <puzzle date="2025-10-06" id="20251006-6e474b" />
+  <puzzle date="2025-10-07" id="20251007-51cfe9" />
+  <puzzle date="2025-10-08" id="20251008-91e7ea" />
+  <puzzle date="2025-10-09" id="20251009-4b337b" />
+  <puzzle date="2025-10-10" id="20251010-4055ec" />
+  <puzzle date="2025-10-11" id="20251011-a26458" />
+  <puzzle date="2025-10-12" id="20251012-e5920c" />
+  <puzzle date="2025-10-13" id="20251013-11d4b9" />
+  <puzzle date="2025-10-14" id="20251014-780b01" />
+  <puzzle date="2025-10-15" id="20251015-956f3b" />
+  <puzzle date="2025-10-16" id="20251016-89a191" />
+  <puzzle date="2025-10-17" id="20251017-2812ba" />
+  <puzzle date="2025-10-18" id="20251018-aaa58c" />
+  <puzzle date="2025-10-19" id="20251019-1f63f4" />
+  <puzzle date="2025-10-20" id="20251020-b4af39" />
+  <puzzle date="2025-10-21" id="20251021-9bb21d" />
+  <puzzle date="2025-10-22" id="20251022-145750" />
+  <puzzle date="2025-10-23" id="20251023-47c82d" />
+  <puzzle date="2025-10-24" id="20251024-c69323" />
+  <puzzle date="2025-10-25" id="20251025-a8da82" />
+  <puzzle date="2025-10-26" id="20251026-2fc127" />
+  <puzzle date="2025-10-27" id="20251027-137c3a" />
+  <puzzle date="2025-10-28" id="20251028-9e3ec4" />
+  <puzzle date="2025-10-29" id="20251029-280ef3" />
+  <puzzle date="2025-10-30" id="20251030-1f5873" />
+  <puzzle date="2025-10-31" id="20251031-544b8b" />
+  <puzzle date="2025-11-01" id="20251101-e1dbd0" />
+  <puzzle date="2025-11-02" id="20251102-7f17ed" />
+  <puzzle date="2025-11-03" id="20251103-98b656" />
+  <puzzle date="2025-11-04" id="20251104-fcbd5d" />
+  <puzzle date="2025-11-05" id="20251105-905979" />
+  <puzzle date="2025-11-06" id="20251106-a62ef5" />
+  <puzzle date="2025-11-07" id="20251107-20653e" />
+  <puzzle date="2025-11-08" id="20251108-017853" />
+  <puzzle date="2025-11-09" id="20251109-5606f3" />
+  <puzzle date="2025-11-10" id="20251110-6941d1" />
+  <puzzle date="2025-11-11" id="20251111-0a5b16" />
+  <puzzle date="2025-11-12" id="20251112-ff8c2c" />
+  <puzzle date="2025-11-13" id="20251113-9b094e" />
+  <puzzle date="2025-11-14" id="20251114-199809" />
+  <puzzle date="2025-11-15" id="20251115-01aa40" />
+  <puzzle date="2025-11-16" id="20251116-210081" />
+  <puzzle date="2025-11-17" id="20251117-7764af" />
+  <puzzle date="2025-11-18" id="20251118-e0106f" />
+  <puzzle date="2025-11-19" id="20251119-c17bcf" />
+  <puzzle date="2025-11-20" id="20251120-950dfd" />
+  <puzzle date="2025-11-21" id="20251121-247582" />
+  <puzzle date="2025-11-22" id="20251122-a9b79f" />
+  <puzzle date="2025-11-23" id="20251123-ca66dd" />
+  <puzzle date="2025-11-24" id="20251124-dff02e" />
+  <puzzle date="2025-11-25" id="20251125-e818e6" />
+  <puzzle date="2025-11-26" id="20251126-e5d59c" />
+  <puzzle date="2025-11-27" id="20251127-142be3" />
+  <puzzle date="2025-11-28" id="20251128-2da363" />
+  <puzzle date="2025-11-29" id="20251129-e41622" />
+  <puzzle date="2025-11-30" id="20251130-5f4c20" />
+  <puzzle date="2025-12-01" id="20251201-1ad03b" />
+  <puzzle date="2025-12-02" id="20251202-580cfa" />
+  <puzzle date="2025-12-03" id="20251203-f79825" />
+  <puzzle date="2025-12-04" id="20251204-cf7bd7" />
+  <puzzle date="2025-12-05" id="20251205-f0c036" />
+  <puzzle date="2025-12-06" id="20251206-707d56" />
+  <puzzle date="2025-12-07" id="20251207-a786db" />
+  <puzzle date="2025-12-08" id="20251208-99c276" />
+  <puzzle date="2025-12-09" id="20251209-5c28d4" />
+  <puzzle date="2025-12-10" id="20251210-d881ef" />
+  <puzzle date="2025-12-11" id="20251211-2189b4" />
+  <puzzle date="2025-12-12" id="20251212-0289a1" />
+  <puzzle date="2025-12-13" id="20251213-17190d" />
+  <puzzle date="2025-12-14" id="20251214-bd7ed6" />
+  <puzzle date="2025-12-15" id="20251215-5f803d" />
+  <puzzle date="2025-12-16" id="20251216-ecaa23" />
+  <puzzle date="2025-12-17" id="20251217-fe941b" />
+  <puzzle date="2025-12-18" id="20251218-760cd8" />
+  <puzzle date="2025-12-19" id="20251219-611069" />
+  <puzzle date="2025-12-20" id="20251220-51e7cc" />
+  <puzzle date="2025-12-21" id="20251221-a00faa" />
+  <puzzle date="2025-12-22" id="20251222-fcff9e" />
+  <puzzle date="2025-12-23" id="20251223-04480d" />
+  <puzzle date="2025-12-24" id="20251224-f2eb5c" />
+  <puzzle date="2025-12-25" id="20251225-6d20cb" />
+  <puzzle date="2025-12-26" id="20251226-271ec1" />
+  <puzzle date="2025-12-27" id="20251227-649e47" />
+  <puzzle date="2025-12-28" id="20251228-46a05b" />
+  <puzzle date="2025-12-29" id="20251229-7f7a80" />
+  <puzzle date="2025-12-30" id="20251230-a93be0" />
+  <puzzle date="2025-12-31" id="20251231-7ed82d" />
+  <puzzle date="2026-01-01" id="20260101-e667a6" />
+  <puzzle date="2026-01-02" id="20260102-3ececd" />
+  <puzzle date="2026-01-03" id="20260103-1c14b1" />
 </puzzles>
