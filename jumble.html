@@ -138,6 +138,7 @@ function loadPuzzle(puzzle) {
   }
 }
 
+
 function populateDateSelector() {
   const params = new URLSearchParams(window.location.search);
   const puzzleid = params.get("puzzleid");
@@ -155,13 +156,25 @@ function populateDateSelector() {
         .filter(p => p.getElementsByTagName("word").length > 0)
         .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
 
-        for (let i = validPuzzles.length - 1; i >= 0; i--) {
-  const p = validPuzzles[i];
+      const newestPuzzle = validPuzzles[validPuzzles.length - 1];
+      const showAll = !!puzzleid;
+      const dropdownPuzzles = showAll ? validPuzzles : validPuzzles.slice(0, -1);
 
+      if (!showAll) {
+        const newestDateStr = newestPuzzle.getAttribute("date");
+        const newestOption = document.createElement("option");
+        newestOption.textContent = newestDateStr + " (Subscribers Only)";
+        newestOption.disabled = true;
+        newestOption.selected = true;
+        selector.appendChild(newestOption);
+      }
+
+      for (let i = dropdownPuzzles.length - 1; i >= 0; i--) {
+        const p = dropdownPuzzles[i];
         const dateStr = p.getAttribute("date");
         const option = document.createElement("option");
-        option.value = dateStr;
         const [yyyy, mm, dd] = dateStr.split('-');
+        option.value = dateStr;
         option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
         selector.appendChild(option);
       }
@@ -173,18 +186,27 @@ function populateDateSelector() {
       }
 
       if (!targetPuzzle && urlDate) {
-        targetPuzzle = validPuzzles.find(p => p.getAttribute("date") === urlDate);
+        const match = dropdownPuzzles.find(p => p.getAttribute("date") === urlDate);
+        if (match) targetPuzzle = match;
       }
 
       if (!targetPuzzle) {
-        targetPuzzle = validPuzzles[validPuzzles.length - 1]; // 🟢 Most recent puzzle with words
-        showWelcomePopup();
+        targetPuzzle = dropdownPuzzles[dropdownPuzzles.length - 1];
+        if (!puzzleid && !urlDate) showWelcomePopup();
       }
 
-      selector.value = targetPuzzle.getAttribute("date");
+      const targetDate = targetPuzzle.getAttribute("date");
+      for (let i = 0; i < selector.options.length; i++) {
+        if (selector.options[i].value === targetDate) {
+          selector.selectedIndex = i;
+          break;
+        }
+      }
+
       loadPuzzle(targetPuzzle);
     });
 }
+
 
 document.getElementById("dateSelector").addEventListener("change", function () {
   const date = this.value;

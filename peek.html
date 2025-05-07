@@ -67,12 +67,13 @@
       return svg;
     }
 
-    function populateDateSelector() {
+    
+function populateDateSelector() {
       const params = new URLSearchParams(window.location.search);
-      const puzzleid = params.get("puzzleid");
-      const urlDate = params.get("date");
+const puzzleid = params.get("puzzleid");
+const urlDate = params.get("date");
+fetch("xml/puzzles.xml")
 
-      fetch("xml/puzzles.xml")
         .then(response => response.text())
         .then(xmlText => {
           const parser = new DOMParser();
@@ -83,12 +84,25 @@
           puzzles.sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
           const validPuzzles = puzzles.filter(p => p.getElementsByTagName("word").length > 0);
 
-          for (let i = validPuzzles.length - 1; i >= 0; i--) {
-            const p = validPuzzles[i];
+          const sortedPuzzles = [...validPuzzles].sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+          const newestPuzzle = sortedPuzzles[sortedPuzzles.length - 1];
+          const showAll = !!puzzleid;
+    const dropdownPuzzles = showAll ? sortedPuzzles : sortedPuzzles.slice(0, -1);
+
+    if (!showAll) {
+      const newestDateStr = newestPuzzle.getAttribute("date");
+      const newestOption = document.createElement("option");
+      newestOption.textContent = newestDateStr + " (Subscribers Only)";
+      newestOption.disabled = true;
+      newestOption.selected = true;
+      selector.appendChild(newestOption);
+    }
+    for (let i = dropdownPuzzles.length - 1; i >= 0; i--) {
+            const p = dropdownPuzzles[i];
             const dateStr = p.getAttribute("date");
             const option = document.createElement("option");
-            option.value = dateStr;
             const [yyyy, mm, dd] = dateStr.split('-');
+            option.value = dateStr;
             option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
             selector.appendChild(option);
           }
@@ -100,17 +114,24 @@
           }
 
           if (!targetPuzzle && urlDate) {
-            targetPuzzle = puzzles.find(p =>
-              p.getAttribute("date") === urlDate && p.getElementsByTagName("word").length > 0
-            );
-          }
+            const match = dropdownPuzzles.find(p => p.getAttribute("date") === urlDate);
+            if (match) targetPuzzle = match;
+        }
 
           if (!targetPuzzle) {
-            targetPuzzle = validPuzzles[validPuzzles.length - 1];
-            showWelcomePopup();
-          }
+            targetPuzzle = dropdownPuzzles[dropdownPuzzles.length - 1];
+            if (!puzzleid && !urlDate) showWelcomePopup();
+        }
 
-          selector.value = targetPuzzle.getAttribute("date");
+          
+      const targetDate = targetPuzzle.getAttribute("date");
+      for (let i = 0; i < selector.options.length; i++) {
+        if (selector.options[i].value === targetDate) {
+          selector.selectedIndex = i;
+          break;
+        }
+      }
+    
           loadPuzzle(targetPuzzle);
         });
     }
