@@ -179,7 +179,6 @@ def append_puzzle(date_str, words):
 def main():
     args = parse_args()
     log("🟡 START HARVEST RUN")
-    raise RuntimeError("💥 Simulated error for testing email alerts.")
 
     if args.test_error:
         log("🚨 Test error triggered via --test-error flag.")

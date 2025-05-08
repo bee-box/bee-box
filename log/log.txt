@@ -1,6 +1,18 @@
+[2025-05-08 06:09:36] ✅ Wax complete.
+
+[2025-05-08 06:09:35] Added 0 blank puzzles through Jan 3.
+[2025-05-08 06:09:35] Imported 1 new puzzles from words.xml.
+[2025-05-08 06:09:34] 🕯 Starting waxer process...
 [2025-05-07 08:32:46] 🟡 START HARVEST RUN
 [2025-05-07 08:32:46] ✅ No missing puzzle dates detected.
 [2025-05-07 08:32:46] ℹ️ Puzzle for 2025-05-07 already exists in words.xml. Skipping scrape.
 [2025-05-07 08:32:46] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 06:06:01] 🟡 START HARVEST RUN
+[2025-05-08 06:08:51] 🟡 START HARVEST RUN
+[2025-05-08 06:08:51] ✅ No missing puzzle dates detected.
+[2025-05-08 06:08:51] ℹ️ Puzzle for 2025-05-08 already exists in words.xml. Skipping scrape.
+[2025-05-08 06:08:51] 🔚 END HARVEST RUN
 ────────────────────────────────────────────
 
