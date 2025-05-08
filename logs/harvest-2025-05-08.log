@@ -1,8 +1,0 @@
-=== Workflow run at Thu May  8 07:32:35 UTC 2025 UTC ===
---- Running harvest.py ---
-[2025-05-08 07:32:35] 🚀 Starting Spelling Bee harvest.
-[2025-05-08 07:32:35] 📡 Fetching Spelling Bee puzzle from NYT...
-[2025-05-08 07:32:35] Attempt 1...
-[2025-05-08 07:32:35] 📅 Puzzle for 2025-05-08 fetched with 58 words.
-[2025-05-08 07:32:36] ✅ Puzzle for 2025-05-08 appended to words.xml.
-[2025-05-08 07:32:36] ✅ Harvest complete.
