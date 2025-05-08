@@ -5,7 +5,7 @@
 Fetches today's NYT Spelling Bee puzzle (date + words only) and
 appends it to `xml/words.xml` if that date isn't already present.
 
-All events are logged (newest first) to log/log.txt
+All events are logged to log/log.txt
 and also printed to the screen.
 """
 
@@ -17,7 +17,7 @@ import argparse
 import requests
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 # ─── Configuration ─────────────────────────────────────────────────────────────
 XML_DIR = "xml"
@@ -29,27 +29,50 @@ NYT_URL = "https://www.nytimes.com/puzzles/spelling-bee"
 os.makedirs(XML_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 
-# ─── Logging (to file + console) ───────────────────────────────────────────────
+# ─── Logging ───────────────────────────────────────────────────────────────────
 def log(message):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     full_msg = f"[{timestamp}] {message}"
     print(full_msg)
-    new_entry = full_msg + "\n"
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(full_msg + "\n")
 
-    if os.path.exists(LOG_FILE):
-        with open(LOG_FILE, "r+", encoding="utf-8") as f:
-            previous = f.read()
-            f.seek(0)
-            f.write(new_entry + previous)
-    else:
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
-            f.write(new_entry)
+def log_separator():
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write("────────────────────────────────────────────\n\n")
 
 # ─── Command Line Arguments ────────────────────────────────────────────────────
 def parse_args():
     parser = argparse.ArgumentParser(description="Harvest today's Spelling Bee puzzle.")
     parser.add_argument("--no-gap-check", action="store_true", help="Skip the missing date report.")
+    parser.add_argument("--test-error", action="store_true", help="Trigger a test error and send a notification.")
     return parser.parse_args()
+
+# ─── Date Gap Checker ──────────────────────────────────────────────────────────
+def log_date_gaps(existing_dates):
+    if not existing_dates:
+        log("⚠️ No existing dates found.")
+        return
+
+    sorted_dates = sorted(existing_dates)
+    missing = []
+
+    for i in range(1, len(sorted_dates)):
+        d1 = datetime.strptime(sorted_dates[i - 1], "%Y-%m-%d")
+        d2 = datetime.strptime(sorted_dates[i], "%Y-%m-%d")
+        gap = (d2 - d1).days
+
+        if gap > 1:
+            for j in range(1, gap):
+                missing_date = (d1 + timedelta(days=j)).strftime("%Y-%m-%d")
+                missing.append(missing_date)
+
+    if missing:
+        log("📅 Missing puzzle dates:")
+        for m in missing:
+            log(f"  - {m}")
+    else:
+        log("✅ No missing puzzle dates detected.")
 
 # ─── Load Existing Puzzle Dates ────────────────────────────────────────────────
 def load_existing_dates():
@@ -68,7 +91,7 @@ def load_latest_words():
     latest_puzzle = puzzles[-1]
     return sorted([w.text.strip().upper() for w in latest_puzzle.findall("word") if w.text])
 
-# ─── Fetch Puzzle Data from NYT ────────────────────────────────────────────────
+# ─── Fetch Puzzle Data ─────────────────────────────────────────────────────────
 def fetch_puzzle():
     log("📡 Fetching Spelling Bee puzzle from NYT...")
     max_retries = 3
@@ -111,11 +134,14 @@ def fetch_puzzle():
 
         except Exception as e:
             log(f"⚠️ Error: {e}")
-            if attempt == max_retries:
-                log("❌ Failed after max retries.")
-                sys.exit(1)
-            log("🔁 Retrying in 5 seconds...")
-            time.sleep(retry_delay)
+            try:
+                from emailer import send_email_notification
+                send_email_notification("❌ Harvest Error", str(e))
+            except Exception as mailerr:
+                log(f"⚠️ Failed to send error email: {mailerr}")
+            sys.exit(1)
+        log("🔁 Retrying in 5 seconds...")
+        time.sleep(retry_delay)
 
 # ─── XML Pretty Formatter ──────────────────────────────────────────────────────
 def indent(elem, level=0):
@@ -131,7 +157,7 @@ def indent(elem, level=0):
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
 
-# ─── Append Puzzle to words.xml ────────────────────────────────────────────────
+# ─── Append Puzzle to XML ──────────────────────────────────────────────────────
 def append_puzzle(date_str, words):
     if os.path.exists(XML_FILE):
         tree = ET.parse(XML_FILE)
@@ -149,27 +175,56 @@ def append_puzzle(date_str, words):
     tree.write(XML_FILE, encoding="utf-8", xml_declaration=True)
     log(f"✅ Puzzle for {date_str} appended to words.xml.")
 
-# ─── Main Orchestration ────────────────────────────────────────────────────────
+# ─── Main Function ─────────────────────────────────────────────────────────────
 def main():
     args = parse_args()
-    log("🚀 Starting Spelling Bee harvest.")
-    date_str, words = fetch_puzzle()
+    log("🟡 START HARVEST RUN")
+    raise RuntimeError("💥 Simulated error for testing email alerts.")
+
+    if args.test_error:
+        log("🚨 Test error triggered via --test-error flag.")
+        from emailer import send_email_notification
+        send_email_notification("🚨 Test Error Notification", "This is a test of the emergency bee-cast system.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
+        return
+
     existing_dates = load_existing_dates()
 
+    if not args.no_gap_check:
+        log_date_gaps(sorted(existing_dates))
+
+    today_str = date.today().strftime("%Y-%m-%d")
+    if today_str in existing_dates:
+        log(f"ℹ️ Puzzle for {today_str} already exists in words.xml. Skipping scrape.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
+        return
+
+    date_str, words = fetch_puzzle()
+
     if date_str in existing_dates:
-        log(f"⚠️ Puzzle for {date_str} already exists. Skipping.")
+        log(f"ℹ️ Puzzle for {date_str} already exists. Skipping.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
         return
     if not words:
         log(f"⚠️ Puzzle for {date_str} has no words. Skipping.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
         return
 
     latest_words = load_latest_words()
     if sorted(words) == latest_words:
-        log("⚠️ Words identical to previous puzzle. Skipping.")
+        log("ℹ️ Words identical to previous puzzle. Skipping.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
         return
 
     append_puzzle(date_str, words)
     log("✅ Harvest complete.")
+    log("🔚 END HARVEST RUN")
+    log_separator()
 
 # ─── Entrypoint ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
