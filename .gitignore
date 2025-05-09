@@ -1,0 +1,32 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+.env
+*.env
+
+# Logs
+log/log.txt
+
+# Backup of words.xml
+xml/backups/words.xml.bak
+
+# Optional: ignore all backups if you rotate them
+# xml/backups/*.bak
+
+# Editor-specific
+.vscode/
+*.swp
+*.tmp
+*.bak
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Notebook checkpoints (if any)
+.ipynb_checkpoints/

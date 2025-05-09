@@ -1,253 +1,185 @@
 #!/usr/bin/env python3
 """
-🏈 Waxer – waxer.py
+Spelling Bee Harvester – harvest.py
 
-Processes Spelling Bee puzzles:
-- Adds new puzzles from words.xml into puzzles.xml (like recruiting rookies to the team)
-- Ensures each puzzle has a unique ID and full metadata (contract signed!)
-- Appends blank puzzles through Jan 3 of next year (depth chart padding)
-- Logs all activity to log/log.txt and prints to screen (play-by-play commentary)
+This script:
+- Scrapes today’s New York Times Spelling Bee word list
+- Saves it to xml/words.xml if the date isn’t already present
+- Always backs up words.xml to xml/backups/words.xml.bak
+- Uses lxml for fast and clean XML handling
+- Logs all activity to log/log.txt and prints updates to the screen
 """
 
 import os
-from datetime import date, timedelta, datetime
-import xml.etree.ElementTree as ET
-from uuid import uuid4
-import random
-from collections import Counter
+import sys
+import time
+import json
+import shutil
+import requests
+from lxml import etree as ET
+from bs4 import BeautifulSoup
+from datetime import date, datetime, timedelta
 
-WORDS_XML = "xml/words.xml"
-PUZZLES_XML = "xml/puzzles.xml"
-LOG_FILE = "log/log.txt"
-os.makedirs("xml", exist_ok=True)
-os.makedirs("log", exist_ok=True)
+# ─── Folder and file paths ─────────────────────────────────────────────────────
+XML_DIR = "xml"
+BACKUP_DIR = os.path.join(XML_DIR, "backups")
+LOG_DIR = "log"
 
-# ─── Logging ───────────────────────────────────────────────────────────────────
+XML_FILE = os.path.join(XML_DIR, "words.xml")
+BACKUP_FILE = os.path.join(BACKUP_DIR, "words.xml.bak")
+LOG_FILE = os.path.join(LOG_DIR, "log.txt")
+
+NYT_URL = "https://www.nytimes.com/puzzles/spelling-bee"
+
+# Make sure all folders exist before use
+os.makedirs(XML_DIR, exist_ok=True)
+os.makedirs(BACKUP_DIR, exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
+
+# ─── Logging ──────────────────────────────────────────────────────────────────
 def log(message):
+    """Log a message with timestamp to screen and log file."""
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     full_msg = f"[{timestamp}] {message}"
     print(full_msg)
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(full_msg + "\n")
 
-def indent(elem, level=0):
-    i = "\n" + "  " * level
-    j = "\n" + "  " * (level + 1)
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = j
-        for idx, child in enumerate(elem):
-            indent(child, level + 1)
-            child.tail = j if idx < len(elem) - 1 else i
+def log_separator():
+    """Adds a divider line to the end of the log entry."""
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write("────────────────────────────────────────────\n\n")
+
+# ─── Load saved puzzle data ───────────────────────────────────────────────────
+def load_existing_dates():
+    """Returns a set of all puzzle dates already stored in words.xml."""
+    if not os.path.exists(XML_FILE):
+        return set()
+    tree = ET.parse(XML_FILE)
+    root = tree.getroot()
+    return {p.get("date") for p in root.findall("puzzle")}
+
+def load_latest_words():
+    """Returns the word list from the most recent puzzle."""
+    if not os.path.exists(XML_FILE):
+        return []
+    tree = ET.parse(XML_FILE)
+    root = tree.getroot()
+    puzzles = root.findall("puzzle")
+    if not puzzles:
+        return []
+    latest = puzzles[-1]
+    return sorted([w.text.strip().upper() for w in latest.findall("word") if w.text])
+
+# ─── Scrape puzzle from NYT website ───────────────────────────────────────────
+def fetch_puzzle():
+    """Scrapes the NYT Spelling Bee puzzle and returns the date and words."""
+    log("📡 Fetching puzzle from NYT...")
+    max_retries = 3
+    delay = 5
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            log(f"Attempt {attempt}...")
+            response = requests.get(NYT_URL, headers={"User-Agent": "Mozilla/5.0"})
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            script = next((s.string for s in soup.find_all("script") if s.string and "window.gameData" in s.string), None)
+            if not script:
+                raise RuntimeError("Game data not found in page source.")
+
+            start = script.find("{")
+            brace_count = 0
+            for i in range(start, len(script)):
+                if script[i] == '{':
+                    brace_count += 1
+                elif script[i] == '}':
+                    brace_count -= 1
+                if brace_count == 0:
+                    json_str = script[start:i + 1]
+                    break
+
+            data = json.loads(json_str)
+            today_data = data.get("today", {})
+            raw_date = today_data.get("printDate")
+            date_str = raw_date.replace("/", "-") if raw_date else date.today().isoformat()
+            answers = today_data.get("answers", [])
+
+            log(f"📅 Puzzle for {date_str} fetched with {len(answers)} words.")
+            return date_str, [w.upper() for w in answers]
+
+        except Exception as e:
+            log(f"⚠️ Error: {e}")
+            try:
+                from emailer import send_email_notification
+                send_email_notification("❌ Harvest Error", str(e))
+            except Exception as mail_err:
+                log(f"⚠️ Failed to send email alert: {mail_err}")
+            sys.exit(1)
+        log("🔁 Retrying in 5 seconds...")
+        time.sleep(delay)
+
+# ─── Save puzzle to XML using lxml ────────────────────────────────────────────
+def append_puzzle(date_str, words):
+    """Adds the puzzle to xml/words.xml using lxml, with pretty print."""
+    if os.path.exists(XML_FILE):
+        tree = ET.parse(XML_FILE)
+        root = tree.getroot()
     else:
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
+        root = ET.Element("words")
+        tree = ET.ElementTree(root)
 
-def get_puzzle_dates(root):
-    return {p.attrib.get("date") for p in root.findall("puzzle")}
+    puzzle = ET.SubElement(root, "puzzle", date=date_str)
+    for word in words:
+        ET.SubElement(puzzle, "word").text = word
 
-def get_existing_ids(root):
-    return {p.attrib.get("id") for p in root.findall("puzzle") if "id" in p.attrib}
+    tree.write(XML_FILE, encoding="utf-8", xml_declaration=True, pretty_print=True)
+    log(f"✅ Puzzle for {date_str} added to words.xml.")
 
-def generate_id(date_str, existing_ids):
-    base = date_str.replace("-", "")
-    while True:
-        suffix = uuid4().hex[:6]
-        new_id = f"{base}-{suffix}"
-        if new_id not in existing_ids:
-            return new_id
+# ─── Main program ─────────────────────────────────────────────────────────────
+def main():
+    log("🟡 START HARVEST RUN")
 
-def generate_jumble(word):
-    if len(word) < 2:
-        return word
-    chars = list(word)
-    attempts = 0
-    while attempts < 10:
-        random.shuffle(chars)
-        jumbled = ''.join(chars)
-        if jumbled != word:
-            return jumbled
-        attempts += 1
-    return word[::-1] if word[::-1] != word else word
+    # Always back up words.xml before doing anything
+    if os.path.exists(XML_FILE):
+        shutil.copyfile(XML_FILE, BACKUP_FILE)
+        log(f"🗂 Backup created: {BACKUP_FILE}")
 
-def add_word_attributes(word_el, letterset=None):
-    added = Counter()
-    text = word_el.text.strip().upper() if word_el.text else ""
-    word_el.text = text
-    if not text:
-        return added
+    existing_dates = load_existing_dates()
+    today_str = date.today().isoformat()
 
-    if "points" in word_el.attrib:
-        return added
+    if today_str in existing_dates:
+        log(f"ℹ️ Puzzle for {today_str} already exists. Skipping.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
+        return
 
-    if "length" not in word_el.attrib:
-        word_el.set("length", str(len(text)))
-        added["length"] += 1
-    if "first" not in word_el.attrib:
-        word_el.set("first", text[0])
-        added["first"] += 1
-    if "firsttwo" not in word_el.attrib:
-        word_el.set("firsttwo", text[:2])
-        added["firsttwo"] += 1
-    if "jumbled" not in word_el.attrib:
-        word_el.set("jumbled", generate_jumble(text))
-        added["jumbled"] += 1
+    date_str, words = fetch_puzzle()
 
-    pangram = False
-    if letterset:
-        wordset = set(text)
-        if wordset >= letterset:
-            pangram = True
-            if "pangram" not in word_el.attrib:
-                word_el.set("pangram", "yes")
-                added["pangram"] += 1
-            if len(text) == 7 and wordset == letterset and "perfectpangram" not in word_el.attrib:
-                word_el.set("perfectpangram", "yes")
-                added["perfectpangram"] += 1
+    if date_str in existing_dates:
+        log(f"ℹ️ Puzzle for {date_str} already exists. Skipping.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
+        return
 
-    base_points = 1 if len(text) == 4 else len(text)
-    if pangram:
-        base_points += 7
-    word_el.set("points", str(base_points))
-    added["points"] += 1
-
-    return added
-
-def get_letters_from_words(words):
-    sets = [set(w) for w in words]
-    if not sets:
-        return ""
-    common = sorted(set.intersection(*sets))
-    if not common:
-        return ""
-    first = common[0]
-    all_letters = set("".join(words))
-    rest = sorted(all_letters - {first})
-    return first + ''.join(rest)
-
-def update_puzzle_metadata(puzzle, existing_ids):
-    if "id" not in puzzle.attrib:
-        date_str = puzzle.attrib.get("date", "unknown")
-        new_id = generate_id(date_str, existing_ids)
-        puzzle.set("id", new_id)
-        existing_ids.add(new_id)
-
-    words = [w_el.text.strip().upper() for w_el in puzzle.findall("word") if w_el.text]
     if not words:
+        log(f"⚠️ No words found for {date_str}.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
         return
 
-    if "count" not in puzzle.attrib:
-        puzzle.set("count", str(len(words)))
-
-    if "letters" not in puzzle.attrib:
-        letters = get_letters_from_words(words)
-        if letters and len(letters) == 7:
-            puzzle.set("letters", letters)
-
-    letterset = set(puzzle.attrib["letters"]) if "letters" in puzzle.attrib else None
-
-    for word_el in puzzle.findall("word"):
-        add_word_attributes(word_el, letterset)
-
-    if "letters" in puzzle.attrib:
-        letters = puzzle.attrib["letters"]
-        starts = {ch: 0 for ch in letters}
-        for w_el in puzzle.findall("word"):
-            first = w_el.attrib.get("first")
-            if first in starts:
-                starts[first] += 1
-        for i, ch in enumerate(letters):
-            puzzle.set(f"letter{i+1}", ch)
-            puzzle.set(f"letter{i+1}count", str(starts[ch]))
-
-        if "pangrams" not in puzzle.attrib or "perfectpangrams" not in puzzle.attrib:
-            pgram_count = 0
-            perfect_count = 0
-            for w_el in puzzle.findall("word"):
-                if w_el.attrib.get("pangram") == "yes":
-                    pgram_count += 1
-                if w_el.attrib.get("perfectpangram") == "yes":
-                    perfect_count += 1
-            puzzle.set("pangrams", str(pgram_count))
-            puzzle.set("perfectpangrams", str(perfect_count))
-
-    if "queenbee" not in puzzle.attrib:
-        total = sum(int(w.attrib.get("points", "0")) for w in puzzle.findall("word"))
-        puzzle.set("queenbee", str(total))
-
-    if "letters" in puzzle.attrib:
-        letters = puzzle.attrib["letters"]
-        starts = {ch: 0 for ch in letters}
-        for w_el in puzzle.findall("word"):
-            first = w_el.attrib.get("first")
-            if first in starts:
-                starts[first] += 1
-        puzzle.set("bingo", "BINGO" if all(starts[ch] > 0 for ch in letters) else "")
-
-def add_blank_puzzles_to_end_of_year_plus_3(root, existing_ids):
-    today = date.today()
-    end_date = date(today.year, 12, 31) + timedelta(days=3)
-    existing_dates = get_puzzle_dates(root)
-    added = 0
-
-    for delta in range((end_date - today).days + 1):
-        target_date = today + timedelta(days=delta)
-        target_str = target_date.isoformat()
-        if target_str not in existing_dates:
-            new_puzzle = ET.SubElement(root, "puzzle", attrib={"date": target_str})
-            new_id = generate_id(target_str, existing_ids)
-            new_puzzle.set("id", new_id)
-            existing_ids.add(new_id)
-            added += 1
-
-    log(f"Added {added} blank puzzles through Jan 3.")
-    return added
-
-def wax():
-    log("🕯 Starting waxer process...")
-
-    if not os.path.exists(WORDS_XML):
-        log(f"⚠️ {WORDS_XML} not found. Exiting.")
+    if sorted(words) == load_latest_words():
+        log("ℹ️ Puzzle is identical to the previous one. Skipping.")
+        log("🔚 END HARVEST RUN")
+        log_separator()
         return
-    words_root = ET.parse(WORDS_XML).getroot()
 
-    if os.path.exists(PUZZLES_XML):
-        puzzles_tree = ET.parse(PUZZLES_XML)
-        puzzles_root = puzzles_tree.getroot()
-    else:
-        puzzles_root = ET.Element("puzzles")
-        puzzles_tree = ET.ElementTree(puzzles_root)
+    append_puzzle(date_str, words)
+    log("✅ Harvest complete.")
+    log("🔚 END HARVEST RUN")
+    log_separator()
 
-    existing_dates = get_puzzle_dates(puzzles_root)
-    existing_ids = get_existing_ids(puzzles_root)
-    seen_dates = set()
-
-    added = 0
-    for puzzle in words_root.findall("puzzle"):
-        date_str = puzzle.attrib.get("date")
-        if not date_str or date_str in existing_dates or date_str in seen_dates:
-            continue
-        seen_dates.add(date_str)
-        new_puzzle = ET.Element("puzzle", attrib=dict(puzzle.attrib))
-        for word_el in puzzle.findall("word"):
-            new_word = ET.Element("word")
-            new_word.text = word_el.text.strip().upper()
-            new_puzzle.append(new_word)
-        puzzles_root.append(new_puzzle)
-        added += 1
-
-    log(f"Imported {added} new puzzles from words.xml.")
-
-    add_blank_puzzles_to_end_of_year_plus_3(puzzles_root, existing_ids)
-
-    for puzzle in puzzles_root.findall("puzzle"):
-        if not puzzle.findall("word") and "id" in puzzle.attrib:
-            continue
-        update_puzzle_metadata(puzzle, existing_ids)
-
-    indent(puzzles_root)
-    puzzles_tree.write(PUZZLES_XML, encoding="utf-8", xml_declaration=True)
-    log("✅ Wax complete.")
-
+# ─── Run the script ───────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    wax()
+    main()
