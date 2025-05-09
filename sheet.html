@@ -110,7 +110,7 @@
     async function showLatestPuzzle() {
       let res;
       try {
-        res = await fetch("../xml/puzzles.xml");
+        res = await fetch("xml/puzzles.xml");
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       } catch (err) {
         const msg = `Failed to load puzzle data: ${err.message}`;
