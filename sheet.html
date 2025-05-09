@@ -6,83 +6,248 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Courier New', Courier, monospace;
       padding: 2em;
       background: #f7f7f7;
       color: #333;
     }
+
+    pre {
+      font-family: inherit;
+    }
+
     h1 {
-      font-size: 1.8em;
       margin-bottom: 0.5em;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-bottom: 1em;
-      color: #666;
-    }
-    pre {
+
+    .section {
       background: #fff;
-      padding: 1em;
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      overflow-x: auto;
-      white-space: pre-wrap;
+      padding: 1em;
+      margin-bottom: 1em;
+      text-align: center;
+    }
+
+    .section h2 {
+      font-size: 1.1em;
+      margin-top: 0;
+    }
+
+    #lettersContent {
+      display: flex;
+      justify-content: center;
+      gap: 1em;
+      flex-wrap: wrap;
+    }
+
+    #lettersContent span {
+      padding: 0.25em 0.5em;
+      background: #eee;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    #firstTwoContent {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5em;
+    }
+
+    #firstTwoContent span {
+      cursor: pointer;
+      padding: 0.25em 0.5em;
+      background: #eee;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    #lengthsContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3em;
+      font-size: 1.2em;
     }
   </style>
 </head>
 <body>
-  <h1 id="title">🐝 Bee Sheet</h1>
-  <h2 id="subtitle"></h2>
-  <pre id="output">Loading latest puzzle data...</pre>
+  <div class="section" id="nav">
+    <h2>Navigation</h2>
+    <h1>🐝 Bee Sheet</h1>
+  </div>
+
+  <div class="section" id="header">
+    <pre id="attributes">Loading...</pre>
+  </div>
+
+  <div class="section" id="letters">
+    <h2>Letters</h2>
+    <div id="lettersContent">Loading...</div>
+  </div>
+
+  <div class="section" id="lengths">
+    <h2>Lengths</h2>
+    <div id="lengthsContent">Loading...</div>
+  </div>
+
+  <div class="section" id="wordsWithAttrs">
+    <h2>Word List with Attributes</h2>
+    <pre id="wordsWithAttrs">Loading...</pre>
+  </div>
+
+  <div class="section" id="firstTwo">
+    <h2>First Two</h2>
+    <div id="firstTwoContent">Loading...</div>
+  </div>
+
+  <div class="section" id="hive">
+    <h2>Hive</h2>
+  </div>
 
   <script>
-    async function loadLatestPuzzle() {
-      const res = await fetch("../xml/puzzles.xml");
-      const text = await res.text();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(text, "application/xml");
-      const puzzles = Array.from(xml.getElementsByTagName("puzzle"));
-
-      if (puzzles.length === 0) {
-        document.getElementById("output").textContent = "No puzzles found.";
+    async function showLatestPuzzle() {
+      let res;
+      try {
+        res = await fetch("../xml/puzzles.xml");
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      } catch (err) {
+        const msg = `Failed to load puzzle data: ${err.message}`;
+        console.error(msg);
+        document.getElementById("attributes").textContent = msg;
         return;
       }
 
-      // Sort by most recent date
-      puzzles.sort((a, b) => new Date(b.getAttribute("date")) - new Date(a.getAttribute("date")));
-      const latest = puzzles[0];
-      const obj = {};
+      const xmlText = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "application/xml");
+      const puzzles = Array.from(xml.getElementsByTagName("puzzle"));
 
-      // Puzzle attributes
-      Array.from(latest.attributes).forEach(attr => {
-        obj[attr.name] = attr.value;
+      let selectedPuzzle;
+      const urlParams = new URLSearchParams(window.location.search);
+      const requestedDate = urlParams.get("date");
+
+      if (requestedDate) {
+        selectedPuzzle = puzzles.find(p => p.getAttribute("date") === requestedDate);
+      } else {
+        selectedPuzzle = puzzles.reverse().find(p =>
+          Array.from(p.getElementsByTagName("word")).some(word => word.attributes.length > 0)
+        );
+      }
+
+      if (!selectedPuzzle) {
+        const message = requestedDate
+          ? `🐝 Whoops! We couldn't unearth a hive for ${requestedDate}. Try a different date?`
+          : `🐝 No fresh honeycomb found — looks like there are no puzzles with word attributes (yet)!`;
+
+        document.getElementById("attributes").textContent = message;
+        document.getElementById("wordsWithAttrs").textContent = "";
+        document.getElementById("firstTwoContent").textContent = "";
+        return;
+      }
+
+      const dateAttr = selectedPuzzle.getAttribute("date");
+      const [yyyy, mm, dd] = dateAttr.split("-");
+      const formattedDate = new Date(+yyyy, +mm - 1, +dd).toLocaleDateString("en-US", {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
 
-      // Word list with attributes
-      obj.words = Array.from(latest.getElementsByTagName("word")).map(word => {
-        const wordObj = { text: word.textContent };
-        Array.from(word.attributes).forEach(attr => {
-          wordObj[attr.name] = attr.value;
+      const headerLine = `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Sheet for ${formattedDate}`;
+      const wordElements = Array.from(selectedPuzzle.getElementsByTagName("word"));
+      const wordCount = wordElements.length;
+      const pangrams = selectedPuzzle.getAttribute("pangrams") || 0;
+      const perfectPangrams = selectedPuzzle.getAttribute("perfectpangrams") || 0;
+      const bingo = selectedPuzzle.getAttribute("bingo") || "";
+      const bingoNote = bingo === "BINGO" ? ", BINGO" : ", NO BINGO";
+      const statsLine = `Words: ${wordCount}, Pangrams: ${pangrams} (${perfectPangrams} Perfect)${bingoNote}`;
+
+      const attrLines = [headerLine, statsLine];
+
+      const queenBee = selectedPuzzle.getAttribute("queenbee");
+      if (queenBee) {
+        const q = parseInt(queenBee, 10);
+        const tiers = [
+          ["Good Start", Math.round(q * 0.02)],
+          ["Moving Up", Math.round(q * 0.05)],
+          ["Good", Math.round(q * 0.08)],
+          ["Solid", Math.round(q * 0.15)],
+          ["Nice", Math.round(q * 0.25)],
+          ["Great", Math.round(q * 0.4)],
+          ["Amazing", Math.round(q * 0.5)],
+          ["Genius", Math.round(q * 0.7)],
+          ["Queen Bee", q]
+        ];
+        const tierLine = tiers.map(([label, score]) => `${label}: ${score}`).join(", ");
+        attrLines.push(tierLine);
+      }
+
+      document.getElementById("attributes").textContent = attrLines.join("\n");
+
+      const wordsWithAttrs = wordElements.map(el => {
+        const attrs = Array.from(el.attributes).map(attr => `${attr.name}=${attr.value}`).join(", ");
+        return attrs ? `${el.textContent} (${attrs})` : el.textContent;
+      });
+      document.getElementById("wordsWithAttrs").textContent = wordsWithAttrs.join("\n");
+
+      const words = wordElements.map(el => el.textContent);
+
+      // First Two Section
+      const firstTwoContainer = document.getElementById("firstTwoContent");
+      firstTwoContainer.innerHTML = "";
+      words.forEach(word => {
+        const span = document.createElement("span");
+        span.textContent = word.slice(0, 2);
+        span.title = "Click to reveal";
+        span.addEventListener("click", () => {
+          span.textContent = word;
         });
-        return wordObj;
+        firstTwoContainer.appendChild(span);
       });
 
-      // Set header content
-      const dateStr = obj.date;
-      const [yyyy, mm, dd] = dateStr.split("-");
-      const date = new Date(+yyyy, +mm - 1, +dd);
-      const formattedDate = date.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      // Letters Section
+      const letters = [];
+      for (let i = 1; i <= 7; i++) {
+        const letter = selectedPuzzle.getAttribute(`letter${i}`);
+        const count = selectedPuzzle.getAttribute(`letter${i}count`);
+        if (letter && count) letters.push(`${letter}(${count})`);
+      }
+      document.getElementById("lettersContent").innerHTML =
+        letters.map(l => `<span>${l}</span>`).join("");
 
-      const wordCount = obj.count || obj.words.length;
-      const pangrams = obj.pangrams || 0;
-      const perfect = obj.perfectpangrams || 0;
+      // Lengths Section – puzzle letters only, all shown, bold center, circle for each word
+      const centerLetter = selectedPuzzle.getAttribute("letter1").toUpperCase();
+      const circledNums = [
+        "⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩",
+        "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳"
+      ];
 
-      document.getElementById("title").textContent = `🐝 Bee Sheet for ${formattedDate}`;
-      document.getElementById("subtitle").textContent = `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect)`;
-      document.getElementById("output").textContent = JSON.stringify(obj, null, 2);
+      const lengthMap = {};
+      words.forEach(word => {
+        const first = word[0].toUpperCase();
+        const len = word.length;
+        if (!lengthMap[first]) lengthMap[first] = [];
+        lengthMap[first].push(len);
+      });
+
+      const puzzleLetters = [];
+      for (let i = 1; i <= 7; i++) {
+        const letter = selectedPuzzle.getAttribute(`letter${i}`);
+        if (letter) puzzleLetters.push(letter.toUpperCase());
+      }
+
+      const lengthsContainer = document.getElementById("lengthsContent");
+      lengthsContainer.innerHTML = puzzleLetters.map(letter => {
+        const lengths = (lengthMap[letter] || [])
+          .sort((a, b) => a - b)
+          .map(len => circledNums[len] || len)
+          .join(" ");
+        const label = letter === centerLetter ? `<strong>${letter}</strong>` : letter;
+        return `<div>${label}: ${lengths}</div>`;
+      }).join("");
     }
 
-    loadLatestPuzzle();
+    showLatestPuzzle();
   </script>
 </body>
 </html>
