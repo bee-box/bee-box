@@ -2,218 +2,231 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tool Template</title>
+  <title id="pageTitle">Loading...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- ── ALL-IN-ONE STYLE (date flush-left, zero wiggle) ── -->
   <style>
-    /* 1 ▸ GLOBAL LAYOUT STABILITY */
-    html  { scrollbar-gutter: stable; }        /* reserve gutter */
-    body  {
-      overflow-y: scroll;                      /* track always shown */
-      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,
-                   Ubuntu,Cantarell,sans-serif;
-      line-height: 1.6;
-      max-width: 1200px;
+    html { scrollbar-gutter: stable; }
+    body {
       margin: 0 auto;
       padding: 1rem;
+      max-width: 1200px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: #f5f5f5;
-    }
-    .section-box{
-      background:#fff;border-radius:8px;
-      box-shadow:0 2px 4px rgba(0,0,0,.1);
-      padding:1.5rem;margin-bottom:1.5rem;
+      line-height: 1.6;
     }
 
-    /* 2 ▸ NAV BAR (no pop, date flush-left) */
-    #navtitle{background:#FFDC00;}
-    nav{padding-bottom:1rem;}
-
-    .nav-container{
-      display:flex;align-items:center;flex-wrap:nowrap;
-    }
-    .nav-left{
-      display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;
-      flex:0 0 auto;margin-right:1rem;padding-bottom:.25rem;
-      width: auto;       /* Allow it to take needed width */
-      min-width: 200px;  /* Ensure enough space for dates */
-    }
-    .nav-left h1{margin:0;font-size:1.75rem;line-height:1.2;}
-    .date-display{
-      position:relative;height:1.25rem;line-height:1.25rem;
-      overflow:hidden;margin-top:-2px;color:#000;text-align:left;
-      width: 100%;       /* Ensures the container takes full width */
-    }
-    .date-display::before{
-      content:"Wednesday, September 30, 2026";     /* widest date */
-      visibility:hidden;pointer-events:none;
-      display: block;    /* Makes sure it behaves as a block */
+    .section-box {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    .nav-right{
-      margin-left:auto;display:flex;gap:.5rem;flex-wrap:nowrap;align-items:center;
+    nav { padding-bottom: 1rem; }
+    #navtitle { background: #FFDC00; }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
     }
-    #dateSelector{min-width:190px;max-width:190px;}
+
+    .nav-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-right: 1rem;
+      min-width: 200px;
+    }
+
+    .nav-left h1 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    .date-display {
+      height: 1.25rem;
+      color: #000;
+    }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      align-items: center;
+    }
 
     .nav-right a,
     .nav-right button,
-    .nav-right select{
-      text-decoration:none;padding:.25rem .5rem;
-      background:#fff;color:#000;border:1px solid #000;
-      font-size:14px;cursor:pointer;line-height:1.1;
-      transition:background-color .2s,color .2s;
-      height:30px;box-sizing:border-box;
-      display:inline-flex;align-items:center;justify-content:center;
+    .nav-right select {
+      background: #fff;
+      color: #000;
+      border: 1px solid #000;
+      font-size: 14px;
+      padding: .25rem .5rem;
+      height: 30px;
+      box-sizing: border-box;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color .2s, color .2s;
+      text-decoration: none;
+      border-radius: 4px;
     }
+
     .nav-right a:hover,
     .nav-right button:hover,
-    .nav-right select:hover{
-      background:#000;color:#fff;border-color:#000;
+    .nav-right select:hover {
+      background: #000;
+      color: #fff;
+      border-color: #000;
     }
 
-    /* 3 ▸ TOOL CONTENT */
+    .nav-right a.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    select#dateSelector {
+      min-width: 190px;
+      max-width: 190px;
+    }
+
     #toolContent.loading,
-    #toolContent.error{min-height:12rem;}
-    #toolContent.fade-in{animation:fade .4s ease-in;}
-    @keyframes fade{from{opacity:0}to{opacity:1}}
-    #toolContent div{margin:.5rem 0;padding:.5rem;border:1px solid #eee;border-radius:4px;}
-    .loading,.error{padding:2rem;text-align:center;color:#666;}
-    .error{color:#d32f2f;}
+    #toolContent.error {
+      min-height: 12rem;
+    }
 
-    /* 4 ▸ FOOTER */
-    footer{padding-top:1rem;font-size:14px;color:#666;text-align:center;}
+    #toolContent.fade-in {
+      animation: fade .4s ease-in;
+    }
 
-    /* 5 ▸ POPUP */
-    #custom-popup-overlay{
-      position:fixed;inset:0;background:rgba(0,0,0,.5);
-      display:none;justify-content:center;align-items:center;z-index:9999;
+    @keyframes fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
-    #custom-popup{
-      position:relative;background:#fff;padding:2rem;border-radius:8px;
-      box-shadow:0 2px 10px rgba(0,0,0,.2);
-      max-width:500px;width:90%;text-align:center;
-    }
-    #custom-popup h2{margin-top:0;}
-    #custom-popup p {font-size:1rem;line-height:1.4;margin:1rem 0;}
-    .popup-close{
-      position:absolute;top:12px;right:12px;font-size:1.5rem;
-      background:none;border:none;color:#888;cursor:pointer;
-    }
-    .popup-close:hover{color:#000;}
 
-    /* Debug styles */
-    .debug-info {
-      background: #f8f8f8;
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin: 10px 0;
-      font-family: monospace;
-      white-space: pre-wrap;
-      display: none; /* Hidden by default */
+    #toolContent div {
+      margin: .5rem 0;
+      padding: .5rem;
+      border: 1px solid #eee;
+      border-radius: 4px;
     }
-    
-    /* Show debug info button */
-    #debugToggle {
-      background: #eee;
-      border: 1px solid #ccc;
-      padding: 5px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      margin-bottom: 10px;
-      display: inline-block;
+
+    footer {
+      padding-top: 1rem;
+      font-size: 14px;
+      text-align: center;
+      color: #666;
+    }
+
+    .error { color: #d32f2f; text-align: center; }
+
+    #headerContent p {
+      margin: 0;
+      text-align: center;
+    }
+
+    #headerContent p:not(:last-child) {
+      margin-bottom: 0.25rem;
+    }
+
+    @media print {
+      nav, footer, .nav-right, #subscribeButton {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+        color: #000;
+      }
+      .section-box {
+        box-shadow: none !important;
+        background: #fff !important;
+        border: none !important;
+        padding: 0 1.5rem;
+      }
+      #toolContent div {
+        border: none !important;
+        padding: 0.25rem 0;
+        margin: 0.25rem 0;
+      }
+      #headerContent p {
+        text-align: left !important;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-right {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .nav-right > * {
+        width: 100%;
+      }
+
+      .nav-left h1 {
+        font-size: 1.5rem;
+      }
+
+      .section-box {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- NAVIGATION -->
+
   <nav id="navtitle" class="section-box">
     <div class="nav-container">
       <div class="nav-left">
-        <h1>Tool Template</h1>
+        <h1 id="toolNameHeading"></h1>
         <div id="navtitleContent" class="date-display"></div>
       </div>
-
       <div class="nav-right" id="navControls">
-        <select id="dateSelector"><option value="">Choose a puzzle</option></select>
+        <select id="dateSelector"><option value="">Choose a Day</option></select>
         <button id="printButton">Print</button>
         <button id="revealButton">Reveal</button>
         <a href="https://beebox.ghost.io" target="_blank">Home</a>
-        <a href="#/portal/signup" id="subscribeButton" data-portal="signup">Subscribe</a>
+        <a href="#" id="subscribeButton" class="disabled" aria-disabled="true">Subscribe</a>
       </div>
     </div>
   </nav>
 
-  <!-- Debug Toggle -->
-  <button id="debugToggle" onclick="toggleDebug()">Show Debug Info</button>
-  <div id="debugInfo" class="debug-info"></div>
-
-  <!-- TOOL SECTION -->
-  <section id="tool" class="section-box">
-    <div id="toolContent" class="loading">Loading puzzle...</div>
+  <section id="header" class="section-box">
+    <div id="headerContent" class="loading">Loading...</div>
   </section>
 
-  <!-- FOOTER -->
+  <section id="tool" class="section-box">
+    <div id="toolContent" class="loading">Loading...</div>
+  </section>
+
   <footer class="section-box">
     <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
   </footer>
 
-  <!-- WELCOME POPUP -->
-  <div id="custom-popup-overlay">
-    <div id="custom-popup">
-      <button id="close-popup" class="popup-close" aria-label="Close">&times;</button>
-      <h2>Welcome!</h2>
-      <p>All days are available to everyone right here, right now —<br>
-         <strong>except for today</strong>.<br>
-         Today is only available to subscribers (it's free!).</p>
-    </div>
-  </div>
-
-  <!-- JS -->
   <script>
-    // Debug helper functions
-    function addDebug(message, obj) {
-      const debugEl = document.getElementById('debugInfo');
-      const timestamp = new Date().toLocaleTimeString();
-      let content = `[${timestamp}] ${message}\n`;
-      
-      if (obj !== undefined) {
-        if (typeof obj === 'object') {
-          try {
-            content += JSON.stringify(obj, null, 2) + '\n';
-          } catch (e) {
-            content += String(obj) + '\n';
-          }
-        } else {
-          content += String(obj) + '\n';
-        }
-      }
-      
-      debugEl.textContent += content + '-------------------\n';
-    }
-    
-    function toggleDebug() {
-      const debugEl = document.getElementById('debugInfo');
-      const btn = document.getElementById('debugToggle');
-      if (debugEl.style.display === 'block') {
-        debugEl.style.display = 'none';
-        btn.textContent = 'Show Debug Info';
-      } else {
-        debugEl.style.display = 'block';
-        btn.textContent = 'Hide Debug Info';
-      }
-    }
+    const toolName = "Tool Template";
 
-    // Main code
     document.addEventListener('DOMContentLoaded', () => {
-      addDebug('DOM content loaded');
+      document.getElementById('pageTitle').textContent = toolName;
+      document.getElementById('toolNameHeading').textContent = toolName;
+      setupSubscribeButton();
       setupEventListeners();
       loadPuzzleData();
     });
 
-    /* UI hooks */
     function setupEventListeners() {
-      document.getElementById('dateSelector')
-              .addEventListener('change', e => {
+      document.getElementById('dateSelector').addEventListener('change', e => {
         const d = e.target.value;
         if (d) {
           const u = new URL(window.location);
@@ -221,201 +234,119 @@
           window.location.href = u.toString();
         }
       });
+
       document.getElementById('printButton').addEventListener('click', () => window.print());
+
       document.getElementById('revealButton').addEventListener('click', () =>
         alert('Revealing answers is not yet implemented')
       );
-      document.getElementById('close-popup').addEventListener('click', hidePopup);
+    }
 
-      document.getElementById('subscribeButton')
-              .addEventListener('click', e => {
-        e.preventDefault();
+    function setupSubscribeButton() {
+      const btn = document.getElementById('subscribeButton');
+
+      const interval = setInterval(() => {
         if (window.Portal && typeof window.Portal.open === 'function') {
-          window.Portal.open('signup');
+          clearInterval(interval);
+          btn.classList.remove('disabled');
+          btn.removeAttribute('aria-disabled');
+          btn.style.opacity = '1';
+          btn.style.pointerEvents = 'auto';
+
+          btn.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.Portal.open('signup');
+          });
         }
-      });
-      
-      addDebug('Event listeners set up');
+      }, 200);
     }
 
-    /* Popup helpers */
-    function showPopup() {
-      document.getElementById('custom-popup-overlay').style.display = 'flex';
-      addDebug('Popup shown');
-    }
-    function hidePopup() {
-      document.getElementById('custom-popup-overlay').style.display = 'none';
-      addDebug('Popup hidden');
-    }
-
-    /* Data load & render */
     async function loadPuzzleData() {
       const box = document.getElementById('toolContent');
-      addDebug('Starting loadPuzzleData');
-      
+      box.className = 'loading';
+      box.textContent = 'Loading puzzle...';
+
       try {
-        box.className = 'loading';
-        box.textContent = 'Loading puzzle...';
-        
-        // Skip the fetch and use direct data to ensure it works
-        addDebug('Using hardcoded data');
-        const mockXmlStr = `
-          <puzzles>
-            <puzzle date="2025-05-08">
-              <word>Example</word>
-              <word>Puzzle</word>
-              <word>Words</word>
-              <word>For</word>
-              <word>Testing</word>
-            </puzzle>
-            <puzzle date="2025-05-07">
-              <word>Previous</word>
-              <word>Day</word>
-              <word>Content</word>
-            </puzzle>
-            <puzzle date="2025-05-06">
-              <word>Even</word>
-              <word>Earlier</word>
-              <word>Content</word>
-            </puzzle>
-          </puzzles>
-        `;
-        
-        const xml = new DOMParser().parseFromString(mockXmlStr, 'application/xml');
-        addDebug('XML parsed', { rootElement: xml.documentElement.tagName });
-        
-        // Directly display a puzzle to ensure data shows
-        directDisplayPuzzle();
-        
-        // Still process the XML data for the selector
-        processPuzzleData(xml);
+        const res = await fetch('xml/puzzles.xml');
+        const xmlText = await res.text();
+        const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+        const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
+        const sorted = puzzles.sort((a, b) => new Date(b.getAttribute('date')) - new Date(a.getAttribute('date')));
+        const req = new URLSearchParams(window.location.search).get('date');
+        const selected = req ? sorted.find(p => p.getAttribute('date') === req) : sorted[0];
+
+        populateDateSelector(sorted);
+        displayPuzzle(selected);
       } catch (err) {
-        addDebug('Error in loadPuzzleData:', err.message);
-        console.error('Error in puzzle data processing:', err);
-        showError('Unable to load puzzle. Please try again later.');
+        box.className = 'error';
+        box.textContent = 'Unable to load puzzle.';
       }
     }
-    
-    // Function to directly display puzzle data without XML
-    function directDisplayPuzzle() {
-      const box = document.getElementById('toolContent');
-      const todayDate = new Date();
-      
-      // Set date display
-      document.getElementById('navtitleContent').textContent = 
-        todayDate.toLocaleDateString('en-US', 
-          {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-      
-      // Hard-coded words that will definitely display
-      const words = ["Direct", "Display", "Example", "Working", "Now"];
-      
-      box.className = ''; 
-      box.innerHTML = ''; 
-      box.classList.add('fade-in');
-      
-      words.forEach(word => {
-        const div = document.createElement('div');
-        div.textContent = word;
-        box.appendChild(div);
-      });
-      
-      addDebug('Direct display completed with words:', words);
-      setTimeout(() => box.classList.remove('fade-in'), 400);
-    }
 
-    function processPuzzleData(xml) {
-      addDebug('Processing puzzle data');
-      const puzzles = [...xml.querySelectorAll('puzzle')];
-      addDebug(`Found ${puzzles.length} puzzles`);
-      
-      const url = new URLSearchParams(window.location.search);
-      const req = url.get('date');
-      addDebug(`URL date parameter: ${req || 'none'}`);
-
-      const sorted = puzzles.sort((a,b) =>
-        new Date(b.getAttribute('date')) - new Date(a.getAttribute('date')));
-      
-      const playable = sorted.filter(p => p.getElementsByTagName('word').length);
-      addDebug(`Found ${playable.length} playable puzzles`);
-
-      const today = new Date().toISOString().slice(0,10);
-      const hasToday = sorted.some(p => p.getAttribute('date') === today);
-      addDebug(`Today: ${today}, Has today's puzzle: ${hasToday}`);
-
-      populateDateSelector(playable, today, hasToday);
-
-      // Skip the selector logic since we're directly displaying
-      addDebug('Skipping selector logic - already displaying puzzle');
-    }
-
-    function populateDateSelector(list, today, hasToday) {
-      addDebug('Populating date selector');
+    function populateDateSelector(puzzles) {
       const sel = document.getElementById('dateSelector');
-      const req = new URLSearchParams(window.location.search).get('date');
       while (sel.options.length > 1) sel.remove(1);
-
-      if (hasToday) {
-        const tStr = new Date(today).toLocaleDateString('en-US',
-                    {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-        const opt  = document.createElement('option');
-        opt.value  = today;
-        opt.textContent = `${tStr} — Subscribers only`;
-        opt.disabled = true;
-        opt.style.color = '#999';
+      puzzles.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.getAttribute('date');
+        opt.textContent = p.getAttribute('date');
         sel.appendChild(opt);
-      }
-
-      list.forEach(p => {
-        const d = p.getAttribute('date');
-        if (d === today) return;
-        const label = new Date(d).toLocaleDateString('en-US',
-                     {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-        const o = document.createElement('option');
-        o.value = d;
-        o.textContent = label;
-        if (req === d) o.selected = true;
-        sel.appendChild(o);
       });
-      
-      addDebug(`Date selector populated with ${list.length} dates`);
     }
 
-    function displayPuzzle(p) {
-      addDebug('Display puzzle called with:', p ? p.getAttribute('date') : 'no puzzle');
+    function formatDateString(dateStr) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(`${y}-${m}-${d}T00:00:00`).toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    function displayPuzzle(puzzle) {
       const box = document.getElementById('toolContent');
-      if (!p) return showError('No puzzle chosen.');
+      if (!puzzle) {
+        box.className = 'error';
+        box.textContent = 'No puzzle found.';
+        return;
+      }
 
-      document.getElementById('navtitleContent').textContent =
-        new Date(p.getAttribute('date')).toLocaleDateString('en-US',
-          {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      const rawDate = puzzle.getAttribute('date');
+      const titleDate = formatDateString(rawDate);
+      document.getElementById('navtitleContent').textContent = titleDate;
 
-      const words = [...p.getElementsByTagName('word')].map(w => w.textContent);
-      addDebug(`Found ${words.length} words in puzzle`);
-      if (!words.length) return showError('This puzzle contains no words.');
+      const words = [...puzzle.getElementsByTagName('word')].map(w => w.textContent);
+      const wordCount = words.length;
+      const pangrams = puzzle.getAttribute("pangrams") || 0;
+      const perfect = puzzle.getAttribute("perfectpangrams") || 0;
+      const bingo = puzzle.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
 
-      box.className = ''; box.innerHTML = ''; box.classList.add('fade-in');
+      const q = parseInt(puzzle.getAttribute("queenbee") || 0, 10);
+      const headerLines = [
+        `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${titleDate}`,
+        `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect), ${bingo}`,
+        q ? `Good Start: ${Math.round(q * .02)}, Moving Up: ${Math.round(q * .05)}, Good: ${Math.round(q * .08)}, Solid: ${Math.round(q * .15)}, Nice: ${Math.round(q * .25)}, Great: ${Math.round(q * .4)}, Amazing: ${Math.round(q * .5)}, Genius: ${Math.round(q * .7)}, Queen Bee: ${q}` : ''
+      ];
+
+      document.getElementById('headerContent').innerHTML = headerLines.filter(Boolean).map(l => `<p>${l}</p>`).join("");
+
+      box.className = '';
+      box.innerHTML = '';
+      box.classList.add('fade-in');
       words.forEach(word => {
         const div = document.createElement('div');
         div.textContent = word;
         box.appendChild(div);
       });
-      setTimeout(()=>box.classList.remove('fade-in'), 400);
-      addDebug('Puzzle displayed successfully');
-    }
 
-    function showError(msg) {
-      addDebug('Error shown:', msg);
-      const box = document.getElementById('toolContent');
-      box.className = 'error';
-      box.textContent = msg || 'An error occurred';
+      setTimeout(() => box.classList.remove('fade-in'), 400);
     }
   </script>
 
-  <!-- Ghost Portal -->
   <script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.50/umd/portal.min.js"
-    data-ghost="https://beebox.ghost.io/" data-i18n="true"
+    data-ghost="https://beebox.ghost.io"
     data-key="b9ac7fd9fa55dc39ce3e8edfe4"
     data-api="https://beebox.ghost.io/ghost/api/content/"
-    data-locale="en" crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
+
 </body>
 </html>
