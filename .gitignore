@@ -10,7 +10,7 @@ __pycache__/
 *.env
 
 # Logs
-log/log.txt
+# log/log.txt
 
 # Backup of words.xml
 xml/backups/words.xml.bak
