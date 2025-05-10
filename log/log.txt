@@ -1,0 +1,85 @@
+[2025-05-08 20:45:38] 🟡 START HARVEST RUN
+[2025-05-08 20:45:38] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 20:45:38] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 20:45:45] 🟡 START HARVEST RUN
+[2025-05-08 20:45:45] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 20:45:45] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 20:53:10] 🟡 START HARVEST RUN
+[2025-05-08 20:53:10] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 20:53:11] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 20:53:11] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 20:53:24] 🟡 START HARVEST RUN
+[2025-05-08 20:53:24] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 20:53:24] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 20:53:24] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 20:54:16] 🟡 START HARVEST RUN
+[2025-05-08 20:54:16] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 20:54:16] 📡 Fetching puzzle from NYT...
+[2025-05-08 20:54:16] Attempt 1...
+[2025-05-08 20:54:16] 📅 Puzzle for 2025-05-08 fetched with 58 words.
+[2025-05-08 20:54:17] ✅ Puzzle for 2025-05-08 added to words.xml.
+[2025-05-08 20:54:17] ✅ Harvest complete.
+[2025-05-08 20:54:17] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 20:55:25] 🟡 START HARVEST RUN
+[2025-05-08 20:55:25] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 20:55:25] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 20:55:25] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 21:06:29] 🟡 START HARVEST RUN
+[2025-05-08 21:06:29] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 21:06:29] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 21:06:29] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 21:21:16] 🟡 START HARVEST RUN
+[2025-05-08 21:21:16] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 21:21:16] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 21:21:16] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 21:23:07] 🟡 START HARVEST RUN
+[2025-05-08 21:23:07] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 21:23:07] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 21:23:07] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-08 21:25:49] 🟡 START HARVEST RUN
+[2025-05-08 21:25:49] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-08 21:25:49] ℹ️ Puzzle for 2025-05-08 already exists. Skipping.
+[2025-05-08 21:25:49] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-09 21:49:57] 🟡 START HARVEST RUN
+[2025-05-09 21:49:57] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-09 21:49:57] ℹ️ Puzzle for 2025-05-09 already exists. Skipping.
+[2025-05-09 21:49:57] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-10 07:12:36] 🟡 START HARVEST RUN
+[2025-05-10 07:12:36] 🗂 Backup created: xml\backups\words.xml.bak
+[2025-05-10 07:12:36] 📡 Fetching puzzle from NYT...
+[2025-05-10 07:12:36] Attempt 1...
+[2025-05-10 07:12:37] 📅 Puzzle for 2025-05-10 fetched with 41 words.
+[2025-05-10 07:12:37] ✅ Puzzle for 2025-05-10 added to words.xml.
+[2025-05-10 07:12:37] ✅ Harvest complete.
+[2025-05-10 07:12:37] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-10 07:12:46] 🕯 Starting waxer process...
+[2025-05-10 07:12:47] 🔄 Filled placeholder puzzle for 2025-05-10.
+[2025-05-10 07:12:47] ⚠️ Puzzle for 2025-05-09 already populated. Skipping.
+[2025-05-10 07:12:47] ⚠️ Puzzle for 2025-05-08 already populated. Skipping.
+[2025-05-10 07:12:47] ⚠️ Puzzle for 2025-05-07 already populated. Skipping.
+[2025-05-10 07:12:47] ⚠️ Puzzle for 2025-05-06 already populated. Skipping.
+[2025-05-10 07:12:49] ✅ Wax complete.
