@@ -24,36 +24,39 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: 📦 Install dependencies from requirements.txt
-        run: |
-          pip install -r requirements.txt
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: 📁 Create logs folder
-        run: mkdir -p logs
+      - name: 📁 Create log folder
+        run: mkdir -p log
 
       - name: 🕒 Log workflow start time
-        run: |
-          echo "=== Workflow run at $(date -u) UTC ===" > logs/workflow-$(date +'%Y-%m-%d').log
+        run: echo "=== Workflow run at $(date -u) UTC ===" >> log/log.txt
 
-      - name: 🐝 Run harvest.py and log output
+      - name: 🐝 Run harvest.py
         run: |
-          LOGFILE="logs/harvest-$(date +'%Y-%m-%d').log"
-          cat logs/workflow-$(date +'%Y-%m-%d').log > "$LOGFILE"
-          echo "--- Running harvest.py ---" >> "$LOGFILE"
-          python code/harvest.py >> "$LOGFILE" 2>&1
+          echo "--- Running harvest.py ---" | tee -a log/log.txt
+          if python code/harvest.py 2>&1 | tee -a log/log.txt; then
+            echo "✅ harvest.py completed successfully" | tee -a log/log.txt
+          else
+            echo "❌ harvest.py failed" | tee -a log/log.txt
+            exit 1
+          fi
 
-      - name: 🕯️ Run waxer.py and log output
-        if: success()
+      - name: 🕯️ Run waxer.py
         run: |
-          LOGFILE="logs/waxer-$(date +'%Y-%m-%d').log"
-          cat logs/workflow-$(date +'%Y-%m-%d').log > "$LOGFILE"
-          echo "--- Running waxer.py ---" >> "$LOGFILE"
-          python code/waxer.py >> "$LOGFILE" 2>&1
+          echo "--- Running waxer.py ---" | tee -a log/log.txt
+          if python code/waxer.py 2>&1 | tee -a log/log.txt; then
+            echo "✅ waxer.py completed successfully" | tee -a log/log.txt
+          else
+            echo "❌ waxer.py failed" | tee -a log/log.txt
+            exit 1
+          fi
 
-      - name: 🚀 Commit and push updated XML + logs
+      - name: 🚀 Commit and push updated XML + log
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add xml/words.xml xml/puzzles.xml logs/
-          git diff --quiet --cached || git commit -m "chore: Bee update + logs for $(date +'%Y-%m-%d')"
+          git add xml/words.xml xml/puzzles.xml log/log.txt
+          git diff --quiet --cached || git commit -m "chore: Bee update + log for $(date +'%Y-%m-%d')"
           git push || echo "Nothing to push or push failed."
