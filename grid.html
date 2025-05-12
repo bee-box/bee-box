@@ -100,23 +100,19 @@ async function loadPuzzleData() {
     const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
     const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
     const sorted = puzzles.sort((a, b) => new Date(a.getAttribute('date')) - new Date(b.getAttribute('date')));
+    const mostRecent = sorted[sorted.length - 1];
 
     const params = new URLSearchParams(window.location.search);
     const puzzleId = params.get('puzzleid');
     const date = params.get('date');
-    const mostRecent = sorted[sorted.length - 1];
 
     let selected;
     if (puzzleId && !date) {
       selected = sorted.find(p => p.getAttribute('id') === puzzleId);
     } else if (date && !puzzleId) {
       selected = sorted.find(p => p.getAttribute('date') === date);
-      if (selected === mostRecent) {
-        openSubscribeModal();
-        selected = sorted[sorted.length - 2];
-      }
     } else {
-      selected = sorted[sorted.length - 2];
+      selected = mostRecent;
     }
 
     populateDateSelector(sorted, selected?.getAttribute('date'));
@@ -157,9 +153,7 @@ function displayPuzzle(puzzle) {
   const lettersBox = document.getElementById('lettersContent');
   const headerBox = document.getElementById('headerContent');
   const toolBox = document.getElementById('toolContent');
-  toolBox.innerHTML = `
-    <table id="gridTable"><thead></thead><tbody></tbody></table>
-  `;
+  toolBox.innerHTML = `<table id="gridTable"><thead></thead><tbody></tbody></table>`;
 
   const letters = (puzzle.getAttribute('letters') || '').toLowerCase().split('');
   const center = letters[0];
