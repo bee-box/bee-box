@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Bee Peek</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="style/bee.ico" rel="icon" type="image/x-icon"/>
+  <link href="style/peek.css" rel="stylesheet"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-title">Bee Peek</div>
+    <div class="navbar-buttons">
+      <div class="nav-controls">
+        <div class="nav-row">
+          <button id="prevDayBtn">←</button>
+          <select id="dateSelector"></select>
+          <button id="nextDayBtn">→</button>
+        </div>
+      </div>
+      <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+      <button class="navbar-button" id="toggleRevealBtn">👁️ Reveal</button>
+      <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
+      <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
+    </div>
+  </nav>
+
+  <div class="subtitle" id="worksheetTitle">
+    The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Peek for
+  </div>
+
+  <header class="main-header">
+    <div class="honeycomb-container">
+      <div class="honeycomb" id="honeycomb"></div>
+    </div>
+  </header>
+
+  <div class="puzzle" id="puzzle"></div>
+
+  <script>
+    function createHexSVG(letter, isCenter = false) {
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", "60");
+      svg.setAttribute("height", "52");
+      svg.setAttribute("viewBox", "0 0 100 86");
+
+      const polygon = document.createElementNS(svgNS, "polygon");
+      polygon.setAttribute("points", "50,0 93,25 93,61 50,86 7,61 7,25");
+      polygon.setAttribute("fill", isCenter ? "#f7da21" : "#e0e0e0");
+      polygon.setAttribute("stroke", isCenter ? "#000" : "#999");
+      polygon.setAttribute("stroke-width", isCenter ? "3" : "1");
+      svg.appendChild(polygon);
+
+      const text = document.createElementNS(svgNS, "text");
+      text.setAttribute("x", "50%");
+      text.setAttribute("y", "50%");
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("font-family", "Georgia");
+      text.setAttribute("font-size", "32");
+      text.setAttribute("font-weight", "bold");
+      text.setAttribute("fill", "#000");
+      text.setAttribute("dominant-baseline", "middle");
+      text.textContent = letter;
+      svg.appendChild(text);
+
+      return svg;
+    }
+
+    
+function populateDateSelector() {
+      const params = new URLSearchParams(window.location.search);
+const puzzleid = params.get("puzzleid");
+const urlDate = params.get("date");
+fetch("xml/puzzles.xml")
+
+        .then(response => response.text())
+        .then(xmlText => {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+          const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
+          const selector = document.getElementById("dateSelector");
+
+          puzzles.sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+          const validPuzzles = puzzles.filter(p => p.getElementsByTagName("word").length > 0);
+
+          const sortedPuzzles = [...validPuzzles].sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+          const newestPuzzle = sortedPuzzles[sortedPuzzles.length - 1];
+          const showAll = !!puzzleid;
+    const dropdownPuzzles = showAll ? sortedPuzzles : sortedPuzzles.slice(0, -1);
+
+    if (!showAll) {
+      const newestDateStr = newestPuzzle.getAttribute("date");
+      const newestOption = document.createElement("option");
+      newestOption.textContent = newestDateStr + " (Subscribers Only)";
+      newestOption.disabled = true;
+      newestOption.selected = true;
+      selector.appendChild(newestOption);
+    }
+    for (let i = dropdownPuzzles.length - 1; i >= 0; i--) {
+            const p = dropdownPuzzles[i];
+            const dateStr = p.getAttribute("date");
+            const option = document.createElement("option");
+            const [yyyy, mm, dd] = dateStr.split('-');
+            option.value = dateStr;
+            option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
+            selector.appendChild(option);
+          }
+
+          let targetPuzzle = null;
+
+          if (puzzleid) {
+            targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
+          }
+
+          if (!targetPuzzle && urlDate) {
+            const match = dropdownPuzzles.find(p => p.getAttribute("date") === urlDate);
+            if (match) targetPuzzle = match;
+        }
+
+          if (!targetPuzzle) {
+            targetPuzzle = dropdownPuzzles[dropdownPuzzles.length - 1];
+            if (!puzzleid && !urlDate) showWelcomePopup();
+        }
+
+          
+      const targetDate = targetPuzzle.getAttribute("date");
+      for (let i = 0; i < selector.options.length; i++) {
+        if (selector.options[i].value === targetDate) {
+          selector.selectedIndex = i;
+          break;
+        }
+      }
+    
+          loadPuzzle(targetPuzzle);
+        });
+    }
+
+    function loadPuzzle(puzzle) {
+      const rawDate = puzzle.getAttribute("date");
+      const [yyyy, mm, dd] = rawDate.split('-');
+      const fullDate = new Date(+yyyy, +mm - 1, +dd);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' };
+      const formatted = fullDate.toLocaleDateString('en-US', options);
+      document.getElementById("worksheetTitle").textContent =
+        `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Peek for ${formatted}`;
+
+      const letters = puzzle.getAttribute("letters");
+      const honeycomb = document.getElementById("honeycomb");
+      const puzzleDiv = document.getElementById("puzzle");
+      honeycomb.innerHTML = '';
+      puzzleDiv.innerHTML = '';
+
+      for (let i = 0; i < letters.length; i++) {
+        const hexSVG = createHexSVG(letters[i], i === 0);
+        honeycomb.appendChild(hexSVG);
+      }
+
+      const wordElements = Array.from(puzzle.getElementsByTagName("word"));
+      const words = wordElements.map(w => ({
+        clue: w.textContent.slice(0, 2).toUpperCase(),
+        full: w.textContent,
+        first: (w.getAttribute("first") || w.textContent[0]).toUpperCase()
+      }));
+
+      words.sort((a, b) => a.first.localeCompare(b.first) || a.clue.localeCompare(b.clue));
+
+      const groups = {};
+      for (let word of words) {
+        const groupKey = `${word.full.length}`;
+        if (!groups[groupKey]) groups[groupKey] = [];
+        groups[groupKey].push(word);
+      }
+
+      const sortedKeys = Object.keys(groups).map(Number).sort((a, b) => a - b);
+
+      for (const key of sortedKeys) {
+        const group = document.createElement("div");
+        group.className = "word-group";
+
+        const label = document.createElement("div");
+        label.className = "group-label";
+        label.textContent = `${key}-Letter Words`;
+        group.appendChild(label);
+
+        const grid = document.createElement("div");
+        grid.className = "word-grid";
+
+        for (let word of groups[key]) {
+          const box = document.createElement("div");
+          box.className = "word-box";
+          box.textContent = word.clue;
+          box.dataset.revealed = "false";
+          box.dataset.word = word.full;
+
+          box.addEventListener("click", () => {
+            if (box.dataset.revealed === "true") {
+              box.textContent = word.clue;
+              box.dataset.revealed = "false";
+              box.classList.remove("revealed");
+            } else {
+              box.textContent = word.full;
+              box.dataset.revealed = "true";
+              box.classList.add("revealed");
+            }
+          });
+
+          grid.appendChild(box);
+        }
+
+        group.appendChild(grid);
+        puzzleDiv.appendChild(group);
+      }
+
+      window.addEventListener('beforeprint', () => {
+        document.querySelectorAll('.word-box').forEach(box => {
+          box.textContent = box.dataset.word;
+          box.classList.add("revealed");
+          box.dataset.revealed = "true";
+        });
+      });
+
+      window.addEventListener('afterprint', () => {
+        document.querySelectorAll('.word-box').forEach(box => {
+          box.textContent = box.dataset.word.slice(0, 2).toUpperCase();
+          box.classList.remove("revealed");
+          box.dataset.revealed = "false";
+        });
+      });
+    }
+
+    document.getElementById("toggleRevealBtn").addEventListener("click", () => {
+      const boxes = document.querySelectorAll('.word-box');
+      const anyHidden = Array.from(boxes).some(box => box.dataset.revealed !== "true");
+
+      boxes.forEach(box => {
+        if (anyHidden) {
+          box.textContent = box.dataset.word;
+          box.dataset.revealed = "true";
+          box.classList.add("revealed");
+        } else {
+          box.textContent = box.dataset.word.slice(0, 2).toUpperCase();
+          box.dataset.revealed = "false";
+          box.classList.remove("revealed");
+        }
+      });
+    });
+
+    document.getElementById("dateSelector").addEventListener("change", function () {
+      const date = this.value;
+      const newUrl = `${window.location.pathname}?date=${date}`;
+      window.location.href = newUrl;
+    });
+
+    document.getElementById("prevDayBtn").addEventListener("click", () => {
+      const selector = document.getElementById("dateSelector");
+      if (selector.selectedIndex < selector.options.length - 1) {
+        const prevDate = selector.options[selector.selectedIndex + 1].value;
+        window.location.href = `${window.location.pathname}?date=${prevDate}`;
+      }
+    });
+
+    document.getElementById("nextDayBtn").addEventListener("click", () => {
+      const selector = document.getElementById("dateSelector");
+      if (selector.selectedIndex > 0) {
+        const nextDate = selector.options[selector.selectedIndex - 1].value;
+        window.location.href = `${window.location.pathname}?date=${nextDate}`;
+      }
+    });
+
+    function showWelcomePopup() {
+      const overlay = document.createElement("div");
+      overlay.className = "popup-overlay";
+
+      const box = document.createElement("div");
+      box.className = "popup-box";
+
+      box.innerHTML = `
+        <h2>Welcome to Bee Peek!</h2>
+        <p>
+          All previous Bee Peeks are available to everyone right here, right now
+          <strong>—except for today's</strong>. Today's Peek is only available to
+          subscribers (it's free!).
+        </p>
+        <button id="continueBtn" class="continue">Continue</button>
+        <a href="https://beebox.ghost.io/#/portal" target="_blank">
+          <button class="subscribe">Subscribe</button>
+        </a>
+      `;
+
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+
+      document.getElementById("continueBtn").onclick = () => overlay.remove();
+    }
+
+    populateDateSelector();
+  </script>
+</body>
+</html>
