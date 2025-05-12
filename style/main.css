@@ -212,3 +212,31 @@ h3 {
     display: none !important;
   }
 }
+#gridTable {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-family: "Times New Roman", serif;
+  font-size: 1.1rem;
+  text-align: center;
+}
+#gridTable th,
+#gridTable td {
+  padding: 0.3rem 0.6rem;
+  border: none;
+}
+#gridTable th {
+  font-weight: bold;
+}
+#gridTable td:first-child,
+#gridTable th:first-child {
+  text-align: right;
+  font-weight: bold;
+}
+#gridTable tr:first-child th,
+#gridTable tr:last-child td {
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+}
