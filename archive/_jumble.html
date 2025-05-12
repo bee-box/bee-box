@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bee Jumble</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style/jumble.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-title">Bee Jumble</div>
+  <div class="navbar-buttons">
+    <div class="nav-controls">
+      <div class="nav-row">
+        <button id="prevDayBtn">←</button>
+        <select id="dateSelector"></select>
+        <button id="nextDayBtn">→</button>
+      </div>
+    </div>
+    <button class="navbar-button" onclick="window.print()">🖨️ Print</button>
+    <a class="navbar-button" href="https://beebox.ghost.io" target="_blank">🐝 Bee Box</a>
+    <a class="navbar-button" href="https://beebox.ghost.io/#/portal" target="_blank">📬 Subscribe</a>
+  </div>
+</nav>
+
+<div class="subtitle" id="worksheetTitle">The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for</div>
+
+<header class="main-header">
+  <div class="honeycomb-container">
+    <div class="honeycomb" id="honeycomb"></div>
+  </div>
+</header>
+
+<div class="puzzle" id="puzzle"></div>
+
+<script>
+function createHexSVG(letter, isCenter = false) {
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("width", "60");
+  svg.setAttribute("height", "52");
+  svg.setAttribute("viewBox", "0 0 100 86");
+
+  const polygon = document.createElementNS(svgNS, "polygon");
+  polygon.setAttribute("points", "50,0 93,25 93,61 50,86 7,61 7,25");
+  polygon.setAttribute("fill", isCenter ? "#f7da21" : "#e0e0e0");
+  polygon.setAttribute("stroke", isCenter ? "#000" : "#999");
+  polygon.setAttribute("stroke-width", isCenter ? "3" : "1");
+  svg.appendChild(polygon);
+
+  const text = document.createElementNS(svgNS, "text");
+  text.setAttribute("x", "50%");
+  text.setAttribute("y", "50%");
+  text.setAttribute("text-anchor", "middle");
+  text.setAttribute("font-family", "Georgia");
+  text.setAttribute("font-size", "32");
+  text.setAttribute("font-weight", "bold");
+  text.setAttribute("fill", "#000");
+  text.setAttribute("dominant-baseline", "middle");
+  text.textContent = letter;
+  svg.appendChild(text);
+
+  return svg;
+}
+
+function loadPuzzle(puzzle) {
+  const rawDate = puzzle.getAttribute("date");
+  const [yyyy, mm, dd] = rawDate.split('-');
+  const fullDate = new Date(+yyyy, +mm - 1, +dd);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' };
+  const formatted = fullDate.toLocaleDateString('en-US', options);
+  document.getElementById("worksheetTitle").textContent =
+    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for ${formatted}`;
+
+  const letters = puzzle.getAttribute("letters");
+  const honeycomb = document.getElementById("honeycomb");
+  const puzzleDiv = document.getElementById("puzzle");
+  honeycomb.innerHTML = '';
+  puzzleDiv.innerHTML = '';
+
+  for (let i = 0; i < letters.length; i++) {
+    const hexSVG = createHexSVG(letters[i], i === 0);
+    honeycomb.appendChild(hexSVG);
+  }
+
+  const wordElements = Array.from(puzzle.getElementsByTagName("word"));
+  const words = wordElements.map(w => ({
+    text: w.getAttribute("jumbled") || w.textContent,
+    original: w.textContent,
+    length: (w.textContent || '').length
+  }));
+
+  words.sort((a, b) => a.length - b.length || a.text.localeCompare(b.text));
+
+  const groups = {};
+  for (let word of words) {
+    if (!groups[word.length]) groups[word.length] = [];
+    groups[word.length].push(word);
+  }
+
+  for (const len of Object.keys(groups).sort((a, b) => a - b)) {
+    const group = document.createElement("div");
+    group.className = "word-group";
+
+    const label = document.createElement("div");
+    label.className = "group-label";
+    label.textContent = `${len}-letter words`;
+    group.appendChild(label);
+
+    const grid = document.createElement("div");
+    grid.className = "word-grid";
+
+    for (let word of groups[len]) {
+      const box = document.createElement("div");
+      box.className = "word-box" + (word.length >= 8 ? " long-word" : "");
+      box.textContent = word.text;
+      box.dataset.revealed = "false";
+      box.dataset.word = word.original;
+      box.dataset.jumbled = word.text;
+
+      box.addEventListener("click", () => {
+        if (box.dataset.revealed === "true") {
+          box.textContent = word.text;
+          box.dataset.revealed = "false";
+        } else {
+          box.textContent = word.original;
+          box.dataset.revealed = "true";
+        }
+      });
+
+      grid.appendChild(box);
+    }
+
+    group.appendChild(grid);
+    puzzleDiv.appendChild(group);
+  }
+}
+
+
+function populateDateSelector() {
+  const params = new URLSearchParams(window.location.search);
+  const puzzleid = params.get("puzzleid");
+  const urlDate = params.get("date");
+
+  fetch("xml/puzzles.xml")
+    .then(response => response.text())
+    .then(xmlText => {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+      const puzzles = Array.from(xmlDoc.getElementsByTagName("puzzle"));
+      const selector = document.getElementById("dateSelector");
+
+      const validPuzzles = puzzles
+        .filter(p => p.getElementsByTagName("word").length > 0)
+        .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+
+      const newestPuzzle = validPuzzles[validPuzzles.length - 1];
+      const showAll = !!puzzleid;
+      const dropdownPuzzles = showAll ? validPuzzles : validPuzzles.slice(0, -1);
+
+      if (!showAll) {
+        const newestDateStr = newestPuzzle.getAttribute("date");
+        const newestOption = document.createElement("option");
+        newestOption.textContent = newestDateStr + " (Subscribers Only)";
+        newestOption.disabled = true;
+        newestOption.selected = true;
+        selector.appendChild(newestOption);
+      }
+
+      for (let i = dropdownPuzzles.length - 1; i >= 0; i--) {
+        const p = dropdownPuzzles[i];
+        const dateStr = p.getAttribute("date");
+        const option = document.createElement("option");
+        const [yyyy, mm, dd] = dateStr.split('-');
+        option.value = dateStr;
+        option.textContent = new Date(+yyyy, +mm - 1, +dd).toDateString();
+        selector.appendChild(option);
+      }
+
+      let targetPuzzle = null;
+
+      if (puzzleid) {
+        targetPuzzle = puzzles.find(p => p.getAttribute("id") === puzzleid);
+      }
+
+      if (!targetPuzzle && urlDate) {
+        const match = dropdownPuzzles.find(p => p.getAttribute("date") === urlDate);
+        if (match) targetPuzzle = match;
+      }
+
+      if (!targetPuzzle) {
+        targetPuzzle = dropdownPuzzles[dropdownPuzzles.length - 1];
+        if (!puzzleid && !urlDate) showWelcomePopup();
+      }
+
+      const targetDate = targetPuzzle.getAttribute("date");
+      for (let i = 0; i < selector.options.length; i++) {
+        if (selector.options[i].value === targetDate) {
+          selector.selectedIndex = i;
+          break;
+        }
+      }
+
+      loadPuzzle(targetPuzzle);
+    });
+}
+
+
+document.getElementById("dateSelector").addEventListener("change", function () {
+  const date = this.value;
+  const newUrl = `${window.location.pathname}?date=${date}`;
+  window.location.href = newUrl;
+});
+
+document.getElementById("prevDayBtn").addEventListener("click", () => {
+  const selector = document.getElementById("dateSelector");
+  if (selector.selectedIndex < selector.options.length - 1) {
+    const prevDate = selector.options[selector.selectedIndex + 1].value;
+    window.location.href = `${window.location.pathname}?date=${prevDate}`;
+  }
+});
+
+document.getElementById("nextDayBtn").addEventListener("click", () => {
+  const selector = document.getElementById("dateSelector");
+  if (selector.selectedIndex > 0) {
+    const nextDate = selector.options[selector.selectedIndex - 1].value;
+    window.location.href = `${window.location.pathname}?date=${nextDate}`;
+  }
+});
+
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('.word-box[data-jumbled]').forEach(box => {
+    box.textContent = box.dataset.jumbled;
+    box.dataset.revealed = "false";
+  });
+});
+
+function showWelcomePopup() {
+  const overlay = document.createElement("div");
+  overlay.className = "popup-overlay";
+
+  const box = document.createElement("div");
+  box.className = "popup-box";
+
+  box.innerHTML = `
+    <h2>Welcome to Bee Jumble!</h2>
+    <p>
+      All previous Bee Jumbles are available to everyone right here, right now
+      <strong>—except for today's</strong>. Today's Jumble is only available to
+      subscribers (it's free!).
+    </p>
+    <button id="continueBtn" class="continue">Continue</button>
+    <a href="https://beebox.ghost.io/#/portal" target="_blank">
+      <button class="subscribe">Subscribe</button>
+    </a>
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  document.getElementById("continueBtn").onclick = () => overlay.remove();
+}
+
+populateDateSelector();
+</script>
+
+</body>
+</html>
