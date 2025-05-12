@@ -149,3 +149,40 @@
 [2025-05-11 07:29:03] ⚠️ Puzzle for 2025-05-07 already populated. Skipping.
 [2025-05-11 07:29:04] ✅ Wax complete.
 ✅ waxer.py completed successfully
+=== Workflow run at Mon May 12 07:21:52 UTC 2025 UTC ===
+--- Running harvest.py ---
+[2025-05-12 07:21:52] 🟡 START HARVEST RUN
+[2025-05-12 07:21:52] 🗂 Backup created: xml/backups/words.xml.bak
+[2025-05-12 07:21:52] 📡 Fetching puzzle from NYT...
+[2025-05-12 07:21:52] Attempt 1...
+[2025-05-12 07:21:52] 📅 Puzzle for 2025-05-12 fetched with 27 words.
+[2025-05-12 07:21:53] ✅ Puzzle for 2025-05-12 added to words.xml.
+[2025-05-12 07:21:53] ✅ Harvest complete.
+[2025-05-12 07:21:53] 🔚 END HARVEST RUN
+────────────────────────────────────────────
+
+[2025-05-12 07:21:52] 🟡 START HARVEST RUN
+[2025-05-12 07:21:52] 🗂 Backup created: xml/backups/words.xml.bak
+[2025-05-12 07:21:52] 📡 Fetching puzzle from NYT...
+[2025-05-12 07:21:52] Attempt 1...
+[2025-05-12 07:21:52] 📅 Puzzle for 2025-05-12 fetched with 27 words.
+[2025-05-12 07:21:53] ✅ Puzzle for 2025-05-12 added to words.xml.
+[2025-05-12 07:21:53] ✅ Harvest complete.
+[2025-05-12 07:21:53] 🔚 END HARVEST RUN
+✅ harvest.py completed successfully
+--- Running waxer.py ---
+[2025-05-12 07:21:53] 🕯 Starting waxer process...
+[2025-05-12 07:21:53] 🔄 Filled placeholder puzzle for 2025-05-12.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-11 already populated. Skipping.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-10 already populated. Skipping.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-09 already populated. Skipping.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-08 already populated. Skipping.
+[2025-05-12 07:21:54] ✅ Wax complete.
+[2025-05-12 07:21:53] 🕯 Starting waxer process...
+[2025-05-12 07:21:53] 🔄 Filled placeholder puzzle for 2025-05-12.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-11 already populated. Skipping.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-10 already populated. Skipping.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-09 already populated. Skipping.
+[2025-05-12 07:21:53] ⚠️ Puzzle for 2025-05-08 already populated. Skipping.
+[2025-05-12 07:21:54] ✅ Wax complete.
+✅ waxer.py completed successfully
