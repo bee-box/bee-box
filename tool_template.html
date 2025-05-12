@@ -4,188 +4,211 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Loading...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    html { scrollbar-gutter: stable; }
-    body {
-      margin: 0 auto;
-      padding: 1rem;
-      max-width: 1200px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: #f5f5f5;
-      line-height: 1.6;
+<style>
+  html { scrollbar-gutter: stable; }
+
+  body {
+    margin: 0 auto;
+    padding: 1rem;
+    max-width: 1200px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f5f5f5;
+    line-height: 1.6;
+  }
+
+  .section-box {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  nav { padding-bottom: 1rem; }
+  #navtitle { background: #FFDC00; }
+
+  .nav-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 1rem;
+    min-width: 200px;
+  }
+
+  .nav-left h1 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+
+  .date-display {
+    height: 1.25rem;
+    color: #000;
+  }
+
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+  }
+
+  .nav-right a,
+  .nav-right button,
+  .nav-right select {
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+    font-size: 14px;
+    padding: .25rem .5rem;
+    height: 30px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .2s, color .2s;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+
+  .nav-right a:hover,
+  .nav-right button:hover,
+  .nav-right select:hover {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+  }
+
+  select#dateSelector {
+    min-width: 190px;
+    max-width: 190px;
+  }
+
+  #toolContent.loading,
+  #toolContent.error {
+    min-height: 12rem;
+  }
+
+  #toolContent.fade-in {
+    animation: fade .4s ease-in;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  #toolContent div {
+    margin: .5rem 0;
+    padding: .5rem;
+    border: 1px solid #eee;
+    border-radius: 4px;
+  }
+
+  footer {
+    padding-top: 1rem;
+    font-size: 14px;
+    text-align: center;
+    color: #666;
+  }
+
+  .error {
+    color: #d32f2f;
+    text-align: center;
+  }
+
+  #headerContent p {
+    margin: 0;
+    text-align: center;
+  }
+
+  #headerContent p:not(:last-child) {
+    margin-bottom: 0.25rem;
+  }
+
+  /* ───── Modal Styles ───── */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .modal-content {
+    background: white;
+    width: 95%;
+    max-width: 540px;
+    min-height: 620px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-content iframe {
+    flex: 1;
+    width: 100%;
+    height: 620px;
+    border: none;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #555;
+    z-index: 10001;
+  }
+
+  @media print {
+    nav, footer, .nav-right, #subscribePopupBtn, .modal-overlay {
+      display: none !important;
     }
+  }
 
-    .section-box {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,.1);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    nav { padding-bottom: 1rem; }
-    #navtitle { background: #FFDC00; }
-
+  @media (max-width: 600px) {
     .nav-container {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .nav-left {
-      display: flex;
       flex-direction: column;
       align-items: flex-start;
-      margin-right: 1rem;
-      min-width: 200px;
-    }
-
-    .nav-left h1 {
-      margin: 0;
-      font-size: 1.75rem;
-    }
-
-    .date-display {
-      height: 1.25rem;
-      color: #000;
     }
 
     .nav-right {
-      margin-left: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      align-items: center;
+      width: 100%;
+      justify-content: flex-start;
     }
 
-    .nav-right a,
-    .nav-right button,
-    .nav-right select {
-      background: #fff;
-      color: #000;
-      border: 1px solid #000;
-      font-size: 14px;
-      padding: .25rem .5rem;
-      height: 30px;
-      box-sizing: border-box;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color .2s, color .2s;
-      text-decoration: none;
-      border-radius: 4px;
+    .nav-right > * {
+      width: 100%;
     }
 
-    .nav-right a:hover,
-    .nav-right button:hover,
-    .nav-right select:hover {
-      background: #000;
-      color: #fff;
-      border-color: #000;
+    .nav-left h1 {
+      font-size: 1.5rem;
     }
 
-    .nav-right a.disabled {
-      opacity: 0.5;
-      pointer-events: none;
+    .section-box {
+      padding: 1rem;
     }
-
-    select#dateSelector {
-      min-width: 190px;
-      max-width: 190px;
-    }
-
-    #toolContent.loading,
-    #toolContent.error {
-      min-height: 12rem;
-    }
-
-    #toolContent.fade-in {
-      animation: fade .4s ease-in;
-    }
-
-    @keyframes fade {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    #toolContent div {
-      margin: .5rem 0;
-      padding: .5rem;
-      border: 1px solid #eee;
-      border-radius: 4px;
-    }
-
-    footer {
-      padding-top: 1rem;
-      font-size: 14px;
-      text-align: center;
-      color: #666;
-    }
-
-    .error { color: #d32f2f; text-align: center; }
-
-    #headerContent p {
-      margin: 0;
-      text-align: center;
-    }
-
-    #headerContent p:not(:last-child) {
-      margin-bottom: 0.25rem;
-    }
-
-    @media print {
-      nav, footer, .nav-right, #subscribeButton {
-        display: none !important;
-      }
-      body {
-        background: #fff;
-        color: #000;
-      }
-      .section-box {
-        box-shadow: none !important;
-        background: #fff !important;
-        border: none !important;
-        padding: 0 1.5rem;
-      }
-      #toolContent div {
-        border: none !important;
-        padding: 0.25rem 0;
-        margin: 0.25rem 0;
-      }
-      #headerContent p {
-        text-align: left !important;
-        font-size: 14px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .nav-right {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .nav-right > * {
-        width: 100%;
-      }
-
-      .nav-left h1 {
-        font-size: 1.5rem;
-      }
-
-      .section-box {
-        padding: 1rem;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-
   <nav id="navtitle" class="section-box">
     <div class="nav-container">
       <div class="nav-left">
@@ -197,7 +220,7 @@
         <button id="printButton">Print</button>
         <button id="revealButton">Reveal</button>
         <a href="https://beebox.ghost.io" target="_blank">Home</a>
-        <a href="#" id="subscribeButton" class="disabled" aria-disabled="true">Subscribe</a>
+        <a href="#" id="subscribePopupBtn" onclick="openSubscribeModal(); return false;">Subscribe</a>
       </div>
     </div>
   </nav>
@@ -214,16 +237,31 @@
     <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
   </footer>
 
+  <!-- Subscribe Modal -->
+  <div class="modal-overlay" id="subscribeOverlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeSubscribeModal()">&times;</button>
+      <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
+    </div>
+  </div>
+
   <script>
     const toolName = "Tool Template";
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('pageTitle').textContent = toolName;
       document.getElementById('toolNameHeading').textContent = toolName;
-      setupSubscribeButton();
       setupEventListeners();
       loadPuzzleData();
     });
+
+    function openSubscribeModal() {
+      document.getElementById('subscribeOverlay').style.display = 'flex';
+    }
+
+    function closeSubscribeModal() {
+      document.getElementById('subscribeOverlay').style.display = 'none';
+    }
 
     function setupEventListeners() {
       document.getElementById('dateSelector').addEventListener('change', e => {
@@ -231,6 +269,7 @@
         if (d) {
           const u = new URL(window.location);
           u.searchParams.set('date', d);
+          u.searchParams.delete('puzzleid');
           window.location.href = u.toString();
         }
       });
@@ -240,26 +279,6 @@
       document.getElementById('revealButton').addEventListener('click', () =>
         alert('Revealing answers is not yet implemented')
       );
-    }
-
-    function setupSubscribeButton() {
-      const btn = document.getElementById('subscribeButton');
-
-      const interval = setInterval(() => {
-        if (window.Portal && typeof window.Portal.open === 'function') {
-          clearInterval(interval);
-          btn.classList.remove('disabled');
-          btn.removeAttribute('aria-disabled');
-          btn.style.opacity = '1';
-          btn.style.pointerEvents = 'auto';
-
-          btn.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            window.Portal.open('signup');
-          });
-        }
-      }, 200);
     }
 
     async function loadPuzzleData() {
@@ -273,10 +292,26 @@
         const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
         const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
         const sorted = puzzles.sort((a, b) => new Date(b.getAttribute('date')) - new Date(a.getAttribute('date')));
-        const req = new URLSearchParams(window.location.search).get('date');
-        const selected = req ? sorted.find(p => p.getAttribute('date') === req) : sorted[0];
+
+        const params = new URLSearchParams(window.location.search);
+        const puzzleId = params.get('puzzleid');
+        const date = params.get('date');
+
+        let selected;
+        if (puzzleId && !date) {
+          selected = sorted.find(p => p.getAttribute('id') === puzzleId);
+        } else if (date && !puzzleId) {
+          selected = sorted.find(p => p.getAttribute('date') === date);
+        } else {
+          selected = sorted[0];
+        }
 
         populateDateSelector(sorted);
+
+        if (date && !puzzleId) {
+          document.getElementById('dateSelector').value = date;
+        }
+
         displayPuzzle(selected);
       } catch (err) {
         box.className = 'error';
@@ -297,7 +332,7 @@
 
     function formatDateString(dateStr) {
       const [y, m, d] = dateStr.split('-').map(Number);
-      return new Date(`${y}-${m}-${d}T00:00:00`).toLocaleDateString('en-US', {
+      return new Date(y, m - 1, d).toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
     }
@@ -319,8 +354,8 @@
       const pangrams = puzzle.getAttribute("pangrams") || 0;
       const perfect = puzzle.getAttribute("perfectpangrams") || 0;
       const bingo = puzzle.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
-
       const q = parseInt(puzzle.getAttribute("queenbee") || 0, 10);
+
       const headerLines = [
         `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${titleDate}`,
         `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect), ${bingo}`,
@@ -328,10 +363,10 @@
       ];
 
       document.getElementById('headerContent').innerHTML = headerLines.filter(Boolean).map(l => `<p>${l}</p>`).join("");
-
       box.className = '';
       box.innerHTML = '';
       box.classList.add('fade-in');
+
       words.forEach(word => {
         const div = document.createElement('div');
         div.textContent = word;
@@ -341,12 +376,5 @@
       setTimeout(() => box.classList.remove('fade-in'), 400);
     }
   </script>
-
-  <script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.50/umd/portal.min.js"
-    data-ghost="https://beebox.ghost.io"
-    data-key="b9ac7fd9fa55dc39ce3e8edfe4"
-    data-api="https://beebox.ghost.io/ghost/api/content/"
-    crossorigin="anonymous"></script>
-
 </body>
 </html>
