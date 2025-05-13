@@ -403,6 +403,9 @@ function displayPuzzle(p) {
   wrapper.appendChild(wordsTable);
 
   combinedContent.appendChild(wrapper);
+  
+  // Initialize mobile enhancements after puzzle data is loaded
+  initMobileEnhancements();
 }
 
 function toggleRevealAll(on) {
@@ -417,6 +420,123 @@ function toggleRevealAll(on) {
     }
   });
 }
+
+// Mobile enhancements for Bee Sheet (without letter tabs)
+
+// Create floating hive button for mobile
+function createMobileHive() {
+  if (window.innerWidth > 768) return;
+  
+  // Remove any existing floating hive button
+  const existingButton = document.querySelector('.mobile-hive-toggle');
+  if (existingButton) existingButton.remove();
+  
+  // Get the original hive SVG
+  const originalHive = document.querySelector('.hive-container svg');
+  if (!originalHive) return;
+  
+  // Create the floating button
+  const hiveButton = document.createElement('button');
+  hiveButton.className = 'mobile-hive-toggle';
+  hiveButton.setAttribute('aria-label', 'Show hive');
+  
+  // Create the icon for collapsed state
+  const hiveIcon = document.createElement('span');
+  hiveIcon.className = 'mobile-hive-icon';
+  hiveIcon.textContent = '🐝';
+  
+  // Create the content for expanded state
+  const hiveContent = document.createElement('div');
+  hiveContent.className = 'mobile-hive-content';
+  
+  // Clone the original hive
+  const hiveClone = originalHive.cloneNode(true);
+  hiveContent.appendChild(hiveClone);
+  
+  // Add icon and content to button
+  hiveButton.appendChild(hiveIcon);
+  hiveButton.appendChild(hiveContent);
+  
+  // Add toggle functionality
+  hiveButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hiveButton.classList.toggle('expanded');
+    
+    // Update aria-label based on state
+    if (hiveButton.classList.contains('expanded')) {
+      hiveButton.setAttribute('aria-label', 'Hide hive');
+    } else {
+      hiveButton.setAttribute('aria-label', 'Show hive');
+    }
+  });
+  
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (
+      hiveButton.classList.contains('expanded') && 
+      !hiveButton.contains(e.target)
+    ) {
+      hiveButton.classList.remove('expanded');
+      hiveButton.setAttribute('aria-label', 'Show hive');
+    }
+  });
+  
+  // Add to document
+  document.body.appendChild(hiveButton);
+}
+
+// Add mobile-specific controls
+function createMobileControls() {
+  if (window.innerWidth > 768) return;
+  
+  const wordsTable = document.querySelector('.words-table');
+  if (!wordsTable) return;
+  
+  // Check if mobile controls already exist
+  if (document.querySelector('.mobile-controls')) return;
+  
+  const controlsDiv = document.createElement('div');
+  controlsDiv.className = 'mobile-controls';
+  
+  // Add reveal button to controls
+  const revealBtn = document.getElementById('revealButton').cloneNode(true);
+  revealBtn.textContent = document.getElementById('revealButton').textContent;
+  revealBtn.addEventListener('click', () => {
+    document.getElementById('revealButton').click();
+    revealBtn.textContent = document.getElementById('revealButton').textContent;
+  });
+  
+  // Add print button to controls
+  const printBtn = document.getElementById('printButton').cloneNode(true);
+  printBtn.addEventListener('click', () => {
+    document.getElementById('printButton').click();
+  });
+  
+  controlsDiv.appendChild(revealBtn);
+  controlsDiv.appendChild(printBtn);
+  
+  // Add controls before the words table
+  wordsTable.parentNode.insertBefore(controlsDiv, wordsTable);
+}
+
+// Initialize mobile enhancements
+function initMobileEnhancements() {
+  createMobileHive();
+  createMobileControls();
+}
+
+// Reinitialize on window resize
+window.addEventListener('resize', () => {
+  // Debounce the resize event
+  clearTimeout(window.resizeTimer);
+  window.resizeTimer = setTimeout(() => {
+    // Remove existing mobile elements
+    document.querySelectorAll('.mobile-hive-toggle, .mobile-controls').forEach(el => el.remove());
+    
+    // Reinitialize
+    initMobileEnhancements();
+  }, 250);
+});
 </script>
 </body>
 </html>

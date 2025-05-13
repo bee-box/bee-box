@@ -1,12 +1,4 @@
-/* ─── Letters Table ─── */
-.letters-table {
-  margin-bottom: 0.5rem;
-}
-.letters-table td {
-  text-align: center;
-  height: 40px; /* Reduced from 50px */
-}
-.letters-table/* Additional CSS for new table-based layout */
+/* Additional CSS for new table-based layout */
 html { scrollbar-gutter: stable; }
 body {
   margin: 0 auto;
@@ -255,8 +247,9 @@ footer {
   user-select: none; /* Prevent text selection */
 }
 
-/* Responsive adjustments */
+/* Mobile Enhancements for Bee Sheet */
 @media (max-width: 768px) {
+  /* Responsive header */
   .header-flex {
     flex-direction: column;
   }
@@ -264,11 +257,103 @@ footer {
   .hive-container {
     margin-top: 1rem;
   }
+
+  /* Responsive navigation */
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nav-right {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .nav-left {
+    width: 100%;
+  }
+  
+  select#dateSelector {
+    flex-grow: 1;
+    max-width: none;
+  }
+  
+  /* Reduced padding for section boxes */
+  .section-box {
+    padding: 1rem;
+  }
+  
+  /* Make letter table more compact */
+  .letters-table td {
+    padding: 0.15rem !important;
+  }
+  
+  /* Improved word boxes for touch */
+  .word-box {
+    padding: 0.75rem;
+    margin-bottom: 0.25rem;
+    touch-action: manipulation; /* Improves touch response */
+  }
+  
+  /* Center controls */
+  .mobile-controls {
+    display: flex;
+    justify-content: space-around;
+    margin: 1rem 0;
+  }
+  
+  /* Fixed minimized hive button that expands on tap */
+  .mobile-hive-toggle {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    width: 50px;
+    height: 50px;
+    background: #FFDC00;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .mobile-hive-toggle.expanded {
+    width: 240px;
+    height: 220px;
+    border-radius: 8px;
+    right: 0.5rem;
+    bottom: 0.5rem;
+  }
+  
+  .mobile-hive-icon {
+    font-weight: bold;
+    font-size: 24px;
+  }
+  
+  .mobile-hive-content {
+    display: none;
+  }
+  
+  .mobile-hive-toggle.expanded .mobile-hive-icon {
+    display: none;
+  }
+  
+  .mobile-hive-toggle.expanded .mobile-hive-content {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 /* Print-specific styles */
 @media print {
-  #navtitle, footer, .modal-overlay {
+  #navtitle, footer, .modal-overlay, .mobile-hive-toggle, .mobile-controls {
     display: none !important;
   }
   
