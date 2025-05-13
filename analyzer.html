@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee Puzzle Analyzer</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #f7b500;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            cursor: pointer;
+            background-color: #f1f1f1;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .selected {
+            background-color: #fff3cd;
+        }
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .word {
+            background-color: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .pangram {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        .letter-stat {
+            display: inline-block;
+            background-color: #f7b500;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐝 Spelling Bee Puzzle Analyzer</h1>
+    
+    <div id="stats" class="card">
+        <h2>Puzzle Statistics</h2>
+        <div id="stats-content"></div>
+    </div>
+    
+    <div id="letter-stats" class="card">
+        <h2>Letter Statistics</h2>
+        <div id="letter-stats-content"></div>
+    </div>
+    
+    <div id="puzzles" class="card">
+        <h2>Puzzles (click header to sort)</h2>
+        <table id="puzzle-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Letters</th>
+                    <th>Words</th>
+                    <th>Pangrams</th>
+                    <th>Longest Word</th>
+                </tr>
+            </thead>
+            <tbody id="puzzle-tbody"></tbody>
+        </table>
+    </div>
+    
+    <div id="words-by-letter" class="card">
+        <h2>Words By First Letter</h2>
+        <div id="words-container"></div>
+    </div>
+
+    <script>
+        let puzzlesData = [];
+        let currentSort = { index: null, asc: true };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('xml/puzzles.xml')
+                .then(resp => resp.text())
+                .then(xml => analyzePuzzles(xml))
+                .catch(err => {
+                    console.error('Failed to load XML:', err);
+                    document.getElementById('stats-content').innerHTML = '<p>Error loading puzzle data.</p>';
+                });
+        });
+
+        function analyzePuzzles(xmlData) {
+            puzzlesData = extractPuzzles(xmlData);
+            if (!puzzlesData.length) {
+                document.getElementById('stats-content').innerHTML = '<p>No puzzles found.</p>';
+                return;
+            }
+            const stats = calculateStats(puzzlesData);
+            displayStats(stats);
+            displayLetterStats(stats);
+            displayPuzzles(puzzlesData);
+            setupSorting();
+            displayWords(puzzlesData[0]);
+            document.querySelector('#puzzle-tbody tr')?.classList.add('selected');
+        }
+
+        function setupSorting() {
+            document.querySelectorAll('#puzzle-table th').forEach((th, idx) => {
+                th.addEventListener('click', () => {
+                    if (currentSort.index === idx) currentSort.asc = !currentSort.asc;
+                    else { currentSort.index = idx; currentSort.asc = true; }
+
+                    const sorted = [...puzzlesData].sort((a, b) => {
+                        let res = 0;
+                        switch (idx) {
+                            case 0: res = new Date(a.date) - new Date(b.date); break;
+                            case 1: res = a.letters.localeCompare(b.letters); break;
+                            case 2: res = a.words.length - b.words.length; break;
+                            case 3: res = a.words.filter(w=>w.pangram).length - b.words.filter(w=>w.pangram).length; break;
+                            case 4: {
+                                const al = a.words.reduce((p,c)=>c.length>p.length?c:p,{length:0}).text;
+                                const bl = b.words.reduce((p,c)=>c.length>p.length?c:p,{length:0}).text;
+                                res = al.localeCompare(bl);
+                                break;
+                            }
+                        }
+                        return currentSort.asc ? res : -res;
+                    });
+                    displayPuzzles(sorted);
+                });
+            });
+        }
+
+        function extractPuzzles(xml) {
+            const puzzles = [];
+            const pRe = /<puzzle\s+([^>]*)>([\s\S]*?)<\/puzzle>/g;
+            let m;
+            while (m = pRe.exec(xml)) {
+                const attrs = m[1], body = m[2];
+                const pz = { date: getAttr(attrs,'date'), letters: getAttr(attrs,'letters'), words: [] };
+                const wRe = /<word\s+([^>]*)>([^<]*)<\/word>/g;
+                let wm;
+                while (wm = wRe.exec(body)) {
+                    const a = wm[1];
+                    pz.words.push({ text: wm[2], length: +getAttr(a,'length'), first: getAttr(a,'first'), pangram: getAttr(a,'pangram')==='yes' });
+                }
+                if (pz.date && pz.letters) puzzles.push(pz);
+            }
+            return puzzles;
+        }
+
+        function getAttr(str,name) {
+            const r=new RegExp(name+'="([^"]*)"','i'), m=str.match(r);
+            return m?m[1]:'';
+        }
+
+        function calculateStats(ps) {
+            const s={ totalPuzzles:ps.length, totalWords:0, totalPangrams:0, avgWords:0, mostWords:null, longest:{text:'',length:0}, freqLetters:{}, freqFirst:{}, lengthDist:{} };
+            ps.forEach(p=>{
+                s.totalWords+=p.words.length;
+                s.totalPangrams+=p.words.filter(w=>w.pangram).length;
+                if (!s.mostWords||p.words.length>s.mostWords.words.length) s.mostWords=p;
+                p.words.forEach(w=>{
+                    if(w.length>s.longest.length) s.longest=w;
+                    s.lengthDist[w.length]=(s.lengthDist[w.length]||0)+1;
+                    s.freqFirst[w.first]=(s.freqFirst[w.first]||0)+1;
+                    w.text.split('').forEach(c=>s.freqLetters[c.toUpperCase()] = (s.freqLetters[c.toUpperCase()]||0)+1);
+                });
+            });
+            s.avgWords = s.totalWords/ps.length;
+            return s;
+        }
+
+        function displayStats(s) {
+            document.getElementById('stats-content').innerHTML = `
+                <p><strong>Total Puzzles:</strong> ${s.totalPuzzles}</p>
+                <p><strong>Total Words:</strong> ${s.totalWords}</p>
+                <p><strong>Total Pangrams:</strong> ${s.totalPangrams}</p>
+                <p><strong>Average Words:</strong> ${s.avgWords.toFixed(1)}</p>
+                <p><strong>Puzzle w/ Most Words:</strong> ${formatDate(s.mostWords.date)} (${s.mostWords.words.length})</p>
+                <p><strong>Longest Word:</strong> ${s.longest.text.toUpperCase()} (${s.longest.length})</p>
+            `;
+        }
+
+        function displayLetterStats(s) {
+            const sl = Object.entries(s.freqLetters).sort((a,b)=>b[1]-a[1]);
+            const sf = Object.entries(s.freqFirst).sort((a,b)=>b[1]-a[1]);
+            document.getElementById('letter-stats-content').innerHTML = `
+                <p><strong>Most Common Letter:</strong> ${sl[0][0]} (${sl[0][1]})</p>
+                <p><strong>Most Common First Letter:</strong> ${sf[0][0]} (${sf[0][1]})</p>
+                <p><strong>Top 10 Letters:</strong></p>
+                <div>${sl.slice(0,10).map(l=>`<span class="letter-stat">${l[0]}: ${l[1]}</span>`).join('')}</div>
+                <p><strong>Word Lengths:</strong></p>
+                <div>${Object.entries(s.lengthDist).sort((a,b)=>a[0]-b[0]).map(e=>`<span class="letter-stat">${e[0]} letters: ${e[1]}</span>`).join('')}</div>
+            `;
+        }
+
+        function displayPuzzles(ps) {
+            const tb = document.getElementById('puzzle-tbody'); tb.innerHTML='';
+            ps.forEach(p=>{
+                const lw = p.words.reduce((a,b)=>b.length>a.length?b:a,{length:0});
+                const tr=document.createElement('tr');
+                tr.addEventListener('click',()=>{document.querySelectorAll('#puzzle-tbody tr').forEach(r=>r.classList.remove('selected'));tr.classList.add('selected');displayWords(p);});
+                tr.innerHTML = `<td>${formatDate(p.date)}</td><td>${p.letters}</td><td>${p.words.length}</td><td>${p.words.filter(w=>w.pangram).length}</td><td>${lw.text.toUpperCase()}</td>`;
+                tb.appendChild(tr);
+            });
+        }
+
+        function displayWords(p) {
+            const c=document.getElementById('words-container');
+            const by={};p.words.forEach(w=>by[w.first]=(by[w.first]||[]).concat(w));
+            let h=`<h3>Puzzle ${formatDate(p.date)}</h3><p><strong>Letters:</strong> ${p.letters} | <strong>Words:</strong> ${p.words.length} | <strong>Pangrams:</strong> ${p.words.filter(w=>w.pangram).length}</p>`;
+            Object.keys(by).sort().forEach(l=>{h+=`<h4>${l}</h4><div class="word-list">`+by[l].map(w=>`<span class="word ${w.pangram?'pangram':''}">${w.text.toUpperCase()}</span>`).join('')+`</div>`;});
+            c.innerHTML=h;
+        }
+
+        function formatDate(d){const [y,m,day]=d.split('-');return `${m}/${day}/${y}`;}
+    </script>
+</body>
+</html>

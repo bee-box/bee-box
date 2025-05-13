@@ -318,16 +318,35 @@ footer {
     margin-bottom: 0.25rem !important;
   }
   
-  /* Make header more compact */
+  /* UPDATED: Keep the header in horizontal layout just like web version */
   .header-flex {
+    display: flex;
+    flex-direction: row !important; /* Force row direction */
+    align-items: center;
+    justify-content: space-between;
     gap: 0.5rem !important;
   }
   
-  /* Make header text more compact */
+  /* Make header text more compact but keep it in its column */
+  .header-text {
+    flex: 1;
+  }
+  
   #headerContent p {
     white-space: nowrap;
     line-height: 1.1 !important;
     margin-bottom: 0.15rem !important;
+  }
+  
+  /* Ensure hive container stays on the right */
+  .hive-container {
+    flex-shrink: 0;
+  }
+  
+  /* Make hive smaller for print but keep it visible */
+  .hive-container svg {
+    max-width: 180px !important;
+    height: auto;
   }
   
   /* Reduce spacing around tables */
@@ -366,12 +385,6 @@ footer {
   /* Less space between words in columns */
   .words-table .wcol {
     gap: 0.1rem !important;
-  }
-  
-  /* Make hive smaller for print */
-  .hive-container svg {
-    max-width: 180px !important;
-    height: auto;
   }
   
   /* Change yellow background to gray in print */
