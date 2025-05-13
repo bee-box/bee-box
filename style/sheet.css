@@ -7,6 +7,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: #f5f5f5;
   line-height: 1.6;
+  font-size: 16px; /* Base size for web */
 }
 .section-box {
   background: #fff;
@@ -42,7 +43,7 @@ nav { padding-bottom: 1rem; }
   background: #fff;
   color: #000;
   border: 1px solid #000;
-  font-size: 14px;
+  font-size: 0.875rem; /* Standardized */
   padding: .25rem .5rem;
   height: 30px;
   box-sizing: border-box;
@@ -67,7 +68,7 @@ select#dateSelector { min-width: 190px; max-width: 190px; }
 
 footer {
   padding-top: 1rem;
-  font-size: 14px;
+  font-size: 0.875rem; /* Slightly smaller than base */
   text-align: center;
   color: #666;
 }
@@ -105,14 +106,14 @@ footer {
   justify-content: center;
 }
 .letters-table .char {
-  font-size: 14px;
+  font-size: 1rem; /* Standardized */
   line-height: 1;
 }
 .letters-table .char.bold {
   font-weight: 700;
 }
 .letters-table .count {
-  font-size: 10px;
+  font-size: 1rem; /* Standardized */
   margin-left: 2px;
   line-height: 1;
   color: #666;
@@ -129,30 +130,31 @@ footer {
 .lengths-table td {
   text-align: center;
   padding: 0.25rem;
-  height: auto; /* Changed from fixed height to auto */
-  min-height: 30px; /* Added minimum height */
+  height: auto;
+  min-height: 30px;
 }
 .lengths-table .icons {
-  font-size: 1rem;
+  font-size: 1rem; /* Standardized */
   letter-spacing: 0.1rem;
-  white-space: normal; /* Changed from nowrap to normal */
-  overflow: visible; /* Changed from hidden to visible */
-  text-overflow: clip; /* Changed from ellipsis to clip */
-  line-height: 1.5; /* Added line height for better readability */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.5;
 }
 .length-indicator {
   display: inline-block;
   margin-right: 3px;
-  margin-bottom: 3px; /* Added margin bottom for spacing between wrapped lines */
-  transition: transform 0.2s ease, color 0.2s ease; /* Added color transition */
+  margin-bottom: 3px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  font-size: 1rem; /* Standardized */
 }
 .length-indicator.revealed {
-  color: #000000; /* Changed from Royal Blue to Black */
+  color: #000000;
 }
 
 /* ─── Words Table ─── */
 .words-table, .words-table td {
-  border: none; /* Removed borders for words table */
+  border: none;
 }
 .words-table td {
   vertical-align: top;
@@ -171,7 +173,7 @@ footer {
   border-radius: 4px;
   cursor: pointer;
   font-family: monospace;
-  font-size: 1rem;
+  font-size: 1rem; /* Standardized */
   text-align: left;
   box-sizing: border-box;
   transition: background-color 0.2s ease;
@@ -258,38 +260,74 @@ footer {
   user-select: none; /* Prevent text selection */
 }
 
-/* Print-specific styles */
-@media print {
-  /* No orientation forcing - let user choose in browser print dialog */
-  
-  #navtitle, footer, .modal-overlay {
-    display: none !important;
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px; /* Base size for mobile */
+    padding: 0.5rem;
   }
   
+  .section-box {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nav-right {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  select#dateSelector {
+    min-width: 150px;
+    max-width: 150px;
+  }
+  
+  .header-flex {
+    flex-direction: column;
+  }
+  
+  .hive-container svg {
+    max-width: 200px;
+  }
+}
+
+/* Print-specific styles */
+@media print {
   body {
+    font-size: 12px; /* Base size for print */
     background: white;
     padding: 0;
     margin: 0;
   }
   
+  #navtitle, footer, .modal-overlay {
+    display: none !important;
+  }
+  
   .section-box {
     box-shadow: none;
     border: none;
-    padding: 0.25rem !important; /* Much smaller padding */
-    margin-bottom: 0.25rem !important; /* Much smaller margins */
+    padding: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
   }
   
   /* Make header more compact */
   .header-flex {
-    gap: 0.5rem !important; /* Reduced gap */
+    gap: 0.5rem !important;
   }
   
-  /* Make header text smaller and more compact */
+  /* Make header text more compact */
   #headerContent p {
     white-space: nowrap;
-    font-size: 0.8rem !important; /* Even smaller */
-    line-height: 1.1 !important; /* Tighter line height */
-    margin-bottom: 0.15rem !important; /* Less space between lines */
+    line-height: 1.1 !important;
+    margin-bottom: 0.15rem !important;
   }
   
   /* Reduce spacing around tables */
@@ -299,23 +337,8 @@ footer {
   
   /* Make letter table more compact */
   .letters-table td {
-    height: 20px !important; /* Shorter height */
-    padding: 1px !important; /* Less padding */
-  }
-  
-  /* Smaller letter characters */
-  .letters-table .char {
-    font-size: 12px !important;
-  }
-  
-  .letters-table .count {
-    font-size: 9px !important;
-  }
-  
-  /* Make length table more compact */
-  .lengths-table td {
-    padding: 0.15rem !important; /* Less padding */
-    min-height: 20px !important; /* Shorter minimum height */
+    height: 20px !important;
+    padding: 1px !important;
   }
   
   /* Keep border styles consistent with web version */
@@ -329,28 +352,20 @@ footer {
   .words-table, 
   .words-table td {
     border: none;
-    padding: 0.25rem !important; /* Less padding */
+    padding: 0.25rem !important;
   }
   
   /* Compact word boxes */
   .word-box {
     border: 1px solid #ddd;
-    padding: 0.15rem 0.3rem !important; /* Extremely minimal padding */
-    margin-bottom: 0.1rem !important; /* Very small margin */
-    font-size: 0.85rem !important; /* Smaller font */
-    line-height: 1.1 !important; /* Tighter line height */
+    padding: 0.15rem 0.3rem !important;
+    margin-bottom: 0.1rem !important;
+    line-height: 1.1 !important;
   }
   
-  /* Even less space between words in columns */
+  /* Less space between words in columns */
   .words-table .wcol {
-    gap: 0.1rem !important; /* Minimal gap */
-  }
-  
-  /* Smaller font for length indicators */
-  .length-indicator {
-    font-size: 0.75rem !important; /* Even smaller */
-    margin-right: 2px !important;
-    margin-bottom: 2px !important;
+    gap: 0.1rem !important;
   }
   
   /* Make hive smaller for print */
@@ -379,8 +394,7 @@ footer {
     content: "THE END";
     display: block;
     text-align: center;
-    margin-top: 0.5rem !important; /* Less margin */
-    font-size: 0.8rem !important; /* Smaller text */
+    margin-top: 0.5rem !important;
     font-style: italic;
     color: #666;
   }
