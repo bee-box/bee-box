@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Bee Sheet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style/main.css">
+  <link rel="stylesheet" href="style/sheet.css">
   <link rel="icon" href="style/bee.ico" type="image/x-icon" />
 </head>
 <body>
@@ -24,10 +24,13 @@
   </div>
 </nav>
 
-<section id="header" class="section-box"><div id="headerContent" class="loading">Loading...</div></section>
+<section id="header" class="section-box">
+  <div id="headerContent" class="loading">Loading...</div>
+</section>
 
-<!-- Combined section that replaces letterLengths and tool sections -->
-<section id="combinedSection" class="section-box"><div id="combinedContent" class="loading">Loading...</div></section>
+<section id="combinedSection" class="section-box">
+  <div id="combinedContent" class="loading">Loading...</div>
+</section>
 
 <footer class="section-box">
   <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
@@ -45,19 +48,22 @@ const toolName = "Bee Sheet";
 let globalWords = [];
 let revealMode = false;
 
+const numIcons = {
+  1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
+  11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
+};
+
+const invertedNumIcons = {
+  1: "❶", 2: "❷", 3: "❸", 4: "❹", 5: "❺", 6: "❻", 7: "❼", 8: "❽", 9: "❾", 10: "❿",
+  11: "⓫", 12: "⓬", 13: "⓭", 14: "⓮", 15: "⓯", 16: "⓰", 17: "⓱", 18: "⓲", 19: "⓳", 20: "⓴"
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("pageTitle").textContent = toolName;
   document.getElementById("toolNameHeading").textContent = toolName;
   setupEventListeners();
   loadPuzzleData();
 });
-
-function openSubscribeModal() {
-  document.getElementById("subscribeOverlay").style.display = "flex";
-}
-function closeSubscribeModal() {
-  document.getElementById("subscribeOverlay").style.display = "none";
-}
 
 function setupEventListeners() {
   document.getElementById("dateSelector").addEventListener("change", (e) => {
@@ -72,7 +78,7 @@ function setupEventListeners() {
 
   document.getElementById("printButton").addEventListener("click", () => {
     const wordBoxes = document.querySelectorAll(".word-box");
-    wordBoxes.forEach((b) => b.setAttribute("data-print-value", b.textContent));
+    wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
 
     window.addEventListener("beforeprint", () => {
       wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
@@ -90,12 +96,23 @@ function setupEventListeners() {
   document.getElementById("revealButton").addEventListener("click", () => {
     revealMode = !revealMode;
     toggleRevealAll(revealMode);
+    document.getElementById("revealButton").textContent = revealMode ? "Hide" : "Reveal";
   });
 }
 
+function openSubscribeModal() {
+  document.getElementById("subscribeOverlay").style.display = "flex";
+}
+
+function closeSubscribeModal() {
+  document.getElementById("subscribeOverlay").style.display = "none";
+}
+
 async function loadPuzzleData() {
-  const els = ["combinedContent", "headerContent"].map(id => document.getElementById(id));
-  els.forEach(el => { el.className = "loading"; el.textContent = "Loading..."; });
+  const header = document.getElementById("headerContent");
+  const content = document.getElementById("combinedContent");
+  header.className = content.className = "loading";
+  header.textContent = content.textContent = "Loading...";
 
   try {
     const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
@@ -110,9 +127,9 @@ async function loadPuzzleData() {
 
     let selected;
     if (puzzleId && !date) {
-      selected = puzzles.find((x) => x.id === puzzleId);
+      selected = puzzles.find(p => p.id === puzzleId);
     } else if (date && !puzzleId) {
-      selected = puzzles.find((x) => x.getAttribute("date") === date);
+      selected = puzzles.find(p => p.getAttribute("date") === date);
       if (selected === mostRecent) {
         openSubscribeModal();
         selected = puzzles.at(-2);
@@ -121,72 +138,14 @@ async function loadPuzzleData() {
       selected = puzzles.at(-2);
     }
 
-    populateDateSelector(puzzles, selected?.getAttribute("date"));
+    if (!selected) throw new Error("No puzzle selected.");
+    populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
-  } catch {
-    // For demonstration purposes, create some sample puzzle data if loading fails
-    const samplePuzzleData = createSamplePuzzleData();
-    displayPuzzle(samplePuzzleData);
-    populateDateSelector([samplePuzzleData], samplePuzzleData.getAttribute("date"));
+  } catch (err) {
+    header.innerHTML = `<p>⚠️ Error loading puzzle data.</p>`;
+    content.innerHTML = "";
+    console.error("Puzzle load error:", err);
   }
-}
-
-function createSamplePuzzleData() {
-  // Create a sample puzzle node for demonstration
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString("<puzzles></puzzles>", "application/xml");
-  const puzzle = xmlDoc.createElement("puzzle");
-  
-  // Set puzzle attributes
-  puzzle.setAttribute("date", "2025-05-12");
-  puzzle.setAttribute("letters", "ABCDEFG");
-  puzzle.setAttribute("letter1", "A");
-  puzzle.setAttribute("letter1count", "8");
-  puzzle.setAttribute("letter2", "B");
-  puzzle.setAttribute("letter2count", "6");
-  puzzle.setAttribute("letter3", "C");
-  puzzle.setAttribute("letter3count", "5");
-  puzzle.setAttribute("letter4", "D");
-  puzzle.setAttribute("letter4count", "4");
-  puzzle.setAttribute("letter5", "E");
-  puzzle.setAttribute("letter5count", "7");
-  puzzle.setAttribute("letter6", "F");
-  puzzle.setAttribute("letter6count", "3");
-  puzzle.setAttribute("letter7", "G");
-  puzzle.setAttribute("letter7count", "4");
-  puzzle.setAttribute("pangrams", "2");
-  puzzle.setAttribute("perfectpangrams", "1");
-  puzzle.setAttribute("bingo", "BINGO");
-  puzzle.setAttribute("queenbee", "24");
-  
-  // Create sample words
-  const words = [
-    {text: "AGENDA", first: "A", firsttwo: "AG", length: 6},
-    {text: "ABLE", first: "A", firsttwo: "AB", length: 4},
-    {text: "ACNE", first: "A", firsttwo: "AC", length: 4},
-    {text: "BADGE", first: "B", firsttwo: "BA", length: 5},
-    {text: "BEAD", first: "B", firsttwo: "BE", length: 4},
-    {text: "CABBAGE", first: "C", firsttwo: "CA", length: 7},
-    {text: "CAFE", first: "C", firsttwo: "CA", length: 4},
-    {text: "DECAF", first: "D", firsttwo: "DE", length: 5},
-    {text: "DEAF", first: "D", firsttwo: "DE", length: 4},
-    {text: "EDGE", first: "E", firsttwo: "ED", length: 4},
-    {text: "FACE", first: "F", firsttwo: "FA", length: 4},
-    {text: "FACADE", first: "F", firsttwo: "FA", length: 6},
-    {text: "GAGE", first: "G", firsttwo: "GA", length: 4},
-    {text: "GABFED", first: "G", firsttwo: "GA", length: 6}
-  ];
-  
-  words.forEach(w => {
-    const wordElem = xmlDoc.createElement("word");
-    wordElem.textContent = w.text;
-    wordElem.setAttribute("first", w.first);
-    wordElem.setAttribute("firsttwo", w.firsttwo);
-    wordElem.setAttribute("length", w.length);
-    puzzle.appendChild(wordElem);
-  });
-  
-  return puzzle;
 }
 
 function populateDateSelector(puzzles, selectedDate) {
@@ -210,31 +169,31 @@ function displayPuzzle(p) {
   const headerContent = document.getElementById("headerContent");
   combinedContent.innerHTML = headerContent.innerHTML = "";
 
-  const raw = p.getAttribute("date");
-  document.getElementById("navtitleContent").textContent = formatDateString(raw);
+  const rawDate = p.getAttribute("date");
+  document.getElementById("navtitleContent").textContent = formatDateString(rawDate);
 
-  const countsArr = [...Array(7)].map((_, i) => ({
+  const counts = [...Array(7)].map((_, i) => ({
     letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
     count: +p.getAttribute(`letter${i + 1}count`) || 0
   }));
-  const countsMap = Object.fromEntries(countsArr.map(o => [o.letter, o.count]));
-
-  const lettersAll = (p.getAttribute("letters") || "").toUpperCase().split("").sort();
-  const boldLetter = (p.getAttribute("letter1") || lettersAll[0]).toUpperCase();
+  const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
+  const letters = [...counts.map(c => c.letter)].sort();
+  const center = (p.getAttribute("letter1") || letters[0]).toUpperCase();
 
   globalWords = [...p.getElementsByTagName("word")].map(w => ({
     text: w.textContent,
-    length: +w.getAttribute("length") || w.textContent.length,
-    first: (w.getAttribute("first") || w.textContent[0]).toUpperCase(),
-    firsttwo: w.getAttribute("firsttwo") || w.textContent.slice(0, 2),
-    revealed: false // Add a revealed state to track each word
+    length: +w.getAttribute("length"),
+    first: w.getAttribute("first").toUpperCase(),
+    firsttwo: w.getAttribute("firsttwo"),
+    revealed: false
   }));
-  const byLetter = {};
-  globalWords.forEach(w => (byLetter[w.first] = byLetter[w.first] || []).push(w));
 
-  const pang = p.getAttribute("pangrams") || 0;
-  const perf = p.getAttribute("perfectpangrams") || 0;
-  const bingo = p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
+  const byLetter = {};
+  globalWords.forEach(w => {
+    if (!byLetter[w.first]) byLetter[w.first] = [];
+    byLetter[w.first].push(w);
+  });
+
   const q = +p.getAttribute("queenbee") || 0;
   const thresh = q ? [
     `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
@@ -244,274 +203,217 @@ function displayPuzzle(p) {
     `Queen Bee: ${q}`
   ] : [];
 
-  headerContent.innerHTML = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Sheet for ${formatDateString(raw)}`,
-    `Words: ${globalWords.length}, Pangrams: ${pang} (${perf} Perfect), ${bingo}`,
+  // Create a flex container for the header
+  const headerFlex = document.createElement("div");
+  headerFlex.className = "header-flex";
+  
+  // Add title text to the left
+  const titleDiv = document.createElement("div");
+  titleDiv.className = "header-text";
+  titleDiv.innerHTML = [
+    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Sheet for ${formatDateString(rawDate)}`,
+    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
     thresh.join(", ")
   ].map(t => `<p>${t}</p>`).join("");
-
-  // Define both regular and inverted number icons
-  const numIcons = {
-    1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
-    11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
-  };
   
-  // Define inverted/highlighted versions of the number icons
-  const invertedNumIcons = {
-    1: "❶", 2: "❷", 3: "❸", 4: "❹", 5: "❺", 6: "❻", 7: "❼", 8: "❽", 9: "❾", 10: "❿",
-    11: "⓫", 12: "⓬", 13: "⓭", 14: "⓮", 15: "⓯", 16: "⓰", 17: "⓱", 18: "⓲", 19: "⓳", 20: "⓴"
-  };
-
-  // Create the combined content structure
-  const combinedContainer = document.createElement("div");
-  combinedContainer.className = "combined-container";
-
-  // 1. Create letters section
-  const lettersSection = document.createElement("div");
-  lettersSection.className = "letters-section";
-  lettersSection.innerHTML = `
-    <table class="bee-table letters-table">
-      <tr>
-        ${lettersAll.map(l => `
-          <td>
-            <div class="wrapper">
-              <span class="char ${l === boldLetter ? "bold" : ""}">${l}</span>
-              <span class="count">${countsMap[l] ?? 0}</span>
-            </div>
-          </td>`).join("")}
-      </tr>
-    </table>
-  `;
+  // Create SVG for hive
+  const hiveContainer = document.createElement("div");
+  hiveContainer.className = "hive-container";
   
-  // 2. Create the word columns with integrated length indicators
-  const wordColumnsContainer = document.createElement("div");
-  wordColumnsContainer.className = "word-columns-container";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "240");
+  svg.setAttribute("height", "220");
+  svg.setAttribute("viewBox", "-120 -110 240 220");
   
-  lettersAll.forEach(l => {
-    const columnDiv = document.createElement("div");
-    columnDiv.className = "letter-column";
+  // Set up hexagon data
+  const hexSize = 40;
+  const hexPositions = [
+    { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
+    { x: 0, y: -70, letter: letters[0], fill: "#E6E6E6" },    // Top
+    { x: 60, y: -35, letter: letters[1], fill: "#E6E6E6" },   // Top right
+    { x: 60, y: 35, letter: letters[2], fill: "#E6E6E6" },    // Bottom right
+    { x: 0, y: 70, letter: letters[3], fill: "#E6E6E6" },     // Bottom
+    { x: -60, y: 35, letter: letters[4], fill: "#E6E6E6" },   // Bottom left
+    { x: -60, y: -35, letter: letters[5], fill: "#E6E6E6" }   // Top left
+  ];
+  
+  // Draw hexagons and letters
+  hexPositions.forEach(pos => {
+    // Create hexagon
+    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     
-    // Column header with letter
-    const columnHeader = document.createElement("div");
-    columnHeader.className = "column-header";
-    columnHeader.innerHTML = `
-      <div class="letter-header ${l === boldLetter ? "bold" : ""}">
-        ${l}
-        <span class="count-badge">${countsMap[l] ?? 0}</span>
-      </div>
-    `;
-    
-    // Length indicators row
-    const lengthIndicatorsDiv = document.createElement("div");
-    lengthIndicatorsDiv.className = "length-indicators";
-    
-    const wordsInColumn = byLetter[l] || [];
-    if (wordsInColumn.length > 0) {
-      wordsInColumn
-        .sort((a, b) => a.length - b.length || a.text.localeCompare(b.text))
-        .forEach((w, idx) => {
-          const length = w.length;
-          const wordId = `${l}-${length}-${idx}`;
-          w.lengthIconId = wordId; // Store the ID reference in the word object
-          
-          const lengthIcon = document.createElement("span");
-          lengthIcon.id = `length-${wordId}`;
-          lengthIcon.className = "length-icon";
-          lengthIcon.textContent = numIcons[length] || length;
-          lengthIndicatorsDiv.appendChild(lengthIcon);
-        });
-    } else {
-      lengthIndicatorsDiv.innerHTML = "<span class='no-words'>–</span>";
+    // Calculate points for a hexagon
+    const points = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = pos.x + hexSize * Math.cos(angle);
+      const y = pos.y + hexSize * Math.sin(angle);
+      points.push(`${x},${y}`);
     }
     
-    // Word boxes
-    const wordBoxesDiv = document.createElement("div");
-    wordBoxesDiv.className = "word-boxes";
+    hex.setAttribute("points", points.join(" "));
+    hex.setAttribute("fill", pos.fill);
+    hex.setAttribute("stroke", "#FFFFFF");
+    hex.setAttribute("stroke-width", "2");
+    svg.appendChild(hex);
     
-    if (wordsInColumn.length > 0) {
-      wordsInColumn.sort((a, b) => a.text.localeCompare(b.text)).forEach((w, idx) => {
-        const box = document.createElement("div");
-        box.className = "word-box";
-        box.dataset.word = w.text;
-        box.dataset.firsttwo = w.firsttwo;
-        box.dataset.lengthIconId = w.lengthIconId;
-        box.textContent = revealMode ? w.text : w.firsttwo;
-        
-        // Add click handler to toggle word display and update length indicator
-        box.addEventListener("click", () => {
-          const isRevealing = box.textContent === box.dataset.firsttwo;
-          box.textContent = isRevealing ? box.dataset.word : box.dataset.firsttwo;
-          
-          // Add a pulse animation class and remove it after animation completes
-          box.classList.add('just-toggled');
-          setTimeout(() => box.classList.remove('just-toggled'), 300);
-          
-          // Find and update the corresponding length icon
-          const lengthIcon = document.getElementById(`length-${box.dataset.lengthIconId}`);
-          if (lengthIcon) {
-            const length = w.length;
-            lengthIcon.textContent = isRevealing ? invertedNumIcons[length] || `[${length}]` : numIcons[length] || length;
-            
-            // Optional: Add a visual class for additional styling
-            if (isRevealing) {
-              lengthIcon.classList.add('revealed');
-            } else {
-              lengthIcon.classList.remove('revealed');
-            }
-          }
-          
-          // Update the revealed state in our data model
-          w.revealed = isRevealing;
-        });
-        
-        wordBoxesDiv.appendChild(box);
-      });
-    }
-    
-    // Assemble the column
-    columnDiv.appendChild(columnHeader);
-    columnDiv.appendChild(lengthIndicatorsDiv);
-    columnDiv.appendChild(wordBoxesDiv);
-    wordColumnsContainer.appendChild(columnDiv);
+    // Create letter
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", pos.x);
+    text.setAttribute("y", pos.y + 2);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("font-size", "24");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
+    text.textContent = pos.letter;
+    svg.appendChild(text);
   });
   
-  // Add a suggested style for the combined layout
-  const styleElement = document.createElement("style");
-  styleElement.textContent = `
-    .combined-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    
-    .letters-section {
-      margin-bottom: 10px;
-    }
-    
-    .word-columns-container {
-      display: grid;
-      grid-template-columns: repeat(${lettersAll.length}, 1fr);
-      gap: 10px;
-    }
-    
-    .letter-column {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    
-    .column-header {
-      text-align: center;
-      font-weight: bold;
-      padding: 5px 0;
-    }
-    
-    .letter-header {
-      font-size: 1.2em;
-      position: relative;
-    }
-    
-    .letter-header.bold {
-      color: #e86b1c;
-    }
-    
-    .count-badge {
-      font-size: 0.7em;
-      vertical-align: super;
-    }
-    
-    .length-indicators {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-      justify-content: center;
-      min-height: 25px;
-      padding: 5px;
-      background: #f5f5f5;
-      border-radius: 4px;
-    }
-    
-    .length-icon {
-      font-size: 0.9em;
-      cursor: default;
-    }
-    
-    .length-icon.revealed {
-      color: #e86b1c;
-    }
-    
-    .word-boxes {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    
-    .word-box {
-      padding: 5px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    
-    .word-box:hover {
-      background: #f0f0f0;
-    }
-    
-    .word-box.just-toggled {
-      animation: pulse 0.3s;
-    }
-    
-    @keyframes pulse {
-      0% { background-color: #fff; }
-      50% { background-color: #ffe0b2; }
-      100% { background-color: #fff; }
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .word-columns-container {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .word-columns-container {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-  `;
+  hiveContainer.appendChild(svg);
   
-  combinedContainer.appendChild(styleElement);
-  combinedContainer.appendChild(lettersSection);
-  combinedContainer.appendChild(wordColumnsContainer);
+  // Add both elements to the flex container
+  headerFlex.appendChild(titleDiv);
+  headerFlex.appendChild(hiveContainer);
+  headerContent.appendChild(headerFlex);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "combined-container";
+
+  // Letters table (real table, alphabetical)
+  const lettersTable = document.createElement("table");
+  lettersTable.className = "bee-table letters-table";
+  lettersTable.style.marginBottom = "0.5rem";
+  const lettersTr = document.createElement("tr");
+  letters.forEach(letter => {
+    const td = document.createElement("td");
+    td.style.padding = "2px"; // Force minimal padding with inline style
+    td.style.height = "25px"; // Force small height with inline style
+    td.style.textAlign = "center";
+    
+    // Set cream background color (#FFF8E1) for letter1 (center letter) only in the letters table
+    if (letter === center) {
+      td.style.backgroundColor = "#FFF8E1"; // Cream background color for letter1
+    }
+    
+    const inner = document.createElement("div");
+    inner.className = "wrapper";
+    inner.style.display = "flex";
+    inner.style.alignItems = "center";
+    inner.style.justifyContent = "center";
+
+    const spanChar = document.createElement("span");
+    spanChar.className = "char" + (letter === center ? " bold" : "");
+    spanChar.style.fontSize = "14px"; // Force small font size
+    spanChar.style.lineHeight = "1";
+    spanChar.style.fontWeight = letter === center ? "bold" : "normal";
+    spanChar.textContent = letter;
+
+    const spanCount = document.createElement("span");
+    spanCount.className = "count";
+    spanCount.style.fontSize = "10px"; // Force tiny count size
+    spanCount.style.marginLeft = "2px";
+    spanCount.style.color = "#666";
+    spanCount.textContent = countMap[letter] || 0;
+
+    inner.appendChild(spanChar);
+    inner.appendChild(spanCount);
+    td.appendChild(inner);
+    lettersTr.appendChild(td);
+  });
+  lettersTable.appendChild(lettersTr);
+  wrapper.appendChild(lettersTable);
+
+  // Length indicators table
+  const lengthsTable = document.createElement("table");
+  lengthsTable.className = "bee-table lengths-table";
+  const lengthsTr = document.createElement("tr");
   
-  combinedContent.appendChild(combinedContainer);
+  letters.forEach(l => {
+    const td = document.createElement("td");
+    td.className = "length-icons";
+    
+    const wordList = (byLetter[l] || []).sort((a, b) => a.length - b.length || a.text.localeCompare(b.text));
+    const icons = document.createElement("div");
+    icons.className = "icons";
+    
+    wordList.forEach((w, idx) => {
+      const id = `${l}-${w.length}-${idx}`;
+      w.lengthIconId = id;
+      const span = document.createElement("span");
+      span.id = `length-${id}`;
+      span.className = "length-indicator";
+      span.textContent = revealMode ? invertedNumIcons[w.length] || `[${w.length}]` : numIcons[w.length] || w.length;
+      icons.appendChild(span);
+    });
+    
+    td.appendChild(icons);
+    lengthsTr.appendChild(td);
+  });
+  
+  lengthsTable.appendChild(lengthsTr);
+  wrapper.appendChild(lengthsTable);
+
+  // Words table
+  const wordsTable = document.createElement("table");
+  wordsTable.className = "bee-table words-table";
+  const wordsTr = document.createElement("tr");
+  
+  letters.forEach(l => {
+    const td = document.createElement("td");    
+    const col = document.createElement("div");
+    col.className = "wcol";
+    
+    const wordList = (byLetter[l] || []).sort((a, b) => a.text.localeCompare(b.text));
+    wordList.forEach((w, idx) => {
+      const box = document.createElement("div");
+      box.className = "word-box";
+      box.dataset.word = w.text;
+      box.dataset.firsttwo = w.firsttwo;
+      box.dataset.lengthIconId = w.lengthIconId;
+      box.textContent = revealMode ? w.text : w.firsttwo;
+      box.addEventListener("click", () => {
+        const isRevealed = box.textContent === box.dataset.firsttwo;
+        box.textContent = isRevealed ? box.dataset.word : box.dataset.firsttwo;
+        
+        // Change background color to yellow when the word is revealed
+        box.style.backgroundColor = isRevealed ? "#FFDC00" : "";
+        
+        const icon = document.getElementById(`length-${box.dataset.lengthIconId}`);
+        if (icon) {
+          icon.textContent = isRevealed
+            ? invertedNumIcons[w.length] || `[${w.length}]`
+            : numIcons[w.length] || w.length;
+          icon.classList.toggle("revealed", isRevealed);
+        }
+        box.classList.add("just-toggled");
+        setTimeout(() => box.classList.remove("just-toggled"), 300);
+      });
+      if (revealMode) {
+        box.style.backgroundColor = "#FFDC00"; // Yellow when in reveal mode
+      }
+      col.appendChild(box);
+    });
+    
+    td.appendChild(col);
+    wordsTr.appendChild(td);
+  });
+  
+  wordsTable.appendChild(wordsTr);
+  wrapper.appendChild(wordsTable);
+
+  combinedContent.appendChild(wrapper);
 }
 
-// Update the toggleRevealAll function to also update length indicators
 function toggleRevealAll(on) {
   document.querySelectorAll(".word-box").forEach(b => {
-    const isCurrentlyRevealed = b.textContent === b.dataset.word;
-    
-    // Only perform the toggle if needed
-    if ((on && !isCurrentlyRevealed) || (!on && isCurrentlyRevealed)) {
-      b.textContent = on ? b.dataset.word : b.dataset.firsttwo;
-      
-      // Find and update the corresponding length icon
-      const lengthIcon = document.getElementById(`length-${b.dataset.lengthIconId}`);
-      if (lengthIcon) {
-        const wordLength = b.dataset.word.length;
-        lengthIcon.textContent = on ? invertedNumIcons[wordLength] || `[${wordLength}]` : numIcons[wordLength] || wordLength;
-        
-        if (on) {
-          lengthIcon.classList.add('revealed');
-        } else {
-          lengthIcon.classList.remove('revealed');
-        }
-      }
+    b.textContent = on ? b.dataset.word : b.dataset.firsttwo;
+    b.style.backgroundColor = on ? "#FFDC00" : ""; // Original yellow (#FFDC00)
+    const icon = document.getElementById(`length-${b.dataset.lengthIconId}`);
+    if (icon) {
+      const len = b.dataset.word.length;
+      icon.textContent = on ? invertedNumIcons[len] || `[${len}]` : numIcons[len] || len;
+      icon.classList.toggle("revealed", on);
     }
   });
 }

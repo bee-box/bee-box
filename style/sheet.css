@@ -1,4 +1,12 @@
-/* sheet.css - Combined and simplified styles for Bee Sheet */
+/* ─── Letters Table ─── */
+.letters-table {
+  margin-bottom: 0.5rem;
+}
+.letters-table td {
+  text-align: center;
+  height: 40px; /* Reduced from 50px */
+}
+.letters-table/* Additional CSS for new table-based layout */
 html { scrollbar-gutter: stable; }
 body {
   margin: 0 auto;
@@ -61,8 +69,8 @@ nav { padding-bottom: 1rem; }
 }
 select#dateSelector { min-width: 190px; max-width: 190px; }
 
-#combinedContent.loading, #combinedContent.error { min-height: 12rem; }
-#combinedContent.fade-in { animation: fade .4s ease-in; }
+#toolContent.loading, #toolContent.error { min-height: 12rem; }
+#toolContent.fade-in { animation: fade .4s ease-in; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 footer {
@@ -72,10 +80,110 @@ footer {
   color: #666;
 }
 .error { color: #d32f2f; text-align: center; }
-#headerContent p { margin: 0; text-align: center; }
-#headerContent p:not(:last-child) { margin-bottom: 0.25rem; }
+#headerContent p, #lettersContent p { margin: 0; text-align: center; }
+#headerContent p:not(:last-child), #lettersContent p:not(:last-child) { margin-bottom: 0.25rem; }
 
-/* Modal styles */
+/* ─── Unified table styles for Bee Sheet ─── */
+.bee-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.bee-table td {
+  width: 14.28%;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  vertical-align: middle;
+  background-color: #fff;
+}
+
+/* ─── Letters Table ─── */
+.letters-table {
+  margin-bottom: 0.5rem;
+}
+.letters-table td {
+  text-align: center;
+  height: 50px;
+}
+.letters-table .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.letters-table .char {
+  font-size: 2rem;
+  line-height: 1;
+}
+.letters-table .char.bold {
+  font-weight: 700;
+}
+.letters-table .count {
+  font-size: 0.9rem;
+  margin-left: 0.25rem;
+  line-height: 1;
+}
+
+/* ─── Lengths Table ─── */
+.lengths-table {
+  margin-bottom: 0.5rem;
+}
+.lengths-table td {
+  text-align: center;
+  padding: 0.25rem;
+  height: auto; /* Changed from fixed height to auto */
+  min-height: 30px; /* Added minimum height */
+}
+.lengths-table .icons {
+  font-size: 1rem;
+  letter-spacing: 0.1rem;
+  white-space: normal; /* Changed from nowrap to normal */
+  overflow: visible; /* Changed from hidden to visible */
+  text-overflow: clip; /* Changed from ellipsis to clip */
+  line-height: 1.5; /* Added line height for better readability */
+}
+.length-indicator {
+  display: inline-block;
+  margin-right: 3px;
+  margin-bottom: 3px; /* Added margin bottom for spacing between wrapped lines */
+  transition: transform 0.2s ease, color 0.2s ease; /* Added color transition */
+}
+.length-indicator.revealed {
+  color: #000000; /* Changed from Royal Blue to Black */
+}
+
+/* ─── Words Table ─── */
+.words-table, .words-table td {
+  border: none; /* Removed borders for words table */
+}
+.words-table td {
+  vertical-align: top;
+  padding: 0.5rem;
+  height: auto;
+}
+.words-table .wcol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.word-box {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 1rem;
+  text-align: left;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+}
+.word-box:hover {
+  background-color: #f9f9f9;
+}
+
+
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -86,7 +194,6 @@ footer {
   justify-content: center;
   z-index: 9999;
 }
-
 .modal-content {
   background: white;
   width: 95%;
@@ -99,14 +206,12 @@ footer {
   display: flex;
   flex-direction: column;
 }
-
 .modal-content iframe {
   flex: 1;
   width: 100%;
   height: 620px;
   border: none;
 }
-
 .modal-close {
   position: absolute;
   top: 10px;
@@ -119,115 +224,54 @@ footer {
   z-index: 10001;
 }
 
-/* Combined section styles */
-.combined-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* Letter header row styles */
-.letter-headers-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border: 1px solid #ddd;
-  border-bottom: none;
-}
-
-.letter-header {
-  padding: 10px 5px;
-  text-align: center;
-  border-right: 1px solid #ddd;
+/* ─── Hive SVG Styles ─── */
+/* Horizontal layout for header */
+.header-flex {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.hive-container {
+  display: flex;
   justify-content: center;
+  margin: 0;
+  flex-shrink: 0;
 }
 
-.letter-header:last-child {
-  border-right: none;
+.hive-container svg {
+  max-width: 240px;
+  height: auto;
 }
 
-.letter-char {
-  font-size: 2rem;
-  margin-right: 5px;
+/* Make sure the text remains sharp and clear */
+.hive-container svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none; /* Prevent text selection */
 }
 
-.letter-char.bold {
-  font-weight: bold;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-flex {
+    flex-direction: column;
+  }
+  
+  .hive-container {
+    margin-top: 1rem;
+  }
 }
 
-.letter-count {
-  font-size: 0.9rem;
-}
-
-/* Word columns container */
-.word-columns-container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border: 1px solid #ddd;
-}
-
-.word-column {
-  border-right: 1px solid #ddd;
-  padding: 5px;
-}
-
-.word-column:last-child {
-  border-right: none;
-}
-
-/* Word boxes */
-.word-box {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: #fff;
-  cursor: pointer;
-  font-family: monospace;
-  font-size: 1rem;
-  text-align: left;
-  box-sizing: border-box;
-  margin-bottom: 5px;
-}
-
-.word-box:last-child {
-  margin-bottom: 0;
-}
-
-.word-box.just-toggled {
-  animation: pulse 0.3s;
-}
-
-@keyframes pulse {
-  0% { background-color: #fff; }
-  50% { background-color: #ffe0b2; }
-  100% { background-color: #fff; }
-}
-
-/* Length indicators */
-.length-indicator {
-  display: inline-block;
-  margin-right: 3px;
-}
-
-.length-indicator.revealed {
-  color: #e86b1c;
-}
-
-/* Print styles */
+/* Print-specific styles */
 @media print {
-  /* Hide navigation/title section */
-  #navtitle {
-    display: none;
+  #navtitle, footer, .modal-overlay {
+    display: none !important;
   }
   
-  /* Hide footer on print */
-  footer {
-    display: none;
-  }
-  
-  /* Remove background colors and shadows */
   body {
     background: white;
     padding: 0;
@@ -237,56 +281,26 @@ footer {
     box-shadow: none;
     border: none;
     padding: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
   
-  /* Ensure header text doesn't wrap */
   #headerContent p {
     white-space: nowrap;
-    font-size: 0.9rem; /* Slightly reduce font size for printing */
+    font-size: 0.9rem;
     line-height: 1.2;
     margin-bottom: 0.2rem;
   }
   
-  /* Hide modals */
-  .modal-overlay {
-    display: none !important;
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .word-columns-container, .letter-headers-row {
-    grid-template-columns: repeat(4, 1fr);
+  .bee-table td {
+    border: 1px solid #ccc;
   }
   
-  .letter-header:nth-child(4) {
-    border-right: none;
+  .word-box {
+    border: 1px solid #ddd;
+    padding: 0.25rem 0.4rem;
   }
   
-  .word-column:nth-child(4) {
-    border-right: none;
-  }
-  
-  .letter-headers-row {
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .word-columns-container {
-    border-top: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .word-columns-container, .letter-headers-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .letter-header:nth-child(2) {
-    border-right: none;
-  }
-  
-  .word-column:nth-child(2) {
-    border-right: none;
+  #toolContent.fade-in {
+    animation: none;
   }
 }
