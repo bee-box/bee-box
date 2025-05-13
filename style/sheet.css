@@ -96,7 +96,8 @@ footer {
 }
 .letters-table td {
   text-align: center;
-  height: 50px;
+  height: 25px;
+  padding: 2px;
 }
 .letters-table .wrapper {
   display: flex;
@@ -104,16 +105,21 @@ footer {
   justify-content: center;
 }
 .letters-table .char {
-  font-size: 2rem;
+  font-size: 14px;
   line-height: 1;
 }
 .letters-table .char.bold {
   font-weight: 700;
 }
 .letters-table .count {
-  font-size: 0.9rem;
-  margin-left: 0.25rem;
+  font-size: 10px;
+  margin-left: 2px;
   line-height: 1;
+  color: #666;
+}
+/* Special styling for center letter */
+.letters-table .center-letter {
+  background-color: #FFF8E1;
 }
 
 /* ─── Lengths Table ─── */
@@ -174,7 +180,6 @@ footer {
   background-color: #f9f9f9;
 }
 
-
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -234,6 +239,12 @@ footer {
   justify-content: center;
   margin: 0;
   flex-shrink: 0;
+  cursor: pointer; /* Make hive clickable */
+}
+
+.hive-container:hover {
+  transform: scale(1.02); /* Slight enlarge on hover */
+  transition: transform 0.2s ease;
 }
 
 .hive-container svg {
@@ -247,142 +258,131 @@ footer {
   user-select: none; /* Prevent text selection */
 }
 
-/* Mobile Enhancements for Bee Sheet */
-@media (max-width: 768px) {
-  /* Responsive header */
-  .header-flex {
-    flex-direction: column;
-  }
-  
-  .hive-container {
-    margin-top: 1rem;
-  }
-
-  /* Responsive navigation */
-  .nav-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .nav-right {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .nav-left {
-    width: 100%;
-  }
-  
-  select#dateSelector {
-    flex-grow: 1;
-    max-width: none;
-  }
-  
-  /* Reduced padding for section boxes */
-  .section-box {
-    padding: 1rem;
-  }
-  
-  /* Make letter table more compact */
-  .letters-table td {
-    padding: 0.15rem !important;
-  }
-  
-  /* Improved word boxes for touch */
-  .word-box {
-    padding: 0.75rem;
-    margin-bottom: 0.25rem;
-    touch-action: manipulation; /* Improves touch response */
-  }
-  
-  /* Center controls */
-  .mobile-controls {
-    display: flex;
-    justify-content: space-around;
-    margin: 1rem 0;
-  }
-  
-  /* Fixed minimized hive button that expands on tap */
-  .mobile-hive-toggle {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    width: 50px;
-    height: 50px;
-    background: #FFDC00;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .mobile-hive-toggle.expanded {
-    width: 240px;
-    height: 220px;
-    border-radius: 8px;
-    right: 0.5rem;
-    bottom: 0.5rem;
-  }
-  
-  .mobile-hive-icon {
-    font-weight: bold;
-    font-size: 24px;
-  }
-  
-  .mobile-hive-content {
-    display: none;
-  }
-  
-  .mobile-hive-toggle.expanded .mobile-hive-icon {
-    display: none;
-  }
-  
-  .mobile-hive-toggle.expanded .mobile-hive-content {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-}
-
 /* Print-specific styles */
 @media print {
-  #navtitle, footer, .modal-overlay, .mobile-hive-toggle, .mobile-controls {
+  /* No orientation forcing - let user choose in browser print dialog */
+  
+  #navtitle, footer, .modal-overlay {
     display: none !important;
   }
   
   body {
     background: white;
     padding: 0;
+    margin: 0;
   }
   
   .section-box {
     box-shadow: none;
     border: none;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
+    padding: 0.25rem !important; /* Much smaller padding */
+    margin-bottom: 0.25rem !important; /* Much smaller margins */
   }
   
+  /* Make header more compact */
+  .header-flex {
+    gap: 0.5rem !important; /* Reduced gap */
+  }
+  
+  /* Make header text smaller and more compact */
   #headerContent p {
     white-space: nowrap;
-    font-size: 0.9rem;
-    line-height: 1.2;
-    margin-bottom: 0.2rem;
+    font-size: 0.8rem !important; /* Even smaller */
+    line-height: 1.1 !important; /* Tighter line height */
+    margin-bottom: 0.15rem !important; /* Less space between lines */
   }
   
-  .bee-table td {
+  /* Reduce spacing around tables */
+  .bee-table {
+    margin-bottom: 0.25rem !important;
+  }
+  
+  /* Make letter table more compact */
+  .letters-table td {
+    height: 20px !important; /* Shorter height */
+    padding: 1px !important; /* Less padding */
+  }
+  
+  /* Smaller letter characters */
+  .letters-table .char {
+    font-size: 12px !important;
+  }
+  
+  .letters-table .count {
+    font-size: 9px !important;
+  }
+  
+  /* Make length table more compact */
+  .lengths-table td {
+    padding: 0.15rem !important; /* Less padding */
+    min-height: 20px !important; /* Shorter minimum height */
+  }
+  
+  /* Keep border styles consistent with web version */
+  /* Letters and length tables retain borders */
+  .letters-table td,
+  .lengths-table td {
     border: 1px solid #ccc;
   }
   
+  /* Words table has no borders, matching web version */
+  .words-table, 
+  .words-table td {
+    border: none;
+    padding: 0.25rem !important; /* Less padding */
+  }
+  
+  /* Compact word boxes */
   .word-box {
     border: 1px solid #ddd;
-    padding: 0.25rem 0.4rem;
+    padding: 0.15rem 0.3rem !important; /* Extremely minimal padding */
+    margin-bottom: 0.1rem !important; /* Very small margin */
+    font-size: 0.85rem !important; /* Smaller font */
+    line-height: 1.1 !important; /* Tighter line height */
+  }
+  
+  /* Even less space between words in columns */
+  .words-table .wcol {
+    gap: 0.1rem !important; /* Minimal gap */
+  }
+  
+  /* Smaller font for length indicators */
+  .length-indicator {
+    font-size: 0.75rem !important; /* Even smaller */
+    margin-right: 2px !important;
+    margin-bottom: 2px !important;
+  }
+  
+  /* Make hive smaller for print */
+  .hive-container svg {
+    max-width: 180px !important;
+    height: auto;
+  }
+  
+  /* Change yellow background to gray in print */
+  .word-box[style*="background-color"] {
+    background-color: #D0D0D0 !important; /* Medium gray instead of yellow */
+  }
+  
+  /* Center hexagon in hive should also be gray in print */
+  .hive-container svg polygon[fill="#F7DA21"] {
+    fill: #D0D0D0 !important; /* Same medium gray */
+  }
+  
+  /* Navigation background */
+  #navtitle {
+    background: none !important;
+  }
+  
+  /* Make sure 'THE END' appears after all other printable content */
+  .combined-container::after {
+    content: "THE END";
+    display: block;
+    text-align: center;
+    margin-top: 0.5rem !important; /* Less margin */
+    font-size: 0.8rem !important; /* Smaller text */
+    font-style: italic;
+    color: #666;
   }
   
   #toolContent.fade-in {
