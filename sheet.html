@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Bee Sheet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Cache prevention meta tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="stylesheet" href="style/sheet.css">
   <link rel="icon" href="style/bee.ico" type="image/x-icon" />
 </head>
@@ -120,7 +124,17 @@ async function loadPuzzleData() {
   header.textContent = content.textContent = "Loading...";
 
   try {
-    const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
+    // Add cache busting parameter to prevent caching
+    const timestamp = new Date().getTime();
+    const puzzlesUrl = `xml/puzzles.xml?_=${timestamp}`;
+    const xml = new DOMParser().parseFromString(await (await fetch(puzzlesUrl, {
+      cache: 'no-store',  // Tell fetch to bypass cache
+      headers: {
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache'
+      }
+    })).text(), "application/xml");
+    
     const puzzles = [...xml.querySelectorAll("puzzle")]
       .filter(p => p.getElementsByTagName("word").length)
       .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
@@ -550,6 +564,15 @@ function setupMobileAccordion(letters, byLetter, center) {
     firstAccordion.classList.add('active');
   }
 }
+
+// Add cache busting to page refresh
+window.addEventListener('beforeunload', function() {
+  // This is a backup method - it won't always work but can help in some cases
+  const timestamp = new Date().getTime();
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set('_', timestamp);
+  window.location.href = currentUrl.toString();
+});
 
 // Call setupMobileAccordion on window resize with debounce
 let resizeTimer;
