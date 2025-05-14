@@ -2,13 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title id="pageTitle">Loading...</title>
+  <title id="pageTitle">Bee Jumble</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style/main.css">
-  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style/jumble.css">
+  <style>
+    /* Override styles for simplified layout */
+    .hive-container {
+      display: flex;
+      justify-content: center;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    
+    /* Custom color for this game - more orange-yellow */
+    :root {
+      --jumble-highlight: #FFA726; /* Orange-yellow shade */
+    }
+    
+    /* Apply the custom color to the nav background */
+    #navtitle { 
+      background: var(--jumble-highlight);
+    }
+    
+    /* Single column words container */
+    .words-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+    
+    /* Length group styling */
+    .length-group {
+      margin-bottom: 1rem;
+    }
+    
+    .length-group-header {
+      font-weight: bold;
+      padding: 0.5rem;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Words grid for each length group - exactly 4 per row */
+    .words-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      width: 100%;
+    }
+    
+    /* Word box styling */
+    .word-box {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 1rem;
+      text-align: center;
+      box-sizing: border-box;
+      transition: background-color 0.2s ease;
+    }
+    
+    .word-box:hover {
+      background-color: #f9f9f9;
+    }
+    
+    /* Mobile adjustments - still keep 4 per row */
+    @media (max-width: 768px) {
+      .words-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.25rem;
+      }
+      
+      .word-box {
+        padding: 0.25rem;
+        font-size: 0.9rem;
+      }
+    }
+    
+    /* Print-specific styles */
+    @media print {
+      body {
+        font-size: 12px;
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      #navtitle, footer, .modal-overlay {
+        display: none !important;
+      }
+      
+      .section-box {
+        box-shadow: none;
+        border: none;
+        padding: 0.25rem !important;
+        margin-bottom: 0.25rem !important;
+      }
+      
+      /* Header layout for print */
+      .header-flex {
+        display: flex;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem !important;
+      }
+      
+      .header-text {
+        flex: 1;
+      }
+      
+      #headerContent p {
+        white-space: nowrap;
+        line-height: 1.1 !important;
+        margin-bottom: 0.15rem !important;
+      }
+      
+      /* Make hive smaller for print */
+      .hive-container {
+        flex-shrink: 0;
+      }
+      
+      .hive-container svg {
+        max-width: 180px !important;
+        height: auto;
+      }
+      
+      /* Words layout for print */
+      .words-container {
+        padding: 0.25rem !important;
+      }
+      
+      .length-group {
+        margin-bottom: 0.5rem !important;
+      }
+      
+      .length-group-header {
+        padding: 0.25rem !important;
+        margin-bottom: 0.25rem !important;
+        font-size: 0.9rem !important;
+      }
+      
+      .words-grid {
+        gap: 0.25rem !important;
+      }
+      
+      .word-box {
+        padding: 0.15rem 0.3rem !important;
+        margin-bottom: 0.1rem !important;
+        line-height: 1.1 !important;
+        font-size: 0.9rem !important;
+      }
+      
+      /* Change highlighted areas to gray in print */
+      .word-box[style*="background-color"] {
+        background-color: #D0D0D0 !important;
+      }
+      
+      /* Make the center hexagon gray in print */
+      .hive-container svg polygon[fill="#FFA726"] {
+        fill: #D0D0D0 !important;
+      }
+      
+      .combined-container::after {
+        content: "THE END";
+        display: block;
+        text-align: center;
+        margin-top: 0.5rem !important;
+        font-style: italic;
+        color: #666;
+      }
+    }
+  </style>
 </head>
 <body>
-
 <nav id="navtitle" class="section-box">
   <div class="nav-container">
     <div class="nav-left">
@@ -29,12 +200,8 @@
   <div id="headerContent" class="loading">Loading...</div>
 </section>
 
-<section id="letters" class="section-box">
-  <div id="lettersContent" class="loading">Loading...</div>
-</section>
-
-<section id="tool" class="section-box">
-  <div id="toolContent" class="loading">Loading...</div>
+<section id="combinedSection" class="section-box">
+  <div id="combinedContent" class="loading">Loading...</div>
 </section>
 
 <footer class="section-box">
@@ -53,209 +220,297 @@ const toolName = "Bee Jumble";
 let globalWords = [];
 let revealMode = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('pageTitle').textContent = toolName;
-  document.getElementById('toolNameHeading').textContent = toolName;
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("pageTitle").textContent = toolName;
+  document.getElementById("toolNameHeading").textContent = toolName;
   setupEventListeners();
   loadPuzzleData();
 });
 
-function openSubscribeModal() {
-  document.getElementById('subscribeOverlay').style.display = 'flex';
-}
-function closeSubscribeModal() {
-  document.getElementById('subscribeOverlay').style.display = 'none';
-}
-
 function setupEventListeners() {
-  document.getElementById('dateSelector').addEventListener('change', e => {
+  document.getElementById("dateSelector").addEventListener("change", (e) => {
     const d = e.target.value;
     if (d) {
       const u = new URL(window.location);
-      u.searchParams.set('date', d);
-      u.searchParams.delete('puzzleid');
+      u.searchParams.set("date", d);
+      u.searchParams.delete("puzzleid");
       window.location.href = u.toString();
     }
   });
 
-  document.getElementById('printButton').addEventListener('click', () => {
-    const wordBoxes = document.querySelectorAll('.word-box');
-    wordBoxes.forEach(box => {
-      box.setAttribute('data-print-value', box.textContent);
-    });
+  document.getElementById("printButton").addEventListener("click", () => {
+    // Store current word states for printing
+    const wordBoxes = document.querySelectorAll(".word-box");
+    wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
 
-    const beforePrint = () => {
-      wordBoxes.forEach(box => {
-        box.textContent = box.getAttribute('data-print-value');
+    // Set up handlers for before and after printing
+    window.addEventListener("beforeprint", () => {
+      // Use the stored value for printing
+      wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
+    }, { once: true });
+
+    window.addEventListener("afterprint", () => {
+      // Reset to proper state after printing
+      wordBoxes.forEach(b => {
+        b.textContent = revealMode ? b.dataset.word : b.dataset.jumbled;
       });
-    };
+    }, { once: true });
 
-    const afterPrint = () => {
-      wordBoxes.forEach(box => {
-        const word = box.dataset.word;
-        const jumbled = box.dataset.jumbled;
-        box.textContent = revealMode ? word : jumbled;
-      });
-    };
-
-    window.addEventListener('beforeprint', beforePrint, { once: true });
-    window.addEventListener('afterprint', afterPrint, { once: true });
-
+    // Trigger the browser's print dialog
     window.print();
   });
 
-  document.getElementById('revealButton').addEventListener('click', () => {
+  document.getElementById("revealButton").addEventListener("click", () => {
     revealMode = !revealMode;
     toggleRevealAll(revealMode);
+    document.getElementById("revealButton").textContent = revealMode ? "Hide" : "Reveal";
   });
 }
+
+function openSubscribeModal() {
+  document.getElementById("subscribeOverlay").style.display = "flex";
+}
+
+function closeSubscribeModal() {
+  document.getElementById("subscribeOverlay").style.display = "none";
+}
+
 async function loadPuzzleData() {
-  const toolContent = document.getElementById('toolContent');
-  const lettersContent = document.getElementById('lettersContent');
-  const headerContent = document.getElementById('headerContent');
-  [toolContent, lettersContent, headerContent].forEach(el => {
-    el.className = 'loading';
-    el.textContent = 'Loading...';
-  });
+  const header = document.getElementById("headerContent");
+  const content = document.getElementById("combinedContent");
+  header.className = content.className = "loading";
+  header.textContent = content.textContent = "Loading...";
 
   try {
-    const res = await fetch('xml/puzzles.xml');
-    const xmlText = await res.text();
-    const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
-    const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
-    const sorted = puzzles.sort((a, b) => new Date(a.getAttribute('date')) - new Date(b.getAttribute('date')));
+    const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
+    const puzzles = [...xml.querySelectorAll("puzzle")]
+      .filter(p => p.getElementsByTagName("word").length)
+      .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
 
     const params = new URLSearchParams(window.location.search);
-    const puzzleId = params.get('puzzleid');
-    const date = params.get('date');
-    const mostRecent = sorted[sorted.length - 1];
+    const puzzleId = params.get("puzzleid");
+    const date = params.get("date");
+    const mostRecent = puzzles.at(-1);
 
     let selected;
     if (puzzleId && !date) {
-      selected = sorted.find(p => p.getAttribute('id') === puzzleId);
+      selected = puzzles.find(p => p.id === puzzleId);
     } else if (date && !puzzleId) {
-      selected = sorted.find(p => p.getAttribute('date') === date);
+      selected = puzzles.find(p => p.getAttribute("date") === date);
       if (selected === mostRecent) {
         openSubscribeModal();
-        selected = sorted[sorted.length - 2];
+        selected = puzzles.at(-2);
       }
     } else {
-      selected = sorted[sorted.length - 2];
+      selected = puzzles.at(-2);
     }
 
-    populateDateSelector(sorted, selected?.getAttribute('date'));
+    if (!selected) throw new Error("No puzzle selected.");
+    populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
   } catch (err) {
-    [toolContent, lettersContent, headerContent].forEach(el => {
-      el.className = 'error';
-      el.textContent = 'Unable to load data.';
-    });
+    header.innerHTML = `<p>⚠️ Error loading puzzle data.</p>`;
+    content.innerHTML = "";
+    console.error("Puzzle load error:", err);
   }
 }
 
 function populateDateSelector(puzzles, selectedDate) {
-  const sel = document.getElementById('dateSelector');
-  while (sel.options.length > 1) sel.remove(1);
+  const s = document.getElementById("dateSelector");
+  while (s.options.length > 1) s.remove(1);
   [...puzzles].reverse().forEach(p => {
-    const d = p.getAttribute('date');
-    const opt = document.createElement('option');
-    opt.value = d;
-    opt.textContent = d;
-    if (d === selectedDate) opt.selected = true;
-    sel.appendChild(opt);
+    const d = p.getAttribute("date");
+    s.add(new Option(d, d, d === selectedDate, d === selectedDate));
   });
 }
 
-function formatDateString(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+function formatDateString(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
   });
 }
 
-function displayPuzzle(puzzle) {
-  const box = document.getElementById('toolContent');
-  const headerBox = document.getElementById('headerContent');
-  const lettersBox = document.getElementById('lettersContent');
-  box.innerHTML = headerBox.innerHTML = lettersBox.innerHTML = '';
+function displayPuzzle(p) {
+  const combinedContent = document.getElementById("combinedContent");
+  const headerContent = document.getElementById("headerContent");
+  combinedContent.innerHTML = headerContent.innerHTML = "";
 
-  const rawDate = puzzle.getAttribute('date');
-  const titleDate = formatDateString(rawDate);
-  document.getElementById('navtitleContent').textContent = titleDate;
+  const rawDate = p.getAttribute("date");
+  document.getElementById("navtitleContent").textContent = formatDateString(rawDate);
 
-  const letters = puzzle.getAttribute('letters') || '';
   const counts = [...Array(7)].map((_, i) => ({
-    letter: puzzle.getAttribute(`letter${i + 1}`),
-    count: parseInt(puzzle.getAttribute(`letter${i + 1}count`) || 0)
+    letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
+    count: +p.getAttribute(`letter${i + 1}count`) || 0
   }));
-  const centerLetter = counts.reduce((a, b) => a.count > b.count ? a : b).letter || letters[0];
-  const outerLetters = letters.split('').filter(l => l !== centerLetter).sort();
+  const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
+  const letters = [...counts.map(c => c.letter)].sort();
+  const center = (p.getAttribute("letter1") || letters[0]).toUpperCase();
 
-  lettersBox.innerHTML = `<div class="letters-display">
-    <span class="center-letter">${centerLetter.toUpperCase()}</span>
-    ${outerLetters.map(l => `<span>${l.toUpperCase()}</span>`).join('')}
-  </div>`;
-
-  globalWords = [...puzzle.getElementsByTagName('word')].map(w => ({
+  globalWords = [...p.getElementsByTagName("word")].map(w => ({
     text: w.textContent,
-    jumbled: w.getAttribute('jumbled') || w.textContent.slice(0, 2)
-  })).sort((a, b) => a.text.localeCompare(b.text));
+    length: +w.getAttribute("length"),
+    first: w.getAttribute("first").toUpperCase(),
+    jumbled: w.getAttribute("jumbled"),
+    revealed: false
+  }));
 
-  const grouped = {};
-  globalWords.forEach(({ text, jumbled }) => {
-    const len = text.length;
-    if (!grouped[len]) grouped[len] = [];
-    grouped[len].push({ text, jumbled });
-  });
-
-  const pangrams = puzzle.getAttribute("pangrams") || 0;
-  const perfect = puzzle.getAttribute("perfectpangrams") || 0;
-  const bingo = puzzle.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
-  const q = parseInt(puzzle.getAttribute("queenbee") || 0, 10);
-  const thresholds = q ? [
-    `Good Start: ${Math.round(q * .02)}`, `Moving Up: ${Math.round(q * .05)}`,
-    `Good: ${Math.round(q * .08)}`, `Solid: ${Math.round(q * .15)}`,
-    `Nice: ${Math.round(q * .25)}`, `Great: ${Math.round(q * .4)}`,
-    `Amazing: ${Math.round(q * .5)}`, `Genius: ${Math.round(q * .7)}`,
+  const q = +p.getAttribute("queenbee") || 0;
+  const thresh = q ? [
+    `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
+    `Good: ${Math.round(q * 0.08)}`, `Solid: ${Math.round(q * 0.15)}`,
+    `Nice: ${Math.round(q * 0.25)}`, `Great: ${Math.round(q * 0.40)}`,
+    `Amazing: ${Math.round(q * 0.50)}`, `Genius: ${Math.round(q * 0.70)}`,
     `Queen Bee: ${q}`
   ] : [];
 
-  const headerLines = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${titleDate}`,
-    `Words: ${globalWords.length}, Pangrams: ${pangrams} (${perfect} Perfect), ${bingo}`,
-    thresholds.join(', ')
+  // Create a flex container for the header
+  const headerFlex = document.createElement("div");
+  headerFlex.className = "header-flex";
+  
+  // Add title text to the left
+  const titleDiv = document.createElement("div");
+  titleDiv.className = "header-text";
+  titleDiv.innerHTML = [
+    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Jumble for ${formatDateString(rawDate)}`,
+    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
+    thresh.join(", ")
+  ].map(t => `<p>${t}</p>`).join("");
+  
+  // Create SVG for hive - NON-CLICKABLE VERSION
+  const hiveContainer = document.createElement("div");
+  hiveContainer.className = "hive-container";
+  
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "240");
+  svg.setAttribute("height", "220");
+  svg.setAttribute("viewBox", "-120 -110 240 220");
+  
+  // Set up hexagon data
+  const hexSize = 40;
+  const hexPositions = [
+    { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
+    { x: 0, y: -70, letter: letters[0], fill: "#E6E6E6" },    // Top
+    { x: 60, y: -35, letter: letters[1], fill: "#E6E6E6" },   // Top right
+    { x: 60, y: 35, letter: letters[2], fill: "#E6E6E6" },    // Bottom right
+    { x: 0, y: 70, letter: letters[3], fill: "#E6E6E6" },     // Bottom
+    { x: -60, y: 35, letter: letters[4], fill: "#E6E6E6" },   // Bottom left
+    { x: -60, y: -35, letter: letters[5], fill: "#E6E6E6" }   // Top left
   ];
-  headerBox.innerHTML = headerLines.map(l => `<p>${l}</p>`).join("");
+  
+  // Draw hexagons and letters
+  hexPositions.forEach(pos => {
+    // Create hexagon
+    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    
+    // Calculate points for a hexagon
+    const points = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = pos.x + hexSize * Math.cos(angle);
+      const y = pos.y + hexSize * Math.sin(angle);
+      points.push(`${x},${y}`);
+    }
+    
+    hex.setAttribute("points", points.join(" "));
+    hex.setAttribute("fill", pos.fill === "#F7DA21" ? "#FFA726" : pos.fill); // Use new color for center
+    hex.setAttribute("stroke", "#FFFFFF");
+    hex.setAttribute("stroke-width", "2");
+    svg.appendChild(hex);
+    
+    // Create letter
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", pos.x);
+    text.setAttribute("y", pos.y + 2);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("font-size", "24");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
+    text.textContent = pos.letter;
+    svg.appendChild(text);
+  });
+  
+  hiveContainer.appendChild(svg);
+  
+  // Add both elements to the flex container
+  headerFlex.appendChild(titleDiv);
+  headerFlex.appendChild(hiveContainer);
+  headerContent.appendChild(headerFlex);
 
-  Object.keys(grouped).sort((a, b) => a - b).forEach(len => {
-    const section = document.createElement('div');
-    section.innerHTML = `<h3>${len}-Letter Words</h3>`;
-    const group = document.createElement('div');
-    group.className = 'word-group';
-
-    grouped[len].forEach(({ text, jumbled }) => {
-      const div = document.createElement('div');
-      div.className = 'word-box';
-      div.dataset.word = text;
-      div.dataset.jumbled = jumbled;
-      div.textContent = jumbled;
-      div.onclick = () => {
-        div.textContent = div.textContent === text ? jumbled : text;
-      };
-      group.appendChild(div);
+  // Create a single container for all words
+  const wordsContainer = document.createElement("div");
+  wordsContainer.className = "words-container";
+  
+  // Group words by length
+  const wordsByLength = {};
+  globalWords.forEach(word => {
+    if (!wordsByLength[word.length]) {
+      wordsByLength[word.length] = [];
+    }
+    wordsByLength[word.length].push(word);
+  });
+  
+  // Sort word lengths numerically
+  const lengths = Object.keys(wordsByLength).map(Number).sort((a, b) => a - b);
+  
+  // Create a section for each length group
+  lengths.forEach(length => {
+    const lengthGroup = document.createElement("div");
+    lengthGroup.className = "length-group";
+    
+    // Create header for this length group
+    const lengthHeader = document.createElement("div");
+    lengthHeader.className = "length-group-header";
+    lengthHeader.textContent = `${length}-letter words (${wordsByLength[length].length})`;
+    lengthGroup.appendChild(lengthHeader);
+    
+    // Create grid for words of this length
+    const wordsGrid = document.createElement("div");
+    wordsGrid.className = "words-grid";
+    
+    // Sort words by jumbled text alphabetically
+    const sortedWords = [...wordsByLength[length]].sort((a, b) => 
+      a.jumbled.localeCompare(b.jumbled)
+    );
+    
+    // Add word boxes to the grid
+    sortedWords.forEach(word => {
+      const box = document.createElement("div");
+      box.className = "word-box";
+      box.dataset.word = word.text;
+      box.dataset.jumbled = word.jumbled;
+      box.textContent = revealMode ? word.text : word.jumbled;
+      
+      box.addEventListener("click", () => {
+        const isRevealed = box.textContent === box.dataset.jumbled;
+        box.textContent = isRevealed ? box.dataset.word : box.dataset.jumbled;
+        
+        // Change background color to our custom orange-yellow when the word is revealed
+        box.style.backgroundColor = isRevealed ? "var(--jumble-highlight)" : "";
+      });
+      
+      if (revealMode) {
+        box.style.backgroundColor = "#FFDC00"; // Yellow when in reveal mode
+      }
+      
+      wordsGrid.appendChild(box);
     });
+    
+    lengthGroup.appendChild(wordsGrid);
+    wordsContainer.appendChild(lengthGroup);
+  });
+  
+  combinedContent.appendChild(wordsContainer);
+}
 
-    section.appendChild(group);
-    box.appendChild(section);
+function toggleRevealAll(on) {
+  document.querySelectorAll(".word-box").forEach(b => {
+    b.textContent = on ? b.dataset.word : b.dataset.jumbled;
+    b.style.backgroundColor = on ? "var(--jumble-highlight)" : ""; // Use custom color
   });
 }
 
-function toggleRevealAll(showAll) {
-  document.getElementById('revealButton').textContent = showAll ? 'Hide' : 'Reveal';
-  document.querySelectorAll('.word-box').forEach(box => {
-    box.textContent = showAll ? box.dataset.word : box.dataset.jumbled;
-  });
-}
 </script>
 </body>
 </html>

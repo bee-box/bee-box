@@ -1,3 +1,4 @@
+/* Base layout styles */
 html { scrollbar-gutter: stable; }
 body {
   margin: 0 auto;
@@ -6,6 +7,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: #f5f5f5;
   line-height: 1.6;
+  font-size: 16px;
 }
 .section-box {
   background: #fff;
@@ -14,6 +16,8 @@ body {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
+
+/* Navigation styles */
 nav { padding-bottom: 1rem; }
 #navtitle { background: #FFDC00; }
 .nav-container {
@@ -41,7 +45,7 @@ nav { padding-bottom: 1rem; }
   background: #fff;
   color: #000;
   border: 1px solid #000;
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: .25rem .5rem;
   height: 30px;
   box-sizing: border-box;
@@ -60,66 +64,71 @@ nav { padding-bottom: 1rem; }
 }
 select#dateSelector { min-width: 190px; max-width: 190px; }
 
-#toolContent.loading, #toolContent.error { min-height: 12rem; }
-#toolContent.fade-in { animation: fade .4s ease-in; }
+/* Content styling */
+.loading, .error { min-height: 12rem; }
+.fade-in { animation: fade .4s ease-in; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 footer {
   padding-top: 1rem;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   color: #666;
 }
 .error { color: #d32f2f; text-align: center; }
-#headerContent p, #lettersContent p { margin: 0; text-align: center; }
-#headerContent p:not(:last-child), #lettersContent p:not(:last-child) { margin-bottom: 0.25rem; }
+#headerContent p { margin: 0; text-align: center; }
+#headerContent p:not(:last-child) { margin-bottom: 0.25rem; }
 
-/* Letters display styling */
-.letters-display {
-  font-size: 1.5rem;
-  font-family: monospace;
-  letter-spacing: 0.3rem;
-  display: flex;
-  justify-content: center;
-  margin: 0.2rem 0;
-  line-height: 1.2;
-}
-
-.letters-display .center-letter {
-  font-weight: bold;
-}
-.letters-info {
-  font-size: 0.9rem;
-  color: #666;
-  text-align: center;
-  margin-top: 0.25rem;
-}
-
-.word-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+/* Words Table */
+.bee-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
   margin-bottom: 1rem;
 }
-
+.bee-table td {
+  width: 14.28%;
+  padding: 0.5rem;
+  vertical-align: middle;
+  background-color: #fff;
+}
+.words-table, .words-table td {
+  border: none;
+}
+.words-table td {
+  vertical-align: top;
+  padding: 0.5rem;
+  height: auto;
+}
+.words-table .wcol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 .word-box {
-  padding: 0.5rem 0.75rem;
+  width: 100%;
+  padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
-  background: #fff;
   cursor: pointer;
-  min-width: 60px;
-  text-align: center;
   font-family: monospace;
   font-size: 1rem;
+  text-align: left;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+}
+.word-box:hover {
+  background-color: #f9f9f9;
+}
+.word-box.just-toggled {
+  animation: flash 0.3s;
+}
+@keyframes flash {
+  0% { background-color: #FFDC00; }
+  100% { background-color: inherit; }
 }
 
-h3 {
-  margin-top: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -130,7 +139,6 @@ h3 {
   justify-content: center;
   z-index: 9999;
 }
-
 .modal-content {
   background: white;
   width: 95%;
@@ -143,14 +151,12 @@ h3 {
   display: flex;
   flex-direction: column;
 }
-
 .modal-content iframe {
   flex: 1;
   width: 100%;
   height: 620px;
   border: none;
 }
-
 .modal-close {
   position: absolute;
   top: 10px;
@@ -163,151 +169,221 @@ h3 {
   z-index: 10001;
 }
 
-/* Print-specific styles */
-@media print {
-  /* Hide navigation/title section */
-  #navtitle {
-    display: none;
-  }
-  
-  /* Hide footer on print */
-  footer {
-    display: none;
-  }
-  
-  /* Remove background colors and shadows */
-  body {
-    background: white;
-    padding: 0;
-  }
-  
-  .section-box {
-    box-shadow: none;
-    border: none;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  /* Ensure header text doesn't wrap */
-  #headerContent p {
-    white-space: nowrap;
-    font-size: 0.9rem; /* Slightly reduce font size for printing */
-    line-height: 1.2;
-    margin-bottom: 0.2rem;
-  }
-  
-  /* Optimize word boxes for print */
-  .word-box {
-    border: 1px solid #ccc;
-    padding: 0.3rem 0.5rem;
-  }
-  
-  /* Remove animations */
-  #toolContent.fade-in {
-    animation: none;
-  }
-  
-  /* Hide modals */
-  .modal-overlay {
-    display: none !important;
-  }
+/* Hive SVG Styles - NO CLICK FUNCTIONALITY */
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
-#gridTable {
-  width: 60%;
-  margin-left: auto;
-  margin-right: auto;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  font-family: "Times New Roman", serif;
-  font-size: 1.1rem;
-  text-align: center;
+.header-text {
+  flex: 1;
 }
-#gridTable th,
-#gridTable td {
-  padding: 0.3rem 0.6rem;
-  border: none;
+.hive-container {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  flex-shrink: 0;
 }
-#gridTable th {
-  font-weight: bold;
+.hive-container svg {
+  max-width: 240px;
+  height: auto;
 }
-#gridTable td:first-child,
-#gridTable th:first-child {
-  text-align: right;
-  font-weight: bold;
-}
-#gridTable tr:first-child th,
-#gridTable tr:last-child td {
-  border-top: 2px solid black;
-  border-bottom: 2px solid black;
+.hive-container svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
 }
 
-/* ─── Unified 7-column table styles for Bee Sheet ─── */
-.bee-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-top: 0.5rem;
+/* Mobile accordion styles */
+.mobile-accordion {
+  display: none;
 }
-.bee-table td {
-  width: 14.28%;
+.accordion-item {
+  margin-bottom: 8px;
   border: 1px solid #ddd;
-  padding: 0.25rem 0.5rem;
-  vertical-align: middle;
+  border-radius: 4px;
+  overflow: hidden;
 }
-
-/* ─── Letters Table ─── */
-.letters-table td {
-  vertical-align: middle;
-  text-align: center;
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
-.letters-table .wrapper {
+.accordion-header:hover {
+  background-color: #eaeaea;
+}
+.accordion-letter-container {
+  display: flex;
+  align-items: center;
+}
+.accordion-letter {
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 8px;
+}
+.accordion-letter.center-letter {
+  color: #000;
+  background-color: #FFDC00;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.letters-table .char {
-  font-size: 2rem;
-  line-height: 1;
+.accordion-count {
+  font-size: 14px;
+  color: #666;
 }
-.letters-table .char.bold {
-  font-weight: 700;
+.accordion-indicator {
+  font-size: 18px;
+  transition: transform 0.3s;
 }
-.letters-table .count {
-  font-size: 0.9rem;
-  margin-left: 0.25rem;
-  line-height: 1;
+.accordion-item.active .accordion-indicator {
+  transform: rotate(180deg);
 }
-
-/* ─── Lengths Table ─── */
-.lengths-table td {
-  vertical-align: middle;
-  text-align: center;
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
 }
-.lengths-table .icons {
-  font-size: 1rem;
-  line-height: 1.2;
-  word-break: keep-all;
+.accordion-item.active .accordion-content {
+  max-height: 2000px;
 }
-
-/* ─── Words Table ─── */
-.words-table .wcol {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
+.accordion-words {
+  padding: 12px;
 }
-.words-table td {
-  vertical-align: top !important;
-}
-.word-box {
+.accordion-words .word-box {
+  margin-bottom: 10px;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: #fff;
-  cursor: pointer;
-  font-family: monospace;
-  font-size: 1rem;
-  text-align: left;
-  box-sizing: border-box;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 0.5rem;
+  }
+  .section-box {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nav-right {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+  select#dateSelector {
+    min-width: 150px;
+    max-width: 150px;
+  }
+  .header-flex {
+    flex-direction: column;
+  }
+  .hive-container svg {
+    max-width: 200px;
+  }
+  
+  /* Hide the regular table structure */
+  .bee-table.words-table {
+    display: none;
+  }
+  
+  /* Show the mobile accordion instead */
+  .mobile-accordion {
+    display: block;
+    margin-top: 10px;
+  }
+}
+
+/* Print-specific styles */
+@media print {
+  body {
+    font-size: 12px;
+    background: white;
+    padding: 0;
+    margin: 0;
+  }
+  #navtitle, footer, .modal-overlay {
+    display: none !important;
+  }
+  .section-box {
+    box-shadow: none;
+    border: none;
+    padding: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .header-flex {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem !important;
+  }
+  .header-text {
+    flex: 1;
+  }
+  #headerContent p {
+    white-space: nowrap;
+    line-height: 1.1 !important;
+    margin-bottom: 0.15rem !important;
+  }
+  .hive-container {
+    flex-shrink: 0;
+  }
+  .hive-container svg {
+    max-width: 180px !important;
+    height: auto;
+  }
+  .bee-table {
+    margin-bottom: 0.25rem !important;
+  }
+  .words-table, 
+  .words-table td {
+    border: none;
+    padding: 0.25rem !important;
+  }
+  .bee-table.words-table {
+    display: table !important;
+  }
+  .word-box {
+    border: 1px solid #ddd;
+    padding: 0.15rem 0.3rem !important;
+    margin-bottom: 0.1rem !important;
+    line-height: 1.1 !important;
+  }
+  .words-table .wcol {
+    gap: 0.1rem !important;
+  }
+  /* Change yellow background to gray in print */
+  .word-box[style*="background-color"] {
+    background-color: #D0D0D0 !important;
+  }
+  /* Center hexagon in hive should also be gray in print */
+  .hive-container svg polygon[fill="#F7DA21"] {
+    fill: #D0D0D0 !important;
+  }
+  #navtitle {
+    background: none !important;
+  }
+  .combined-container::after {
+    content: "THE END";
+    display: block;
+    text-align: center;
+    margin-top: 0.5rem !important;
+    font-style: italic;
+    color: #666;
+  }
+  .mobile-accordion {
+    display: none !important;
+  }
 }
