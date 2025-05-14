@@ -33,3 +33,18 @@ Traceback (most recent call last):
     ^^^^^^^^^^^
 ModuleNotFoundError: No module named 'pytz'
 ✅ waxer.py completed successfully
+=== Workflow run at Wed May 14 11:06:09 UTC 2025 UTC ===
+--- Running harvest.py ---
+Traceback (most recent call last):
+  File "/home/runner/work/bee-box/bee-box/code/harvest.py", line 24, in <module>
+    import pytz  # For timezone handling
+    ^^^^^^^^^^^
+ModuleNotFoundError: No module named 'pytz'
+✅ harvest.py completed successfully
+--- Running waxer.py ---
+Traceback (most recent call last):
+  File "/home/runner/work/bee-box/bee-box/code/waxer.py", line 18, in <module>
+    import pytz  # Added for timezone support
+    ^^^^^^^^^^^
+ModuleNotFoundError: No module named 'pytz'
+✅ waxer.py completed successfully
