@@ -17,9 +17,14 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Custom color for this game - more orange-yellow */
+:root {
+  --jumble-highlight: #FFA726; /* Orange-yellow shade */
+}
+
 /* Navigation styles */
 nav { padding-bottom: 1rem; }
-#navtitle { background: #FFDC00; }
+#navtitle { background: var(--jumble-highlight); }
 .nav-container {
   display: flex;
   align-items: center;
@@ -79,53 +84,75 @@ footer {
 #headerContent p { margin: 0; text-align: center; }
 #headerContent p:not(:last-child) { margin-bottom: 0.25rem; }
 
-/* Words Table */
-.bee-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
+/* Hive SVG Styles - NON-CLICKABLE VERSION */
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
-.bee-table td {
-  width: 14.28%;
-  padding: 0.5rem;
-  vertical-align: middle;
-  background-color: #fff;
+.header-text {
+  flex: 1;
 }
-.words-table, .words-table td {
-  border: none;
+.hive-container {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  flex-shrink: 0;
 }
-.words-table td {
-  vertical-align: top;
-  padding: 0.5rem;
+.hive-container svg {
+  max-width: 240px;
   height: auto;
 }
-.words-table .wcol {
+.hive-container svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+}
+
+/* Single column words container */
+.words-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
+  padding: 1rem;
 }
-.word-box {
+
+/* Length group styling */
+.length-group {
+  margin-bottom: 1rem;
+}
+
+.length-group-header {
+  font-weight: bold;
+  padding: 0.5rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* Words grid for each length group - exactly 4 per row */
+.words-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
   width: 100%;
+}
+
+/* Word box styling */
+.word-box {
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
   font-family: monospace;
   font-size: 1rem;
-  text-align: left;
+  text-align: center;
   box-sizing: border-box;
   transition: background-color 0.2s ease;
 }
+
 .word-box:hover {
   background-color: #f9f9f9;
-}
-.word-box.just-toggled {
-  animation: flash 0.3s;
-}
-@keyframes flash {
-  0% { background-color: #FFDC00; }
-  100% { background-color: inherit; }
 }
 
 /* Modal Styles */
@@ -169,31 +196,6 @@ footer {
   z-index: 10001;
 }
 
-/* Hive SVG Styles - NO CLICK FUNCTIONALITY */
-.header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.header-text {
-  flex: 1;
-}
-.hive-container {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-  flex-shrink: 0;
-}
-.hive-container svg {
-  max-width: 240px;
-  height: auto;
-}
-.hive-container svg text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  user-select: none;
-}
-
 /* Mobile accordion styles */
 .mobile-accordion {
   display: none;
@@ -227,7 +229,7 @@ footer {
 }
 .accordion-letter.center-letter {
   color: #000;
-  background-color: #FFDC00;
+  background-color: var(--jumble-highlight);
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -262,7 +264,7 @@ footer {
   width: 100%;
 }
 
-/* Media query for mobile devices */
+/* Mobile adjustments - still keep 4 per row */
 @media (max-width: 768px) {
   body {
     font-size: 14px;
@@ -293,15 +295,26 @@ footer {
     max-width: 200px;
   }
   
-  /* Hide the regular table structure */
-  .bee-table.words-table {
-    display: none;
+  .words-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
   }
   
-  /* Show the mobile accordion instead */
-  .mobile-accordion {
-    display: block;
-    margin-top: 10px;
+  .word-box {
+    padding: 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Show the mobile accordion on very small screens */
+  @media (max-width: 480px) {
+    .words-container {
+      display: none;
+    }
+    
+    .mobile-accordion {
+      display: block;
+      margin-top: 10px;
+    }
   }
 }
 
@@ -313,15 +326,19 @@ footer {
     padding: 0;
     margin: 0;
   }
+  
   #navtitle, footer, .modal-overlay {
     display: none !important;
   }
+  
   .section-box {
     box-shadow: none;
     border: none;
     padding: 0.25rem !important;
     margin-bottom: 0.25rem !important;
   }
+  
+  /* Header layout for print */
   .header-flex {
     display: flex;
     flex-direction: row !important;
@@ -329,52 +346,63 @@ footer {
     justify-content: space-between;
     gap: 0.5rem !important;
   }
+  
   .header-text {
     flex: 1;
   }
+  
   #headerContent p {
     white-space: nowrap;
     line-height: 1.1 !important;
     margin-bottom: 0.15rem !important;
   }
+  
+  /* Make hive smaller for print */
   .hive-container {
     flex-shrink: 0;
   }
+  
   .hive-container svg {
     max-width: 180px !important;
     height: auto;
   }
-  .bee-table {
-    margin-bottom: 0.25rem !important;
-  }
-  .words-table, 
-  .words-table td {
-    border: none;
+  
+  /* Words layout for print */
+  .words-container {
     padding: 0.25rem !important;
   }
-  .bee-table.words-table {
-    display: table !important;
+  
+  .length-group {
+    margin-bottom: 0.5rem !important;
   }
+  
+  .length-group-header {
+    padding: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .words-grid {
+    gap: 0.25rem !important;
+  }
+  
   .word-box {
-    border: 1px solid #ddd;
     padding: 0.15rem 0.3rem !important;
     margin-bottom: 0.1rem !important;
     line-height: 1.1 !important;
+    font-size: 0.9rem !important;
   }
-  .words-table .wcol {
-    gap: 0.1rem !important;
-  }
-  /* Change yellow background to gray in print */
+  
+  /* Change highlighted areas to gray in print */
   .word-box[style*="background-color"] {
     background-color: #D0D0D0 !important;
   }
-  /* Center hexagon in hive should also be gray in print */
-  .hive-container svg polygon[fill="#F7DA21"] {
+  
+  /* Make the center hexagon gray in print */
+  .hive-container svg polygon[fill="#FFA726"] {
     fill: #D0D0D0 !important;
   }
-  #navtitle {
-    background: none !important;
-  }
+  
   .combined-container::after {
     content: "THE END";
     display: block;
@@ -383,6 +411,7 @@ footer {
     font-style: italic;
     color: #666;
   }
+  
   .mobile-accordion {
     display: none !important;
   }
