@@ -240,7 +240,17 @@ def append_puzzle(date_str, words):
 
         # Write to file with pretty formatting
         log("Writing updated XML to file")
-        tree.write(XML_FILE, encoding="utf-8", xml_declaration=True, pretty_print=True)
+        
+        # Generate XML string with pretty print
+        xml_str = ET.tostring(root, encoding="utf-8", xml_declaration=True, pretty_print=True)
+        
+        # Ensure the closing </words> tag is on its own line
+        xml_str = xml_str.replace(b'</words>', b'\n</words>')
+        
+        # Write the modified XML to file
+        with open(XML_FILE, 'wb') as f:
+            f.write(xml_str)
+            
         log(f"✅ Puzzle for {date_str} successfully added to words.xml")
         log_operation_end(f"Adding puzzle for {date_str} to XML")
         return True
