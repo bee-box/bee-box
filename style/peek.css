@@ -107,6 +107,24 @@ footer {
   user-select: none;
 }
 
+/* Mobile layout for the hive - NEW ADDITION */
+@media (max-width: 768px) {
+  .header-flex {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .header-text {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .hive-container {
+    margin-top: 0.5rem;
+  }
+}
+
 /* Single column words container */
 .words-container {
   display: flex;
@@ -143,6 +161,13 @@ footer {
 }
 .word-box:hover {
   background-color: #f9f9f9;
+}
+
+/* Mobile layout for word grid - ADDITIONAL IMPROVEMENT */
+@media (max-width: 640px) {
+  .words-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* Modal Styles */
