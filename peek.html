@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title id="pageTitle">Loading...</title>
+  <title id="pageTitle">Bee Peek</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style/main.css">
-  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style/peek.css">
 </head>
 <body>
-
 <nav id="navtitle" class="section-box">
   <div class="nav-container">
     <div class="nav-left">
@@ -29,12 +27,8 @@
   <div id="headerContent" class="loading">Loading...</div>
 </section>
 
-<section id="letters" class="section-box">
-  <div id="lettersContent" class="loading">Loading...</div>
-</section>
-
-<section id="tool" class="section-box">
-  <div id="toolContent" class="loading">Loading...</div>
+<section id="combinedSection" class="section-box">
+  <div id="combinedContent" class="loading">Loading...</div>
 </section>
 
 <footer class="section-box">
@@ -47,213 +41,274 @@
     <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
   </div>
 </div>
+
 <script>
 const toolName = "Bee Peek";
 let globalWords = [];
 let revealMode = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('pageTitle').textContent = toolName;
-  document.getElementById('toolNameHeading').textContent = toolName;
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("pageTitle").textContent = toolName;
+  document.getElementById("toolNameHeading").textContent = toolName;
   setupEventListeners();
   loadPuzzleData();
 });
 
-function openSubscribeModal() {
-  document.getElementById('subscribeOverlay').style.display = 'flex';
-}
-function closeSubscribeModal() {
-  document.getElementById('subscribeOverlay').style.display = 'none';
-}
-
 function setupEventListeners() {
-  document.getElementById('dateSelector').addEventListener('change', e => {
+  document.getElementById("dateSelector").addEventListener("change", (e) => {
     const d = e.target.value;
     if (d) {
       const u = new URL(window.location);
-      u.searchParams.set('date', d);
-      u.searchParams.delete('puzzleid');
+      u.searchParams.set("date", d);
+      u.searchParams.delete("puzzleid");
       window.location.href = u.toString();
     }
   });
 
-  document.getElementById('printButton').addEventListener('click', () => {
-    const wordBoxes = document.querySelectorAll('.word-box');
-    wordBoxes.forEach(box => {
-      box.setAttribute('data-print-value', box.textContent);
-    });
+  document.getElementById("printButton").addEventListener("click", () => {
+    const wordBoxes = document.querySelectorAll(".word-box");
+    wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
 
-    const beforePrint = () => {
-      wordBoxes.forEach(box => {
-        box.textContent = box.getAttribute('data-print-value');
+    window.addEventListener("beforeprint", () => {
+      wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
+    }, { once: true });
+
+    window.addEventListener("afterprint", () => {
+      wordBoxes.forEach(b => {
+        b.textContent = revealMode ? b.dataset.word : b.dataset.jumbled;
       });
-    };
-
-    const afterPrint = () => {
-      wordBoxes.forEach(box => {
-        const word = box.dataset.word;
-        box.textContent = revealMode ? word : word.slice(0, 2);
-      });
-    };
-
-    window.addEventListener('beforeprint', beforePrint, { once: true });
-    window.addEventListener('afterprint', afterPrint, { once: true });
+    }, { once: true });
 
     window.print();
   });
 
-  document.getElementById('revealButton').addEventListener('click', () => {
+  document.getElementById("revealButton").addEventListener("click", () => {
     revealMode = !revealMode;
     toggleRevealAll(revealMode);
+    document.getElementById("revealButton").textContent = revealMode ? "Hide" : "Reveal";
   });
 }
 
+function openSubscribeModal() {
+  document.getElementById("subscribeOverlay").style.display = "flex";
+}
+function closeSubscribeModal() {
+  document.getElementById("subscribeOverlay").style.display = "none";
+}
+
 async function loadPuzzleData() {
-  const toolContent = document.getElementById('toolContent');
-  const lettersContent = document.getElementById('lettersContent');
-  const headerContent = document.getElementById('headerContent');
-  [toolContent, lettersContent, headerContent].forEach(el => {
-    el.className = 'loading';
-    el.textContent = 'Loading...';
-  });
+  const header = document.getElementById("headerContent");
+  const content = document.getElementById("combinedContent");
+  header.className = content.className = "loading";
+  header.textContent = content.textContent = "Loading...";
 
   try {
-    const res = await fetch('xml/puzzles.xml');
-    const xmlText = await res.text();
-    const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
-    const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
-    const sorted = puzzles.sort((a, b) => new Date(a.getAttribute('date')) - new Date(b.getAttribute('date')));
+    const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
+    const puzzles = [...xml.querySelectorAll("puzzle")]
+      .filter(p => p.getElementsByTagName("word").length)
+      .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
 
     const params = new URLSearchParams(window.location.search);
-    const puzzleId = params.get('puzzleid');
-    const date = params.get('date');
-    const mostRecent = sorted[sorted.length - 1];
+    const puzzleId = params.get("puzzleid");
+    const date = params.get("date");
+    const mostRecent = puzzles.at(-1);
 
     let selected;
     if (puzzleId && !date) {
-      selected = sorted.find(p => p.getAttribute('id') === puzzleId);
+      selected = puzzles.find(p => p.id === puzzleId);
     } else if (date && !puzzleId) {
-      selected = sorted.find(p => p.getAttribute('date') === date);
+      selected = puzzles.find(p => p.getAttribute("date") === date);
       if (selected === mostRecent) {
         openSubscribeModal();
-        selected = sorted[sorted.length - 2];
+        selected = puzzles.at(-2);
       }
     } else {
-      selected = sorted[sorted.length - 2];
+      selected = puzzles.at(-2);
     }
 
-    populateDateSelector(sorted, selected?.getAttribute('date'));
+    if (!selected) throw new Error("No puzzle selected.");
+    populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
   } catch (err) {
-    [toolContent, lettersContent, headerContent].forEach(el => {
-      el.className = 'error';
-      el.textContent = 'Unable to load data.';
-    });
+    header.innerHTML = `<p>⚠️ Error loading puzzle data.</p>`;
+    content.innerHTML = "";
+    console.error("Puzzle load error:", err);
   }
 }
 
 function populateDateSelector(puzzles, selectedDate) {
-  const sel = document.getElementById('dateSelector');
-  while (sel.options.length > 1) sel.remove(1);
+  const s = document.getElementById("dateSelector");
+  while (s.options.length > 1) s.remove(1);
   [...puzzles].reverse().forEach(p => {
-    const d = p.getAttribute('date');
-    const opt = document.createElement('option');
-    opt.value = d;
-    opt.textContent = d;
-    if (d === selectedDate) opt.selected = true;
-    sel.appendChild(opt);
+    const d = p.getAttribute("date");
+    s.add(new Option(d, d, d === selectedDate, d === selectedDate));
   });
 }
 
-function formatDateString(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+function formatDateString(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
   });
 }
 
-function displayPuzzle(puzzle) {
-  const box = document.getElementById('toolContent');
-  const headerBox = document.getElementById('headerContent');
-  const lettersBox = document.getElementById('lettersContent');
-  box.innerHTML = headerBox.innerHTML = lettersBox.innerHTML = '';
+function displayPuzzle(p) {
+  const combinedContent = document.getElementById("combinedContent");
+  const headerContent = document.getElementById("headerContent");
+  combinedContent.innerHTML = headerContent.innerHTML = "";
 
-  const rawDate = puzzle.getAttribute('date');
-  const titleDate = formatDateString(rawDate);
-  document.getElementById('navtitleContent').textContent = titleDate;
+  const rawDate = p.getAttribute("date");
+  document.getElementById("navtitleContent").textContent = formatDateString(rawDate);
 
-  const letters = puzzle.getAttribute('letters') || '';
   const counts = [...Array(7)].map((_, i) => ({
-    letter: puzzle.getAttribute(`letter${i + 1}`),
-    count: parseInt(puzzle.getAttribute(`letter${i + 1}count`) || 0)
+    letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
+    count: +p.getAttribute(`letter${i + 1}count`) || 0
   }));
-  const centerLetter = counts.reduce((a, b) => a.count > b.count ? a : b).letter || letters[0];
-  const outerLetters = letters.split('').filter(l => l !== centerLetter).sort();
+  const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
+  const letters = [...counts.map(c => c.letter)].sort();
+  const center = (p.getAttribute("letter1") || letters[0]).toUpperCase();
 
-  lettersBox.innerHTML = `<div class="letters-display">
-    <span class="center-letter">${centerLetter.toUpperCase()}</span>
-    ${outerLetters.map(l => `<span>${l.toUpperCase()}</span>`).join('')}
-  </div>`;
+  globalWords = [...p.getElementsByTagName("word")].map(w => ({
+    text: w.textContent,
+    length: +w.getAttribute("length"),
+    first: w.getAttribute("first").toUpperCase(),
+    jumbled: w.getAttribute("jumbled"),
+    firsttwo: w.getAttribute("firsttwo"),
+    revealed: false
+  }));
 
-  globalWords = [...puzzle.getElementsByTagName('word')].map(w => w.textContent).sort();
-  const grouped = {};
-  globalWords.forEach(word => {
-    const len = word.length;
-    if (!grouped[len]) grouped[len] = [];
-    grouped[len].push(word);
-  });
-
-  const pangrams = puzzle.getAttribute("pangrams") || 0;
-  const perfect = puzzle.getAttribute("perfectpangrams") || 0;
-  const bingo = puzzle.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
-  const q = parseInt(puzzle.getAttribute("queenbee") || 0, 10);
-  const thresholds = q ? [
-    `Good Start: ${Math.round(q * .02)}`, `Moving Up: ${Math.round(q * .05)}`,
-    `Good: ${Math.round(q * .08)}`, `Solid: ${Math.round(q * .15)}`,
-    `Nice: ${Math.round(q * .25)}`, `Great: ${Math.round(q * .4)}`,
-    `Amazing: ${Math.round(q * .5)}`, `Genius: ${Math.round(q * .7)}`,
+  const q = +p.getAttribute("queenbee") || 0;
+  const thresh = q ? [
+    `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
+    `Good: ${Math.round(q * 0.08)}`, `Solid: ${Math.round(q * 0.15)}`,
+    `Nice: ${Math.round(q * 0.25)}`, `Great: ${Math.round(q * 0.40)}`,
+    `Amazing: ${Math.round(q * 0.50)}`, `Genius: ${Math.round(q * 0.70)}`,
     `Queen Bee: ${q}`
   ] : [];
 
-  const headerLines = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${titleDate}`,
-    `Words: ${globalWords.length}, Pangrams: ${pangrams} (${perfect} Perfect), ${bingo}`,
-    ...thresholds
+  const headerFlex = document.createElement("div");
+  headerFlex.className = "header-flex";
+
+  const titleDiv = document.createElement("div");
+  titleDiv.className = "header-text";
+  titleDiv.innerHTML = [
+    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Peek for ${formatDateString(rawDate)}`,
+    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
+    thresh.join(", ")
+  ].map(t => `<p>${t}</p>`).join("");
+
+  const hiveContainer = document.createElement("div");
+  hiveContainer.className = "hive-container";
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "240");
+  svg.setAttribute("height", "220");
+  svg.setAttribute("viewBox", "-120 -110 240 220");
+
+  const hexSize = 40;
+  const hexPositions = [
+    { x: 0, y: 0, letter: center, fill: "#A2D729" },
+    { x: 0, y: -70, letter: letters[0], fill: "#E6E6E6" },
+    { x: 60, y: -35, letter: letters[1], fill: "#E6E6E6" },
+    { x: 60, y: 35, letter: letters[2], fill: "#E6E6E6" },
+    { x: 0, y: 70, letter: letters[3], fill: "#E6E6E6" },
+    { x: -60, y: 35, letter: letters[4], fill: "#E6E6E6" },
+    { x: -60, y: -35, letter: letters[5], fill: "#E6E6E6" }
   ];
-  const lastLine = headerLines.splice(2, 9).join(', ');
-  headerLines.push(lastLine);
-  headerBox.innerHTML = headerLines.map(l => `<p>${l}</p>`).join("");
 
-  Object.keys(grouped).sort((a, b) => a - b).forEach(len => {
-    const section = document.createElement('div');
-    section.innerHTML = `<h3>${len}-Letter Words</h3>`;
-    const group = document.createElement('div');
-    group.className = 'word-group';
+  hexPositions.forEach(pos => {
+    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const points = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = pos.x + hexSize * Math.cos(angle);
+      const y = pos.y + hexSize * Math.sin(angle);
+      points.push(`${x},${y}`);
+    }
+    hex.setAttribute("points", points.join(" "));
+    hex.setAttribute("fill", pos.fill);
+    hex.setAttribute("stroke", "#FFFFFF");
+    hex.setAttribute("stroke-width", "2");
+    svg.appendChild(hex);
 
-    grouped[len].forEach(word => {
-      const div = document.createElement('div');
-      div.className = 'word-box';
-      div.dataset.word = word;
-      div.textContent = word.slice(0, 2);
-      div.onclick = () => {
-        div.textContent = div.textContent === word ? word.slice(0, 2) : word;
-      };
-      group.appendChild(div);
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", pos.x);
+    text.setAttribute("y", pos.y + 2);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("font-size", "24");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
+    text.textContent = pos.letter;
+    svg.appendChild(text);
+  });
+
+  hiveContainer.appendChild(svg);
+  headerFlex.appendChild(titleDiv);
+  headerFlex.appendChild(hiveContainer);
+  headerContent.appendChild(headerFlex);
+
+  const wordsContainer = document.createElement("div");
+  wordsContainer.className = "words-container";
+
+  const wordsByLength = {};
+  globalWords.forEach(word => {
+    if (!wordsByLength[word.length]) {
+      wordsByLength[word.length] = [];
+    }
+    wordsByLength[word.length].push(word);
+  });
+
+  const lengths = Object.keys(wordsByLength).map(Number).sort((a, b) => a - b);
+  lengths.forEach(length => {
+    const lengthGroup = document.createElement("div");
+    lengthGroup.className = "length-group";
+
+    const lengthHeader = document.createElement("div");
+    lengthHeader.className = "length-group-header";
+    lengthHeader.textContent = `${length}-letter words (${wordsByLength[length].length})`;
+    lengthGroup.appendChild(lengthHeader);
+
+    const wordsGrid = document.createElement("div");
+    wordsGrid.className = "words-grid";
+
+    const sortedWords = [...wordsByLength[length]].sort((a, b) =>
+      a.text.localeCompare(b.text)
+    );
+
+    sortedWords.forEach(word => {
+      const box = document.createElement("div");
+      box.className = "word-box";
+      box.dataset.word = word.text;
+      box.dataset.jumbled = word.firsttwo;
+      box.textContent = revealMode ? word.text : word.firsttwo;
+
+      box.addEventListener("click", () => {
+        const isRevealed = box.textContent === box.dataset.jumbled;
+        box.textContent = isRevealed ? box.dataset.word : box.dataset.jumbled;
+        box.style.backgroundColor = isRevealed ? "var(--jumble-highlight)" : "";
+      });
+
+      if (revealMode) {
+        box.style.backgroundColor = "var(--jumble-highlight)";
+      }
+
+      wordsGrid.appendChild(box);
     });
 
-    section.appendChild(group);
-    box.appendChild(section);
+    lengthGroup.appendChild(wordsGrid);
+    wordsContainer.appendChild(lengthGroup);
   });
+
+  combinedContent.appendChild(wordsContainer);
 }
 
-function toggleRevealAll(showAll) {
-  document.getElementById('revealButton').textContent = showAll ? 'Hide' : 'Reveal';
-  document.querySelectorAll('.word-box').forEach(box => {
-    const word = box.dataset.word;
-    box.textContent = showAll ? word : word.slice(0, 2);
+function toggleRevealAll(on) {
+  document.querySelectorAll(".word-box").forEach(b => {
+    b.textContent = on ? b.dataset.word : b.dataset.jumbled;
+    b.style.backgroundColor = on ? "var(--jumble-highlight)" : "";
   });
 }
 </script>
-
 </body>
 </html>
