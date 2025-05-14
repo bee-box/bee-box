@@ -117,3 +117,82 @@ ModuleNotFoundError: No module named 'pytz'
 ────────────────────────────────────────────────────────────
 
 [2025-05-14 06:34:29 CDT] [INFO] Total execution time: 0.45 seconds
+=== Workflow run at Wed May 14 11:48:47 UTC 2025 UTC ===
+--- Running harvest.py ---
+[2025-05-14 06:48:47 CDT] [START] 🟡 START HARVEST RUN
+[2025-05-14 06:48:47 CDT] [INFO] Running on system: posix, Python: 3.13.3
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Backing up XML file
+[2025-05-14 06:48:47 CDT] [INFO] Backup created: xml/backups/words.xml.bak
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Backing up XML file
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Loading existing dates from XML
+[2025-05-14 06:48:47 CDT] [INFO] Found 2562 existing puzzle dates in XML
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Loading existing dates
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Fetching puzzle from NYT
+[2025-05-14 06:48:47 CDT] [INFO] Attempt 1 of 3...
+[2025-05-14 06:48:47 CDT] [INFO] Sending HTTP request to NYT
+[2025-05-14 06:48:47 CDT] [INFO] Parsing HTML response
+[2025-05-14 06:48:47 CDT] [INFO] Searching for game data in page source
+[2025-05-14 06:48:47 CDT] [INFO] Extracting JSON data from script
+[2025-05-14 06:48:47 CDT] [INFO] Parsing JSON data
+[2025-05-14 06:48:47 CDT] [INFO] 📅 Successfully fetched puzzle for 2025-05-14 with 40 words
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Fetching puzzle from NYT
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Loading latest word list
+[2025-05-14 06:48:47 CDT] [INFO] Loaded 33 words from latest puzzle (2025-05-13)
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Loading latest word list
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Adding puzzle for 2025-05-14 to XML
+[2025-05-14 06:48:47 CDT] [INFO] Parsing existing XML file
+[2025-05-14 06:48:47 CDT] [INFO] Creating puzzle element with 40 words
+[2025-05-14 06:48:47 CDT] [INFO] Writing updated XML to file
+[2025-05-14 06:48:47 CDT] [INFO] ✅ Puzzle for 2025-05-14 successfully added to words.xml
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Adding puzzle for 2025-05-14 to XML
+[2025-05-14 06:48:47 CDT] [SUCCESS] ✅ Harvest completed successfully
+[2025-05-14 06:48:47 CDT] [END] 🔚 END HARVEST RUN
+────────────────────────────────────────────────────────────
+
+[2025-05-14 06:48:47 CDT] [INFO] Total execution time: 0.27 seconds
+[2025-05-14 06:48:47 CDT] [START] 🟡 START HARVEST RUN
+[2025-05-14 06:48:47 CDT] [INFO] Running on system: posix, Python: 3.13.3
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Backing up XML file
+[2025-05-14 06:48:47 CDT] [INFO] Backup created: xml/backups/words.xml.bak
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Backing up XML file
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Loading existing dates from XML
+[2025-05-14 06:48:47 CDT] [INFO] Found 2562 existing puzzle dates in XML
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Loading existing dates
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Fetching puzzle from NYT
+[2025-05-14 06:48:47 CDT] [INFO] Attempt 1 of 3...
+[2025-05-14 06:48:47 CDT] [INFO] Sending HTTP request to NYT
+[2025-05-14 06:48:47 CDT] [INFO] Parsing HTML response
+[2025-05-14 06:48:47 CDT] [INFO] Searching for game data in page source
+[2025-05-14 06:48:47 CDT] [INFO] Extracting JSON data from script
+[2025-05-14 06:48:47 CDT] [INFO] Parsing JSON data
+[2025-05-14 06:48:47 CDT] [INFO] 📅 Successfully fetched puzzle for 2025-05-14 with 40 words
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Fetching puzzle from NYT
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Loading latest word list
+[2025-05-14 06:48:47 CDT] [INFO] Loaded 33 words from latest puzzle (2025-05-13)
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Loading latest word list
+[2025-05-14 06:48:47 CDT] [INFO] ▶️ Starting operation: Adding puzzle for 2025-05-14 to XML
+[2025-05-14 06:48:47 CDT] [INFO] Parsing existing XML file
+[2025-05-14 06:48:47 CDT] [INFO] Creating puzzle element with 40 words
+[2025-05-14 06:48:47 CDT] [INFO] Writing updated XML to file
+[2025-05-14 06:48:47 CDT] [INFO] ✅ Puzzle for 2025-05-14 successfully added to words.xml
+[2025-05-14 06:48:47 CDT] [INFO] ⏹️ Operation completed: Adding puzzle for 2025-05-14 to XML
+[2025-05-14 06:48:47 CDT] [SUCCESS] ✅ Harvest completed successfully
+[2025-05-14 06:48:47 CDT] [END] 🔚 END HARVEST RUN
+[2025-05-14 06:48:47 CDT] [INFO] Total execution time: 0.27 seconds
+✅ harvest.py completed successfully
+--- Running waxer.py ---
+[2025-05-14 06:48:47] 🕯 Starting waxer process...
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-14 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-13 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-12 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-11 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-10 already populated. Skipping.
+[2025-05-14 06:48:49] ✅ Wax complete.
+[2025-05-14 06:48:47] 🕯 Starting waxer process...
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-14 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-13 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-12 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-11 already populated. Skipping.
+[2025-05-14 06:48:48] ⚠️ Puzzle for 2025-05-10 already populated. Skipping.
+[2025-05-14 06:48:49] ✅ Wax complete.
+✅ waxer.py completed successfully
