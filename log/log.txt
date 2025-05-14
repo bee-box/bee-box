@@ -18,3 +18,18 @@
 [2025-05-13 20:09:46] ⚠️ Puzzle for 2025-05-10 already populated. Skipping.
 [2025-05-13 20:09:46] ⚠️ Puzzle for 2025-05-09 already populated. Skipping.
 [2025-05-13 20:09:47] ✅ Wax complete.
+=== Workflow run at Wed May 14 07:32:16 UTC 2025 UTC ===
+--- Running harvest.py ---
+Traceback (most recent call last):
+  File "/home/runner/work/bee-box/bee-box/code/harvest.py", line 24, in <module>
+    import pytz  # For timezone handling
+    ^^^^^^^^^^^
+ModuleNotFoundError: No module named 'pytz'
+✅ harvest.py completed successfully
+--- Running waxer.py ---
+Traceback (most recent call last):
+  File "/home/runner/work/bee-box/bee-box/code/waxer.py", line 18, in <module>
+    import pytz  # Added for timezone support
+    ^^^^^^^^^^^
+ModuleNotFoundError: No module named 'pytz'
+✅ waxer.py completed successfully
