@@ -194,16 +194,28 @@ footer {
     padding: 0;
     margin: 0;
   }
+
   #navtitle, footer, .modal-overlay {
     display: none !important;
   }
+
   .section-box {
     box-shadow: none;
     border: none;
     padding: 0.25rem !important;
     margin-bottom: 0.25rem !important;
   }
+
   .word-box[style*="background-color"] {
     background-color: #D0D0D0 !important;
+  }
+
+  .combined-container::after {
+    content: "THE END";
+    display: block;
+    text-align: center;
+    margin-top: 0.5rem !important;
+    font-style: italic;
+    color: #666;
   }
 }

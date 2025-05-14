@@ -27,7 +27,8 @@
   <div id="headerContent" class="loading">Loading...</div>
 </section>
 
-<section id="combinedSection" class="section-box">
+<!-- 🔧 CHANGED: Added 'combined-container' class -->
+<section id="combinedSection" class="section-box combined-container">
   <div id="combinedContent" class="loading">Loading...</div>
 </section>
 
@@ -199,7 +200,6 @@ function displayPuzzle(p) {
 
   const hiveContainer = document.createElement("div");
   hiveContainer.className = "hive-container";
-
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("width", "240");
   svg.setAttribute("height", "220");
@@ -250,7 +250,6 @@ function displayPuzzle(p) {
 
   const wordsContainer = document.createElement("div");
   wordsContainer.className = "words-container";
-
   const wordsByLength = {};
   globalWords.forEach(word => {
     if (!wordsByLength[word.length]) {
