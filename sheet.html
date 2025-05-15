@@ -46,7 +46,6 @@
     <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
   </div>
 </div>
-
 <script>
 const toolName = "Bee Sheet";
 let globalWords = [];
@@ -196,8 +195,20 @@ function displayPuzzle(p) {
     count: +p.getAttribute(`letter${i + 1}count`) || 0
   }));
   const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
-  const letters = [...counts.map(c => c.letter)].sort();
-  const center = (p.getAttribute("letter1") || letters[0]).toUpperCase();
+  
+  // Get all letters and sort them (ensuring no duplicates)
+  const allLetters = [...new Set(counts.map(c => c.letter))].filter(Boolean).sort();
+  
+  // Get center letter properly
+  const center = p.getAttribute("letter1").toUpperCase();
+  
+  // Create surrounding letters array (all letters except center, sorted alphabetically)
+  const surroundingLetters = allLetters.filter(l => l !== center).sort();
+  
+  // Make sure we have exactly 6 surrounding letters
+  while (surroundingLetters.length < 6) {
+    surroundingLetters.push(""); // Fill with blanks if needed
+  }
 
   globalWords = [...p.getElementsByTagName("word")].map(w => ({
     text: w.textContent,
@@ -248,16 +259,16 @@ function displayPuzzle(p) {
   svg.setAttribute("height", "220");
   svg.setAttribute("viewBox", "-120 -110 240 220");
   
-  // Set up hexagon data
+  // Set up hexagon data - ensure center is first letter and others are surrounding
   const hexSize = 40;
   const hexPositions = [
     { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
-    { x: 0, y: -70, letter: letters[0], fill: "#E6E6E6" },    // Top
-    { x: 60, y: -35, letter: letters[1], fill: "#E6E6E6" },   // Top right
-    { x: 60, y: 35, letter: letters[2], fill: "#E6E6E6" },    // Bottom right
-    { x: 0, y: 70, letter: letters[3], fill: "#E6E6E6" },     // Bottom
-    { x: -60, y: 35, letter: letters[4], fill: "#E6E6E6" },   // Bottom left
-    { x: -60, y: -35, letter: letters[5], fill: "#E6E6E6" }   // Top left
+    { x: 0, y: -70, letter: surroundingLetters[0], fill: "#E6E6E6" },    // Top
+    { x: 60, y: -35, letter: surroundingLetters[1], fill: "#E6E6E6" },   // Top right
+    { x: 60, y: 35, letter: surroundingLetters[2], fill: "#E6E6E6" },    // Bottom right
+    { x: 0, y: 70, letter: surroundingLetters[3], fill: "#E6E6E6" },     // Bottom
+    { x: -60, y: 35, letter: surroundingLetters[4], fill: "#E6E6E6" },   // Bottom left
+    { x: -60, y: -35, letter: surroundingLetters[5], fill: "#E6E6E6" }   // Top left
   ];
   
   // Draw hexagons and letters
@@ -307,7 +318,7 @@ function displayPuzzle(p) {
   const lettersTable = document.createElement("table");
   lettersTable.className = "bee-table letters-table";
   const lettersTr = document.createElement("tr");
-  letters.forEach(letter => {
+  allLetters.forEach(letter => {
     const td = document.createElement("td");
     if (letter === center) {
       td.classList.add("center-letter");
@@ -337,7 +348,7 @@ function displayPuzzle(p) {
   lengthsTable.className = "bee-table lengths-table";
   const lengthsTr = document.createElement("tr");
   
-  letters.forEach(l => {
+  allLetters.forEach(l => {
     const td = document.createElement("td");
     td.className = "length-icons";
     
@@ -367,7 +378,7 @@ function displayPuzzle(p) {
   wordsTable.className = "bee-table words-table";
   const wordsTr = document.createElement("tr");
   
-  letters.forEach(l => {
+  allLetters.forEach(l => {
     const td = document.createElement("td");    
     const col = document.createElement("div");
     col.className = "wcol";
@@ -413,7 +424,7 @@ function displayPuzzle(p) {
   combinedContent.appendChild(wrapper);
   
   // Setup mobile accordion after desktop view is complete
-  setupMobileAccordion(letters, byLetter, center);
+  setupMobileAccordion(allLetters, byLetter, center);
 }
 
 function toggleRevealAll(on) {
