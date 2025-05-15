@@ -135,8 +135,9 @@ async function loadPuzzleData() {
     })).text(), "application/xml");
     
     const puzzles = [...xml.querySelectorAll("puzzle")]
-      .filter(p => p.getElementsByTagName("word").length)
-      .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+    .filter(p => parseInt(p.getAttribute("count")) > 0)
+    .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+
 
     const params = new URLSearchParams(window.location.search);
     const puzzleId = params.get("puzzleid");
