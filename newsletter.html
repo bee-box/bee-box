@@ -1,583 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title id="pageTitle">Bee Sheet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style/newsletter.css">
-  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .puzzle-container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .puzzle-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background-color: #fce4e4;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        .date-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+        select {
+            padding: 8px 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+            min-width: 300px;
+        }
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .yes-indicator {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .no-indicator {
+            color: #e74c3c;
+        }
+        .code-box {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            line-height: 1.4;
+            font-size: 14px;
+            color: #333;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .detail-item {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .words-list {
+            margin-top: 20px;
+        }
+        .words-list ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .words-list li {
+            background-color: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+        }
+        .words-list li.pangram {
+            background-color: #fdf2d0;
+            border-left: 3px solid #f39c12;
+        }
+        .pangram-tag {
+            background-color: #f39c12;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+    </style>
 </head>
 <body>
-<nav id="navtitle" class="section-box">
-  <div class="nav-container">
-    <div class="nav-left">
-      <h1 id="toolNameHeading">Bee Sheet</h1>
-      <div id="navtitleContent" class="date-display"></div>
+    <h1>Newsletter Generator</h1>
+    
+    <div class="date-selector">
+        <label for="dateSelector">Select Newsletter Date: </label>
+        <select id="dateSelector">
+            <option value="">Loading dates...</option>
+        </select>
     </div>
-    <div class="nav-right" id="navControls">
-      <select id="dateSelector"><option value="">Choose a Day</option></select>
-      <button id="printButton">Print</button>
-      <button id="revealButton">Reveal</button>
-      <a href="https://beebox.ghost.io" target="_blank">Home</a>
-      <a href="#" id="subscribePopupBtn" onclick="openSubscribeModal(); return false;">Subscribe</a>
+    
+    <div id="puzzleContent" class="puzzle-container">
+        <p class="loading">Select a date to load newsletter data...</p>
     </div>
-  </div>
-</nav>
-
-<section id="header" class="section-box">
-  <div id="headerContent" class="loading">Loading...</div>
-</section>
-
-<section id="combinedSection" class="section-box">
-  <div id="combinedContent" class="loading">Loading...</div>
-</section>
-
-<footer class="section-box">
-  <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
-</footer>
-
-<div class="modal-overlay" id="subscribeOverlay">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeSubscribeModal()">&times;</button>
-    <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
-  </div>
-</div>
-
-<script>
-const toolName = "Bee Sheet";
-let globalWords = [];
-let revealMode = false;
-
-const numIcons = {
-  1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
-  11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
-};
-
-const invertedNumIcons = {
-  1: "❶", 2: "❷", 3: "❸", 4: "❹", 5: "❺", 6: "❻", 7: "❼", 8: "❽", 9: "❾", 10: "❿",
-  11: "⓫", 12: "⓬", 13: "⓭", 14: "⓮", 15: "⓯", 16: "⓰", 17: "⓱", 18: "⓲", 19: "⓳", 20: "⓴"
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("pageTitle").textContent = toolName;
-  document.getElementById("toolNameHeading").textContent = toolName;
-  setupEventListeners();
-  loadPuzzleData();
-});
-
-function setupEventListeners() {
-  document.getElementById("dateSelector").addEventListener("change", (e) => {
-    const d = e.target.value;
-    if (d) {
-      const u = new URL(window.location);
-      u.searchParams.set("date", d);
-      u.searchParams.delete("puzzleid");
-      window.location.href = u.toString();
-    }
-  });
-
-  document.getElementById("printButton").addEventListener("click", () => {
-    // Store current word states for printing
-    const wordBoxes = document.querySelectorAll(".word-box");
-    wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
-
-    // Set up handlers for before and after printing
-    window.addEventListener("beforeprint", () => {
-      // Use the stored value for printing
-      wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
-    }, { once: true });
-
-    window.addEventListener("afterprint", () => {
-      // Reset to proper state after printing
-      wordBoxes.forEach(b => {
-        b.textContent = revealMode ? b.dataset.word : b.dataset.firsttwo;
-      });
-    }, { once: true });
-
-    // Trigger the browser's print dialog
-    window.print();
-  });
-
-  document.getElementById("revealButton").addEventListener("click", () => {
-    revealMode = !revealMode;
-    toggleRevealAll(revealMode);
-    document.getElementById("revealButton").textContent = revealMode ? "Hide" : "Reveal";
-  });
-}
-
-function openSubscribeModal() {
-  document.getElementById("subscribeOverlay").style.display = "flex";
-}
-
-function closeSubscribeModal() {
-  document.getElementById("subscribeOverlay").style.display = "none";
-}
-
-async function loadPuzzleData() {
-  const header = document.getElementById("headerContent");
-  const content = document.getElementById("combinedContent");
-  header.className = content.className = "loading";
-  header.textContent = content.textContent = "Loading...";
-
-  try {
-    const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
-    const puzzles = [...xml.querySelectorAll("puzzle")]
-      .filter(p => p.getElementsByTagName("word").length)
-      .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
-
-    const params = new URLSearchParams(window.location.search);
-    const puzzleId = params.get("puzzleid");
-    const date = params.get("date");
-    const mostRecent = puzzles.at(-1);
-
-    let selected;
-    if (puzzleId && !date) {
-      selected = puzzles.find(p => p.id === puzzleId);
-    } else if (date && !puzzleId) {
-      selected = puzzles.find(p => p.getAttribute("date") === date);
-      if (selected === mostRecent) {
-        openSubscribeModal();
-        selected = puzzles.at(-2);
-      }
-    } else {
-      selected = puzzles.at(-2);
-    }
-
-    if (!selected) throw new Error("No puzzle selected.");
-    populateDateSelector(puzzles, selected.getAttribute("date"));
-    displayPuzzle(selected);
-  } catch (err) {
-    header.innerHTML = `<p>⚠️ Error loading puzzle data.</p>`;
-    content.innerHTML = "";
-    console.error("Puzzle load error:", err);
-  }
-}
-
-function populateDateSelector(puzzles, selectedDate) {
-  const s = document.getElementById("dateSelector");
-  while (s.options.length > 1) s.remove(1);
-  [...puzzles].reverse().forEach(p => {
-    const d = p.getAttribute("date");
-    s.add(new Option(d, d, d === selectedDate, d === selectedDate));
-  });
-}
-
-function formatDateString(str) {
-  const [y, m, d] = str.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
-    weekday: "long", year: "numeric", month: "long", day: "numeric"
-  });
-}
-
-function displayPuzzle(p) {
-  const combinedContent = document.getElementById("combinedContent");
-  const headerContent = document.getElementById("headerContent");
-  combinedContent.innerHTML = headerContent.innerHTML = "";
-
-  const rawDate = p.getAttribute("date");
-  document.getElementById("navtitleContent").textContent = formatDateString(rawDate);
-
-  const counts = [...Array(7)].map((_, i) => ({
-    letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
-    count: +p.getAttribute(`letter${i + 1}count`) || 0
-  }));
-  const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
-  const letters = [...counts.map(c => c.letter)].sort();
-  const center = (p.getAttribute("letter1") || letters[0]).toUpperCase();
-
-  globalWords = [...p.getElementsByTagName("word")].map(w => ({
-    text: w.textContent,
-    length: +w.getAttribute("length"),
-    first: w.getAttribute("first").toUpperCase(),
-    firsttwo: w.getAttribute("firsttwo"),
-    revealed: false
-  }));
-
-  const byLetter = {};
-  globalWords.forEach(w => {
-    if (!byLetter[w.first]) byLetter[w.first] = [];
-    byLetter[w.first].push(w);
-  });
-
-  const q = +p.getAttribute("queenbee") || 0;
-  const thresh = q ? [
-    `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
-    `Good: ${Math.round(q * 0.08)}`, `Solid: ${Math.round(q * 0.15)}`,
-    `Nice: ${Math.round(q * 0.25)}`, `Great: ${Math.round(q * 0.40)}`,
-    `Amazing: ${Math.round(q * 0.50)}`, `Genius: ${Math.round(q * 0.70)}`,
-    `Queen Bee: ${q}`
-  ] : [];
-
-  // Create a flex container for the header
-  const headerFlex = document.createElement("div");
-  headerFlex.className = "header-flex";
-  
-  // Add title text to the left
-  const titleDiv = document.createElement("div");
-  titleDiv.className = "header-text";
-  titleDiv.innerHTML = [
-    `The Completely Unauthorized Games Toolbox presents the Bee Sheet for ${formatDateString(rawDate)}`,
-    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
-    thresh.join(", ")
-  ].map(t => `<p>${t}</p>`).join("");
-  
-  // Create SVG for hive
-  const hiveContainer = document.createElement("div");
-  hiveContainer.className = "hive-container";
-  hiveContainer.title = "Click to go to the NY Times Spelling Bee";
-  hiveContainer.addEventListener("click", () => {
-    window.open("https://www.nytimes.com/puzzles/spelling-bee", "_blank");
-  });
-  
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "240");
-  svg.setAttribute("height", "220");
-  svg.setAttribute("viewBox", "-120 -110 240 220");
-  
-  // Set up hexagon data
-  const hexSize = 40;
-  const hexPositions = [
-    { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
-    { x: 0, y: -70, letter: letters[0], fill: "#E6E6E6" },    // Top
-    { x: 60, y: -35, letter: letters[1], fill: "#E6E6E6" },   // Top right
-    { x: 60, y: 35, letter: letters[2], fill: "#E6E6E6" },    // Bottom right
-    { x: 0, y: 70, letter: letters[3], fill: "#E6E6E6" },     // Bottom
-    { x: -60, y: 35, letter: letters[4], fill: "#E6E6E6" },   // Bottom left
-    { x: -60, y: -35, letter: letters[5], fill: "#E6E6E6" }   // Top left
-  ];
-  
-  // Draw hexagons and letters
-  hexPositions.forEach(pos => {
-    // Create hexagon
-    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     
-    // Calculate points for a hexagon
-    const points = [];
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
-      const x = pos.x + hexSize * Math.cos(angle);
-      const y = pos.y + hexSize * Math.sin(angle);
-      points.push(`${x},${y}`);
-    }
-    
-    hex.setAttribute("points", points.join(" "));
-    hex.setAttribute("fill", pos.fill);
-    hex.setAttribute("stroke", "#FFFFFF");
-    hex.setAttribute("stroke-width", "2");
-    svg.appendChild(hex);
-    
-    // Create letter
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", pos.x);
-    text.setAttribute("y", pos.y + 2);
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("dominant-baseline", "middle");
-    text.setAttribute("font-size", "24");
-    text.setAttribute("font-weight", "bold");
-    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
-    text.textContent = pos.letter;
-    svg.appendChild(text);
-  });
-  
-  hiveContainer.appendChild(svg);
-  
-  // Add both elements to the flex container
-  headerFlex.appendChild(titleDiv);
-  headerFlex.appendChild(hiveContainer);
-  headerContent.appendChild(headerFlex);
+    <div class="puzzle-container">
+        <h3>HTML Markup</h3>
+        <div class="code-box">&lt;html&gt;
+&lt;/html&gt;</div>
+    </div>
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "combined-container";
-
-  // Letters table (real table, alphabetical)
-  const lettersTable = document.createElement("table");
-  lettersTable.className = "bee-table letters-table";
-  const lettersTr = document.createElement("tr");
-  letters.forEach(letter => {
-    const td = document.createElement("td");
-    if (letter === center) {
-      td.classList.add("center-letter");
-    }
-    
-    const inner = document.createElement("div");
-    inner.className = "wrapper";
-
-    const spanChar = document.createElement("span");
-    spanChar.className = "char" + (letter === center ? " bold" : "");
-    spanChar.textContent = letter;
-
-    const spanCount = document.createElement("span");
-    spanCount.className = "count";
-    spanCount.textContent = countMap[letter] || 0;
-
-    inner.appendChild(spanChar);
-    inner.appendChild(spanCount);
-    td.appendChild(inner);
-    lettersTr.appendChild(td);
-  });
-  lettersTable.appendChild(lettersTr);
-  wrapper.appendChild(lettersTable);
-
-  // Length indicators table
-  const lengthsTable = document.createElement("table");
-  lengthsTable.className = "bee-table lengths-table";
-  const lengthsTr = document.createElement("tr");
-  
-  letters.forEach(l => {
-    const td = document.createElement("td");
-    td.className = "length-icons";
-    
-    const wordList = (byLetter[l] || []).sort((a, b) => a.length - b.length || a.text.localeCompare(b.text));
-    const icons = document.createElement("div");
-    icons.className = "icons";
-    
-    wordList.forEach((w, idx) => {
-      const id = `${l}-${w.length}-${idx}`;
-      w.lengthIconId = id;
-      const span = document.createElement("span");
-      span.id = `length-${id}`;
-      span.className = "length-indicator";
-      span.textContent = revealMode ? invertedNumIcons[w.length] || `[${w.length}]` : numIcons[w.length] || w.length;
-      icons.appendChild(span);
-    });
-    
-    td.appendChild(icons);
-    lengthsTr.appendChild(td);
-  });
-  
-  lengthsTable.appendChild(lengthsTr);
-  wrapper.appendChild(lengthsTable);
-
-  // Words table
-  const wordsTable = document.createElement("table");
-  wordsTable.className = "bee-table words-table";
-  const wordsTr = document.createElement("tr");
-  
-  letters.forEach(l => {
-    const td = document.createElement("td");    
-    const col = document.createElement("div");
-    col.className = "wcol";
-    
-    const wordList = (byLetter[l] || []).sort((a, b) => a.text.localeCompare(b.text));
-    wordList.forEach((w, idx) => {
-      const box = document.createElement("div");
-      box.className = "word-box";
-      box.dataset.word = w.text;
-      box.dataset.firsttwo = w.firsttwo;
-      box.dataset.lengthIconId = w.lengthIconId;
-      box.textContent = revealMode ? w.text : w.firsttwo;
-      box.addEventListener("click", () => {
-        const isRevealed = box.textContent === box.dataset.firsttwo;
-        box.textContent = isRevealed ? box.dataset.word : box.dataset.firsttwo;
-        
-        // Change background color to yellow when the word is revealed
-        box.style.backgroundColor = isRevealed ? "#FFDC00" : "";
-        
-        const icon = document.getElementById(`length-${box.dataset.lengthIconId}`);
-        if (icon) {
-          icon.textContent = isRevealed
-            ? invertedNumIcons[w.length] || `[${w.length}]`
-            : numIcons[w.length] || w.length;
-          icon.classList.toggle("revealed", isRevealed);
-        }
-        box.classList.add("just-toggled");
-        setTimeout(() => box.classList.remove("just-toggled"), 300);
-      });
-      if (revealMode) {
-        box.style.backgroundColor = "#FFDC00"; // Yellow when in reveal mode
-      }
-      col.appendChild(box);
-    });
-    
-    td.appendChild(col);
-    wordsTr.appendChild(td);
-  });
-  
-  wordsTable.appendChild(wordsTr);
-  wrapper.appendChild(wordsTable);
-
-  combinedContent.appendChild(wrapper);
-  
-  // Setup mobile accordion after desktop view is complete
-  setupMobileAccordion(letters, byLetter, center);
-}
-
-function toggleRevealAll(on) {
-  document.querySelectorAll(".word-box").forEach(b => {
-    b.textContent = on ? b.dataset.word : b.dataset.firsttwo;
-    b.style.backgroundColor = on ? "#FFDC00" : ""; // Original yellow (#FFDC00)
-    const icon = document.getElementById(`length-${b.dataset.lengthIconId}`);
-    if (icon) {
-      const len = b.dataset.word.length;
-      icon.textContent = on ? invertedNumIcons[len] || `[${len}]` : numIcons[len] || len;
-      icon.classList.toggle("revealed", on);
-    }
-  });
-  
-  // Also update mobile accordion words if it exists
-  document.querySelectorAll('.mobile-accordion .word-box').forEach(b => {
-    b.textContent = on ? b.dataset.word : b.dataset.firsttwo;
-    b.style.backgroundColor = on ? "#FFDC00" : "";
-  });
-}
-
-// Mobile Accordion Setup Function
-function setupMobileAccordion(letters, byLetter, center) {
-  // Only run on mobile or when testing
-  if (window.innerWidth > 768 && !window.location.search.includes('forceMobile')) return;
-  
-  // Remove any existing accordion to prevent duplicates
-  const existingAccordion = document.querySelector('.mobile-accordion');
-  if (existingAccordion) {
-    existingAccordion.remove();
-  }
-  
-  // Create accordion container
-  const accordionContainer = document.createElement('div');
-  accordionContainer.className = 'mobile-accordion';
-  
-  // For each letter
-  letters.forEach(letter => {
-    const wordList = (byLetter[letter] || []).sort((a, b) => 
-      a.text.localeCompare(b.text));
-    
-    if (!wordList.length) return;
-    
-    // Create accordion item
-    const item = document.createElement('div');
-    item.className = 'accordion-item';
-    
-    // Create header with letter and count
-    const header = document.createElement('div');
-    header.className = 'accordion-header';
-    
-    // Left side with letter
-    const letterContainer = document.createElement('div');
-    letterContainer.className = 'accordion-letter-container';
-    
-    // Letter with special styling for center letter
-    const letterSpan = document.createElement('span');
-    letterSpan.className = 'accordion-letter' + (letter === center ? ' center-letter' : '');
-    letterSpan.textContent = letter;
-    letterContainer.appendChild(letterSpan);
-    
-    // Word count
-    const countSpan = document.createElement('span');
-    countSpan.className = 'accordion-count';
-    countSpan.textContent = `${wordList.length} words`;
-    letterContainer.appendChild(countSpan);
-    
-    // Add expand/collapse indicator
-    const indicator = document.createElement('span');
-    indicator.className = 'accordion-indicator';
-    indicator.textContent = '▼';
-    
-    // Assemble header
-    header.appendChild(letterContainer);
-    header.appendChild(indicator);
-    
-    // Create content area for words
-    const content = document.createElement('div');
-    content.className = 'accordion-content';
-    
-    const words = document.createElement('div');
-    words.className = 'accordion-words';
-    
-    // Add words to content
-    wordList.forEach(word => {
-      const box = document.createElement('div');
-      box.className = 'word-box';
-      box.dataset.word = word.text;
-      box.dataset.firsttwo = word.firsttwo;
-      box.dataset.lengthIconId = word.lengthIconId;
-      box.textContent = revealMode ? word.text : word.firsttwo;
-      
-      // Reuse existing click handler logic
-      box.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent accordion toggle
-        
-        const isRevealed = box.textContent === box.dataset.firsttwo;
-        box.textContent = isRevealed ? box.dataset.word : box.dataset.firsttwo;
-        box.style.backgroundColor = isRevealed ? "#FFDC00" : "";
-        
-        const icon = document.getElementById(`length-${box.dataset.lengthIconId}`);
-        if (icon) {
-          icon.textContent = isRevealed
-            ? invertedNumIcons[word.length] || `[${word.length}]`
-            : numIcons[word.length] || word.length;
-          icon.classList.toggle("revealed", isRevealed);
-        }
-        
-        box.classList.add("just-toggled");
-        setTimeout(() => box.classList.remove("just-toggled"), 300);
-      });
-      
-      if (revealMode) {
-        box.style.backgroundColor = "#FFDC00";
-      }
-      
-      words.appendChild(box);
-    });
-    
-    content.appendChild(words);
-    
-    // Add event listener to toggle accordion
-    header.addEventListener('click', () => {
-      // Close all other accordions first (optional - comment out for multiple open)
-      document.querySelectorAll('.accordion-item.active').forEach(activeItem => {
-        if (activeItem !== item) {
-          activeItem.classList.remove('active');
-        }
-      });
-      
-      // Toggle this accordion
-      item.classList.toggle('active');
-    });
-    
-    // Assemble accordion item
-    item.appendChild(header);
-    item.appendChild(content);
-    accordionContainer.appendChild(item);
-  });
-  
-  // Add to document
-  const combinedContent = document.getElementById('combinedContent');
-  combinedContent.appendChild(accordionContainer);
-  
-  // Open the first accordion by default
-  const firstAccordion = accordionContainer.querySelector('.accordion-item');
-  if (firstAccordion) {
-    firstAccordion.classList.add('active');
-  }
-}
-
-// Call setupMobileAccordion on window resize with debounce
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    const letters = [...document.querySelectorAll('.letters-table .char')].map(el => el.textContent);
-    const center = document.querySelector('.center-letter .char').textContent;
-    
-    // Recreate byLetter from existing words
-    const byLetter = {};
-    document.querySelectorAll('.words-table .wcol').forEach((col, i) => {
-      const letter = letters[i];
-      byLetter[letter] = [];
-      
-      col.querySelectorAll('.word-box').forEach(box => {
-        byLetter[letter].push({
-          text: box.dataset.word,
-          firsttwo: box.dataset.firsttwo,
-          length: box.dataset.word.length,
-          lengthIconId: box.dataset.lengthIconId
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let puzzleId = urlParams.get('puzzleid');
+            const dateSelector = document.getElementById('dateSelector');
+            const puzzleContent = document.getElementById('puzzleContent');
+            
+            // If no puzzleId exists in URL, use default
+            if (!puzzleId) {
+                // Use default puzzle ID for today (May 15, 2025)
+                puzzleId = "20250515-694539";
+                console.log("No puzzle ID provided, using default: " + puzzleId);
+            }
+            
+            // Function to format date for display
+            function formatDate(dateStr) {
+                const dateObj = new Date(dateStr);
+                return dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            // Function to display puzzle content
+            function displayPuzzle(puzzle) {
+                if (!puzzle) {
+                    puzzleContent.innerHTML = `<div class="error-message">
+                        No newsletter found with the selected ID.
+                    </div>`;
+                    return;
+                }
+                
+                const puzzleDate = puzzle.getAttribute('date');
+                const puzzleId = puzzle.getAttribute('id');
+                const formattedDate = formatDate(puzzleDate);
+                
+                // Check if puzzle has word values
+                const hasWordValues = puzzle.getElementsByTagName('word').length > 0;
+                
+                // Extract puzzle attributes
+                const count = puzzle.getAttribute('count') || 'N/A';
+                const letters = puzzle.getAttribute('letters') || 'N/A';
+                const pangrams = puzzle.getAttribute('pangrams') || 'N/A';
+                const perfectPangrams = puzzle.getAttribute('perfectpangrams') || 'N/A';
+                const queenBee = puzzle.getAttribute('queenbee') || 'N/A';
+                
+                // Get all available words if they exist
+                let wordsList = '';
+                const words = puzzle.getElementsByTagName('word');
+                if (words.length > 0) {
+                    wordsList = '<div class="words-list"><h4>Words in this Puzzle:</h4><ul>';
+                    for (let i = 0; i < words.length; i++) {
+                        const word = words[i];
+                        const wordText = word.textContent;
+                        const points = word.getAttribute('points') || '-';
+                        const isPangram = word.getAttribute('pangram') === 'yes';
+                        
+                        wordsList += `<li class="${isPangram ? 'pangram' : ''}">
+                            <strong>${wordText}</strong> - ${points} points
+                            ${isPangram ? ' <span class="pangram-tag">Pangram</span>' : ''}
+                        </li>`;
+                    }
+                    wordsList += '</ul></div>';
+                }
+                
+                puzzleContent.innerHTML = `
+                    <div class="puzzle-info">
+                        <div>
+                            <strong>Newsletter ID:</strong> ${puzzleId}
+                        </div>
+                        <div>
+                            <strong>Date:</strong> ${formattedDate}
+                        </div>
+                    </div>
+                    
+                    <div class="puzzle-details">
+                        <h3>Puzzle Details</h3>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <strong>Letters:</strong> ${letters}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Word Count:</strong> ${count}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Pangrams:</strong> ${pangrams}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Perfect Pangrams:</strong> ${perfectPangrams}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Queen Bee Score:</strong> ${queenBee}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Has Word Values:</strong> 
+                                <span class="${hasWordValues ? 'yes-indicator' : 'no-indicator'}">
+                                    ${hasWordValues ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${wordsList}
+                `;
+            }
+            
+            // Fetch the XML file and populate dropdown
+            fetch('xml/puzzles.xml')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('XML file not found. Please make sure xml/puzzles.xml exists.');
+                    }
+                    return response.text();
+                })
+                .then(xmlString => {
+                    // Parse XML
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+                    
+                    // Get all puzzles
+                    const puzzles = xmlDoc.getElementsByTagName('puzzle');
+                    
+                    // Clear loading option
+                    dateSelector.innerHTML = '';
+                    
+                    // Add option for each puzzle date
+                    for (let i = 0; i < puzzles.length; i++) {
+                        const puzzle = puzzles[i];
+                        const puzzleDate = puzzle.getAttribute('date');
+                        const currentId = puzzle.getAttribute('id');
+                        const formattedDate = formatDate(puzzleDate);
+                        const hasWordValues = puzzle.getElementsByTagName('word').length > 0;
+                        
+                        const option = document.createElement('option');
+                        option.value = currentId;
+                        option.textContent = `${formattedDate} - Has Words: ${hasWordValues ? 'Yes' : 'No'}`;
+                        
+                        // Select current puzzle ID
+                        if (currentId === puzzleId) {
+                            option.selected = true;
+                        }
+                        
+                        dateSelector.appendChild(option);
+                    }
+                    
+                    // If no options added (empty XML), show message
+                    if (dateSelector.options.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = "";
+                        option.textContent = "No dates available in XML";
+                        dateSelector.appendChild(option);
+                    }
+                    
+                    // Find and display the current puzzle
+                    let foundPuzzle = null;
+                    for (let i = 0; i < puzzles.length; i++) {
+                        if (puzzles[i].getAttribute('id') === puzzleId) {
+                            foundPuzzle = puzzles[i];
+                            break;
+                        }
+                    }
+                    
+                    displayPuzzle(foundPuzzle);
+                })
+                .catch(error => {
+                    puzzleContent.innerHTML = `<div class="error-message">
+                        Error loading newsletter data: ${error.message}
+                    </div>`;
+                    
+                    // Add error option to dropdown
+                    dateSelector.innerHTML = '';
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "Error loading dates";
+                    dateSelector.appendChild(option);
+                });
+            
+            // Handle dropdown change
+            dateSelector.addEventListener('change', function() {
+                const selectedId = this.value;
+                if (selectedId) {
+                    // Change URL and reload page
+                    window.location.href = `?puzzleid=${selectedId}`;
+                }
+            });
         });
-      });
-    });
-    
-    setupMobileAccordion(letters, byLetter, center);
-  }, 250);
-});
-</script>
+    </script>
 </body>
 </html>
