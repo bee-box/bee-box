@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Bee Sheet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Cache prevention meta tags -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -11,42 +12,41 @@
   <link rel="icon" href="style/bee.ico" type="image/x-icon" />
 </head>
 <body>
-  <nav id="navtitle" class="section-box">
-    <div class="nav-container">
-      <div class="nav-left">
-        <h1 id="toolNameHeading">Bee Sheet</h1>
-        <div id="navtitleContent" class="date-display"></div>
-      </div>
-      <div class="nav-right" id="navControls">
-        <select id="dateSelector"><option value="">Choose a Day</option></select>
-        <button id="printButton">Print</button>
-        <button id="revealButton">Reveal</button>
-        <a href="https://beebox.ghost.io" target="_blank">Home</a>
-        <a href="#" id="subscribePopupBtn" onclick="openSubscribeModal(); return false;">Subscribe</a>
-      </div>
+<nav id="navtitle" class="section-box">
+  <div class="nav-container">
+    <div class="nav-left">
+      <h1 id="toolNameHeading">Bee Sheet</h1>
+      <div id="navtitleContent" class="date-display"></div>
     </div>
-  </nav>
-
-  <section id="header" class="section-box">
-    <div id="headerContent" class="loading">Loading...</div>
-  </section>
-
-  <section id="combinedSection" class="section-box">
-    <div id="combinedContent" class="loading">Loading...</div>
-  </section>
-
-  <footer class="section-box">
-    <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
-  </footer>
-
-  <div class="modal-overlay" id="subscribeOverlay">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeSubscribeModal()">&times;</button>
-      <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
+    <div class="nav-right" id="navControls">
+      <select id="dateSelector"><option value="">Choose a Day</option></select>
+      <button id="printButton">Print</button>
+      <button id="revealButton">Reveal</button>
+      <a href="https://beebox.ghost.io" target="_blank">Home</a>
+      <a href="#" id="subscribePopupBtn" onclick="openSubscribeModal(); return false;">Subscribe</a>
     </div>
   </div>
+</nav>
 
-  <script>
+<section id="header" class="section-box">
+  <div id="headerContent" class="loading">Loading...</div>
+</section>
+
+<section id="combinedSection" class="section-box">
+  <div id="combinedContent" class="loading">Loading...</div>
+</section>
+
+<footer class="section-box">
+  <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
+</footer>
+
+<div class="modal-overlay" id="subscribeOverlay">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeSubscribeModal()">&times;</button>
+    <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
+  </div>
+</div>
+<script>
     const toolName = "Bee Sheet";
     let globalWords = [];
     let revealMode = false;
@@ -122,16 +122,32 @@
         const date = params.get("date");
         const mostRecent = puzzles.at(-1);
 
-        console.log("Available IDs:", puzzles.map(p => p.getAttribute("id")));
-        console.log("Available Dates:", puzzles.map(p => p.getAttribute("date")));
-        console.log("URL puzzleid/id:", puzzleId);
-        console.log("URL date:", date);
+        // Enhanced logging for debugging
+        console.log("Available Puzzles:", puzzles.map(p => ({
+          id: p.getAttribute("id"),
+          date: p.getAttribute("date")
+        })));
+        console.log("URL parameters - puzzleid/id:", puzzleId, "date:", date);
 
         let selected = null;
 
-        // Prioritize puzzleId if available
+        // Improved puzzleId matching
         if (puzzleId) {
+          // First try exact matching
           selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
+          
+          if (!selected) {
+            // Try case-insensitive matching if exact match fails
+            selected = puzzles.find(p => 
+              p.getAttribute("id").toLowerCase() === puzzleId.toLowerCase());
+          }
+          
+          // Log if puzzleId specified but not found
+          if (!selected) {
+            console.warn(`Puzzle with ID "${puzzleId}" not found in available puzzles`);
+            // Optionally, show a user-visible message
+            header.innerHTML = `<p>⚠️ Puzzle with ID "${puzzleId}" not found. Showing another puzzle instead.</p>`;
+          }
         }
 
         // If not found or not using puzzleId, fall back to date
@@ -149,11 +165,19 @@
         }
 
         if (!selected) throw new Error("No puzzle selected.");
+        
+        // Clearly log the selected puzzle
+        console.log("Selected puzzle:", {
+          id: selected.getAttribute("id"),
+          date: selected.getAttribute("date"),
+          selectionMethod: puzzleId ? "puzzleId" : (date ? "date" : "fallback")
+        });
+        
         populateDateSelector(puzzles, selected.getAttribute("date"));
         displayPuzzle(selected);
 
       } catch (err) {
-        header.innerHTML = `<p>⚠️ Error loading puzzle data.</p>`;
+        header.innerHTML = `<p>⚠️ Error loading puzzle data: ${err.message}</p>`;
         content.innerHTML = "";
         console.error("Puzzle load error:", err);
       }
@@ -188,5 +212,6 @@
       });
     }
   </script>
+
 </body>
 </html>
