@@ -1,0 +1,249 @@
+name: Send Ghost Newsletter
+
+on:
+  # Schedule it to run automatically (e.g., weekly on Monday at 9:00 UTC)
+  # schedule:
+ #   - cron: '0 9 * * 1'  # Monday at 9:00 UTC
+  
+  # Allow manual triggering through the GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'The Completely Unauthorized Games Toolbox'
+        required: true
+        default: 'Today's Tools'
+      intro:
+        description: 'Newsletter introduction (HTML)'
+        required: false
+        default: '<p>Header stuff goes here</p>'
+      send_type:
+        description: 'Sending type (test, draft, or live)'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - draft
+          - live
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml pytz
+          
+      - name: Verify puzzles.html exists
+        run: |
+          ls -la ../puzzles.html || echo "Warning: ../puzzles.html not found in expected location"
+          # Ensure we know the current directory
+          pwd
+          ls -la
+          
+      - name: Send newsletter
+        env:
+          GHOST_API_URL: ${{ secrets.GHOST_API_URL }}
+          GHOST_ADMIN_KEY: ${{ secrets.GHOST_ADMIN_KEY }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+        run: |
+          # Create a Python script that doesn't require interactive input
+          cat > send_newsletter.py << 'EOF'
+          import requests
+          import json
+          import os
+          import sys
+          from bs4 import BeautifulSoup
+          
+          def load_html_template(template_path):
+              """Load HTML content from a template file"""
+              try:
+                  with open(template_path, 'r', encoding='utf-8') as file:
+                      return file.read()
+              except FileNotFoundError:
+                  print(f"Template file not found: {template_path}")
+                  sys.exit(1)
+          
+          def create_newsletter_content(puzzles_path, title, intro_text=None):
+              """Create newsletter content from puzzles HTML file and custom intro"""
+              try:
+                  # Load the puzzles HTML
+                  with open(puzzles_path, 'r', encoding='utf-8') as file:
+                      puzzles_html = file.read()
+                  
+                  # Parse the puzzles HTML if needed
+                  soup = BeautifulSoup(puzzles_html, 'lxml')
+                  
+                  # Here you can modify/extract parts of the puzzles HTML if needed
+                  puzzles_content = puzzles_html  # Using the whole file for now
+                  
+                  # Construct the complete newsletter
+                  newsletter_html = f"""
+                  <!DOCTYPE html>
+                  <html>
+                  <head>
+                      <title>{title}</title>
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <style>
+                          body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }}
+                          h1 {{ color: #2c3e50; }}
+                          .intro {{ margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }}
+                          .content {{ margin-bottom: 30px; }}
+                          .footer {{ font-size: 12px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 20px; }}
+                      </style>
+                  </head>
+                  <body>
+                      <h1>{title}</h1>
+                      
+                      <div class="intro">
+                          {intro_text if intro_text else ''}
+                      </div>
+                      
+                      <div class="content">
+                          {puzzles_content}
+                      </div>
+                      
+                      <div class="footer">
+                          <p>You received this newsletter because you subscribed to updates.</p>
+                          <p>To unsubscribe, click the unsubscribe link in the footer of the email.</p>
+                      </div>
+                  </body>
+                  </html>
+                  """
+                  
+                  return newsletter_html
+              
+              except Exception as e:
+                  print(f"Error creating newsletter content: {str(e)}")
+                  sys.exit(1)
+          
+          def send_ghost_post(api_url, admin_key, title, html_content, status="published", 
+                             tags=None, featured=False, email_segment=None):
+              """Create and optionally send a Ghost.io post/newsletter"""
+              # Prepare the request headers
+              headers = {
+                  'Authorization': f'Ghost {admin_key}',
+                  'Content-Type': 'application/json'
+              }
+              
+              # Prepare the post data
+              post_data = {
+                  "posts": [{
+                      "title": title,
+                      "html": html_content,
+                      "status": status,
+                      "featured": featured
+                  }]
+              }
+              
+              # Add email segment if provided
+              if email_segment is not None:
+                  post_data["posts"][0]["email_recipient_filter"] = email_segment
+              
+              # Add tags if provided
+              if tags:
+                  post_data["posts"][0]["tags"] = [{"name": tag} for tag in tags]
+              
+              # Make the API request
+              endpoint = f"{api_url.rstrip('/')}/posts/"
+              response = requests.post(endpoint, headers=headers, json=post_data)
+              
+              # Check for success
+              if response.status_code >= 200 and response.status_code < 300:
+                  return response.json()
+              else:
+                  print(f"Failed to create post. Status code: {response.status_code}, Response: {response.text}")
+                  sys.exit(1)
+          
+          # Main execution
+          if __name__ == "__main__":
+              import argparse
+              
+              parser = argparse.ArgumentParser(description='Create and send a Ghost newsletter')
+              parser.add_argument('--url', required=True, help='Ghost Admin API URL')
+              parser.add_argument('--key', required=True, help='Ghost Admin API Key')
+              parser.add_argument('--title', required=True, help='Newsletter title')
+              parser.add_argument('--intro', help='Optional introduction text (HTML)')
+              parser.add_argument('--puzzles', required=True, help='Path to puzzles HTML file')
+              parser.add_argument('--tags', help='Comma-separated list of tags')
+              parser.add_argument('--send-type', required=True, choices=['test', 'draft', 'live'], help='Type of send')
+              parser.add_argument('--test-email', help='Email address for test send')
+              
+              args = parser.parse_args()
+              
+              # Create newsletter content
+              print(f"Loading puzzles from: {args.puzzles}")
+              newsletter_html = create_newsletter_content(args.puzzles, args.title, args.intro)
+              
+              # Save a copy of the newsletter HTML for reference
+              with open("newsletter_content.html", "w", encoding="utf-8") as f:
+                  f.write(newsletter_html)
+              print("Saved newsletter content to newsletter_content.html")
+              
+              # Process tags
+              tags_list = args.tags.split(',') if args.tags else ["newsletter"]
+              
+              if args.send_type == 'test':
+                  if not args.test_email:
+                      print("Error: Test email address is required for test sends")
+                      sys.exit(1)
+                  
+                  print(f"Sending test email to: {args.test_email}")
+                  response = send_ghost_post(
+                      args.url, args.key, f"[TEST] {args.title}", newsletter_html,
+                      status="published", tags=tags_list, featured=False,
+                      email_segment=args.test_email
+                  )
+                  print("Test email sent successfully!")
+                  
+              elif args.send_type == 'draft':
+                  print("Creating draft (no emails will be sent)...")
+                  response = send_ghost_post(
+                      args.url, args.key, args.title, newsletter_html,
+                      status="draft", tags=tags_list, featured=False,
+                      email_segment="none"
+                  )
+                  print("Draft created successfully!")
+                  
+              elif args.send_type == 'live':
+                  print("Sending newsletter to all subscribers...")
+                  response = send_ghost_post(
+                      args.url, args.key, args.title, newsletter_html,
+                      status="published", tags=tags_list, featured=False,
+                      email_segment="all"
+                  )
+                  print("Newsletter sent successfully to all subscribers!")
+          EOF
+          
+          # Find puzzles.html in the repository
+          PUZZLES_PATH="./puzzles.html"
+          if [ ! -f "$PUZZLES_PATH" ]; then
+            # Try alternate locations
+            PUZZLES_PATH=$(find . -name "puzzles.html" | head -n 1)
+            if [ -z "$PUZZLES_PATH" ]; then
+              echo "Could not find puzzles.html in the repository"
+              exit 1
+            fi
+            echo "Found puzzles.html at $PUZZLES_PATH"
+          fi
+          
+          # Run the non-interactive script with appropriate parameters based on workflow input
+          python send_newsletter.py \
+            --url "$GHOST_API_URL" \
+            --key "$GHOST_ADMIN_KEY" \
+            --title "${{ github.event.inputs.title || 'Weekly Puzzle Newsletter' }}" \
+            --intro "${{ github.event.inputs.intro || '<p>Welcome to this week\'s puzzle collection!</p>' }}" \
+            --puzzles "$PUZZLES_PATH" \
+            --tags "newsletter,puzzles" \
+            --send-type "${{ github.event.inputs.send_type || 'test' }}" \
+            --test-email "$TEST_EMAIL"

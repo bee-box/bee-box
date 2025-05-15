@@ -335,7 +335,7 @@ def fetch_puzzle():
             if attempt == max_retries:
                 log("Maximum retry attempts reached")
                 try:
-                    from emailer import send_email_notification
+                    from archive.emailer import send_email_notification
                     log("Sending error notification email")
                     send_email_notification("❌ Spelling Bee Harvest Error", 
                                           f"Failed to fetch puzzle: {str(e)}")
