@@ -1,229 +1,346 @@
-/* ─── Load Custom Font ─── */
-@font-face {
-  font-family: 'Sorts Mill Goudy';
-  src: url('style/SortsMillGoudy-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-/* ─── Base Styling ─── */
+/* Combined CSS for grid with sheet header styles */
+/* Base Styling */
+html { scrollbar-gutter: stable; }
+
 body {
-  font-family: Georgia, Times, "Times New Roman", serif;
-  font-size: clamp(28px, 8vw, 36px);
-  padding: 20px;
-  background: #fafafa;
-  text-transform: uppercase;
-  color: #000;
+  margin: 0 auto;
+  padding: 1rem;
+  max-width: 1200px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #f5f5f5;
+  line-height: 1.6;
+  font-size: 16px; /* Base size for web */
 }
-/* ─── Banner Styling ─── */
-.banner {
+
+.section-box {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Navigation Styling */
+nav { padding-bottom: 1rem; }
+#navtitle { background: #FFDC00; }
+
+.nav-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background-color: #F8DA22;
-  padding: 12px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  min-height: 100px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
 }
-.left-section {
+
+.nav-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-right: 1rem;
+  min-width: 200px;
+}
+
+.nav-left h1 { margin: 0; font-size: 1.75rem; }
+.date-display { height: 1.25rem; color: #000; }
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+}
+
+.nav-right a, .nav-right button, .nav-right select {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  font-size: 0.875rem; /* Standardized */
+  padding: .25rem .5rem;
+  height: 30px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  text-align: left;
+  transition: background-color .2s, color .2s;
+  text-decoration: none;
+  border-radius: 4px;
 }
-.banner-title {
-  font-family: 'Sorts Mill Goudy', Georgia, Times, "Times New Roman", serif;
-  font-size: clamp(28px, 4vw, 36px);
-  letter-spacing: 0.05em;
-  text-transform: none;
+
+.nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
 }
-.banner-date {
-  font-size: clamp(16px, 2.5vw, 20px);
-  margin-top: 4px;
-  text-transform: none;
+
+select#dateSelector { min-width: 190px; max-width: 190px; }
+
+/* Loading States */
+.loading, .error { min-height: 12rem; }
+.fade-in { animation: fade .4s ease-in; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+footer {
+  padding-top: 1rem;
+  font-size: 0.875rem; /* Slightly smaller than base */
+  text-align: center;
+  color: #666;
 }
-/* ─── Right Section ─── */
-.right-section {
+
+.error { color: #d32f2f; text-align: center; }
+#headerContent p, #lettersContent p { margin: 0; text-align: center; }
+#headerContent p:not(:last-child), #lettersContent p:not(:last-child) { margin-bottom: 0.25rem; }
+
+/* ─── Hive SVG Styles ─── */
+/* Horizontal layout for header */
+.header-flex {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 1rem;
 }
-.banner button {
-  font-size: clamp(16px, 2.5vw, 20px);
-  padding: 8px 20px;
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #333;
-  border-radius: 999px;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease;
+
+.header-text {
+  flex: 1;
 }
-.banner button:hover {
-  background-color: #eee;
+
+.hive-container {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer; /* Make hive clickable */
 }
-select#dateSelector {
-  font-family: Georgia, Times, "Times New Roman", serif;
-  font-size: clamp(16px, 2.5vw, 20px);
-  padding: 8px 20px;
-  border: 1px solid #333;
-  border-radius: 999px;
-  background-color: #fff;
-  color: #333;
-  height: 40px;
-  text-transform: uppercase;
-  appearance: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+
+.hive-container:hover {
+  transform: scale(1.02); /* Slight enlarge on hover */
+  transition: transform 0.2s ease;
 }
-select#dateSelector:hover {
-  background-color: #eee;
+
+.hive-container svg {
+  max-width: 240px;
+  height: auto;
 }
-.banner-date,
-.letter-grid,
-.puzzle-summary,
-#gridTable,
-.two-letter-list {
-  min-height: 24px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+
+/* Make sure the text remains sharp and clear */
+.hive-container svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none; /* Prevent text selection */
 }
-.loaded .banner-date,
-.loaded .letter-grid,
-.loaded .puzzle-summary,
-.loaded #gridTable,
-.loaded .two-letter-list {
-  opacity: 1;
-}
-table {
-  margin-bottom: 20px;
+
+/* Grid Table Styles */
+#gridTable {
+  margin: 1rem 0;
+  width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
-  width: auto;
-  max-width: 100%;
+  border: 1px solid #ddd;
 }
-th, td {
-  border-bottom: 1px solid #ddd;
+
+#gridTable th,
+#gridTable td {
   padding: 8px 12px;
-  font-size: clamp(16px, 3vw, 22px);
   text-align: center;
+  border: 1px solid #ddd;
 }
-th {
-  border-bottom: 2px solid #000;
+
+/* Top-left cell with no top and left border */
+#gridTable tr:first-child th:first-child {
+  background-color: transparent;
+  border-top: none;
+  border-left: none;
+}
+
+#gridTable th {
+  background-color: #E6E6E6; /* Consistent gray for all headers */
   font-weight: bold;
 }
-tr:last-child td {
-  border-bottom: 2px solid #000;
+
+#gridTable tr:last-child {
   font-weight: bold;
 }
-tr td:last-child {
+
+#gridTable tr td:last-child {
   font-weight: bold;
 }
-.bee-header {
-  width: 40px;
-}
-.bee-icon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  display: inline-block;
-}
-.letter-grid {
-  font-size: clamp(18px, 3vw, 22px);
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-.letter-grid b {
-  font-weight: bold;
-}
-.puzzle-summary {
-  font-size: clamp(18px, 3vw, 22px);
-  font-weight: normal;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  letter-spacing: 0.03em;
-}
+
+/* Two letter list styles */
 .two-letter-list {
-  font-size: clamp(18px, 3vw, 22px);
+  font-size: 1rem;
   margin-top: 20px;
 }
+
 .two-letter-list strong {
-  text-transform: none;
   display: inline-block;
   margin-bottom: 10px;
-  font-weight: normal;
+  font-weight: bold;
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  width: 95%;
+  max-width: 540px;
+  min-height: 620px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content iframe {
+  flex: 1;
+  width: 100%;
+  height: 620px;
+  border: none;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #555;
+  z-index: 10001;
+}
+
+/* Number icons styling */
+.length-indicator {
+  display: inline-block;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  font-size: 1rem; /* Standardized */
+}
+
+.length-indicator.revealed {
+  color: #000000;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px; /* Base size for mobile */
+    padding: 0.5rem;
+  }
+  
+  .section-box {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nav-right {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  select#dateSelector {
+    min-width: 150px;
+    max-width: 150px;
+  }
+  
+  .header-flex {
+    flex-direction: column;
+  }
+  
+  .hive-container svg {
+    max-width: 200px;
+  }
+  
+  #gridTable th,
+  #gridTable td {
+    padding: 4px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .two-letter-list {
+    font-size: 0.9rem;
+  }
+}
+
+/* Print-specific styles */
 @media print {
   body {
-    background: #fff !important;
-    color: #000 !important;
+    font-size: 12px; /* Base size for print */
+    background: white !important;
+    padding: 0;
+    margin: 0;
   }
-  nav.banner {
-    all: unset;
-    display: block;
-    margin-bottom: 20px;
+  
+  #navtitle, footer, .modal-overlay {
+    display: none !important;
   }
-  .left-section {
-    all: unset;
-    display: block;
-    margin-bottom: 10px;
+  
+  .section-box {
+    box-shadow: none;
+    border: none;
+    padding: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+    page-break-inside: avoid;
   }
-  .banner-title {
-    font-family: 'Sorts Mill Goudy', Georgia, Times, "Times New Roman", serif;
-    font-size: 32px;
-    font-weight: normal;
-    letter-spacing: 0.05em;
-    text-align: left;
-    color: #000 !important;
-    margin-bottom: 2px;
+  
+  /* Keep the header in horizontal layout */
+  .header-flex {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem !important;
   }
-  .banner-date {
-    font-size: 20px;
-    text-align: left;
-    color: #000 !important;
+  
+  .header-text {
+    flex: 1;
   }
-  .right-section {
-    display: none;
+  
+  #headerContent p {
+    white-space: nowrap;
+    line-height: 1.1 !important;
+    margin-bottom: 0.15rem !important;
   }
-  table, th, td {
+  
+  .hive-container svg {
+    max-width: 180px !important;
+  }
+
+  #gridTable,
+  #gridTable th,
+  #gridTable td {
+    page-break-inside: avoid;
     background: #fff !important;
     color: #000 !important;
     border-color: #000 !important;
   }
-  .bee-icon {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
+  
+  /* Change yellow background to gray in print */
+  .hive-container svg polygon[fill="#F7DA21"] {
+    fill: #D0D0D0 !important; /* Medium gray instead of yellow */
   }
-}
-@media (max-width: 600px) {
-  .banner {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 12px 10px;
-  }
-  .left-section {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  .right-section {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .right-section select,
-  .right-section button {
-    flex: 1 1 48%;
-    min-width: 140px;
-  }
-  .banner-title {
-    font-size: 1.8rem;
-  }
-  .banner-date {
-    font-size: 1rem;
+  
+  /* Two-letter list for print */
+  .two-letter-list {
+    page-break-before: auto;
+    page-break-after: auto;
+    page-break-inside: avoid;
   }
 }
