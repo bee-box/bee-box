@@ -145,7 +145,16 @@ async function loadPuzzleData() {
 
     let selected;
     if (puzzleId && !date) {
-      selected = puzzles.find(p => p.id === puzzleId);
+      // Fixed: Use getAttribute("id") instead of .id property
+      selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
+      
+      // Debug logging to help troubleshoot if still not working
+      console.log("Looking for puzzleId:", puzzleId);
+      console.log("Available puzzle IDs:", puzzles.map(p => p.getAttribute("id")));
+      
+      if (!selected) {
+        console.log("No puzzle found with ID:", puzzleId);
+      }
     } else if (date && !puzzleId) {
       selected = puzzles.find(p => p.getAttribute("date") === date);
       if (selected === mostRecent) {

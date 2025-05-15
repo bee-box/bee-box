@@ -6,331 +6,616 @@
     <title>Newsletter Generator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
+            font-family: 'Arial', sans-serif;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f7f9fc;
             color: #333;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
         }
         h1 {
             color: #2c3e50;
-            text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
-        .puzzle-container {
-            background-color: #f9f9f9;
+        .layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .sidebar {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        .main-content {
+            flex: 3;
+            min-width: 300px;
+        }
+        .date-selector {
+            background-color: white;
             border-radius: 8px;
             padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .date-display {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .id-display {
+            font-size: 14px;
+            color: #95a5a6;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .links-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .links-container a {
+            text-decoration: none;
+            color: #3498db;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .links-container a:hover {
+            background-color: #eaf2f8;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .newsletter-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         .puzzle-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .letters-display {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            letter-spacing: 5px;
+        }
+        .center-letter {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 28px;
         }
         .error-message {
             color: #e74c3c;
             font-weight: bold;
             text-align: center;
-            padding: 20px;
-            background-color: #fce4e4;
-            border-radius: 8px;
-            margin-top: 20px;
+            padding: 15px;
+            background-color: #fde2e2;
+            border-radius: 4px;
+            margin-bottom: 15px;
         }
         .loading {
             text-align: center;
+            padding: 20px;
             font-style: italic;
             color: #7f8c8d;
         }
-        .date-selector {
-            margin: 20px 0;
-            text-align: center;
-        }
-        select {
-            padding: 8px 12px;
-            font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            background-color: white;
-            cursor: pointer;
-            min-width: 300px;
-        }
-        select:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-        }
-        .yes-indicator {
+        .success-message {
             color: #27ae60;
+            text-align: center;
+            padding: 15px;
+            background-color: #e8f8f5;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .words-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .word-item {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .word-points {
             font-weight: bold;
+            color: #27ae60;
         }
-        .no-indicator {
-            color: #e74c3c;
+        .pangram {
+            background-color: #fef9e7;
+            border-left: 3px solid #f1c40f;
         }
-        .code-box {
-            background-color: #f8f8f8;
+        .words-by-letter {
+            margin-top: 30px;
+        }
+        .letter-section {
+            margin-bottom: 20px;
+        }
+        .letter-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        #xml-config {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        #direct-xml-input {
+            width: 100%;
+            min-height: 100px;
+            font-family: monospace;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            padding: 15px;
-            margin: 20px 0;
-            font-family: monospace;
-            white-space: pre-wrap;
-            overflow-x: auto;
-            line-height: 1.4;
-            font-size: 14px;
-            color: #333;
+            margin-bottom: 10px;
         }
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .detail-item {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .words-list {
-            margin-top: 20px;
-        }
-        .words-list ul {
-            list-style-type: none;
-            padding: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        .words-list li {
-            background-color: #f0f0f0;
-            padding: 8px 12px;
-            border-radius: 4px;
-            border-left: 3px solid #3498db;
-        }
-        .words-list li.pangram {
-            background-color: #fdf2d0;
-            border-left: 3px solid #f39c12;
-        }
-        .pangram-tag {
-            background-color: #f39c12;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-left: 5px;
+        @media (max-width: 700px) {
+            .layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Newsletter Generator</h1>
-    
-    <div class="date-selector">
-        <label for="dateSelector">Select Newsletter Date: </label>
-        <select id="dateSelector">
-            <option value="">Loading dates...</option>
-        </select>
-    </div>
-    
-    <div id="puzzleContent" class="puzzle-container">
-        <p class="loading">Select a date to load newsletter data...</p>
-    </div>
-    
-    <div class="puzzle-container">
-        <h3>HTML Markup</h3>
-        <div class="code-box">&lt;html&gt;
-&lt;/html&gt;</div>
+    <header>
+        <h1>Newsletter Generator</h1>
+    </header>
+
+    <div id="message-container"></div>
+
+    <div class="layout">
+        <div class="sidebar">
+            <div class="date-selector">
+                <label for="date-select">Select a Date:</label>
+                <select id="date-select">
+                    <option value="">-- Select a date --</option>
+                </select>
+                
+                <div id="xml-config">
+                    <label for="xml-source">XML Source:</label>
+                    <select id="xml-source" style="margin-bottom: 15px;">
+                        <option value="file">XML File Path</option>
+                        <option value="direct">Direct XML Input</option>
+                    </select>
+                    
+                    <div id="file-input-container">
+                        <label for="xml-path">XML File Path:</label>
+                        <input type="text" id="xml-path" value="xml/puzzles.xml">
+                    </div>
+                    
+                    <div id="direct-input-container" style="display: none;">
+                        <label for="direct-xml-input">Paste XML Content:</label>
+                        <textarea id="direct-xml-input" placeholder="Paste your XML content here..."></textarea>
+                    </div>
+                    
+                    <button id="load-xml">Load XML</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="date-display" class="date-display"></div>
+            <div id="short-date-display" class="id-display"></div>
+            <div id="id-display" class="id-display"></div>
+            <div id="links-container" class="links-container"></div>
+            <div id="newsletter-container" class="newsletter-container">
+                <div class="loading">Please select a date or load XML</div>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const dateSelect = document.getElementById('date-select');
+            const dateDisplay = document.getElementById('date-display');
+            const shortDateDisplay = document.getElementById('short-date-display');
+            const idDisplay = document.getElementById('id-display');
+            const linksContainer = document.getElementById('links-container');
+            const newsletterContainer = document.getElementById('newsletter-container');
+            const messageContainer = document.getElementById('message-container');
+            const xmlSourceSelect = document.getElementById('xml-source');
+            const fileInputContainer = document.getElementById('file-input-container');
+            const directInputContainer = document.getElementById('direct-input-container');
+            const xmlPathInput = document.getElementById('xml-path');
+            const directXmlInput = document.getElementById('direct-xml-input');
+            const loadXmlButton = document.getElementById('load-xml');
+            
+            // Initial variables
             const urlParams = new URLSearchParams(window.location.search);
-            let puzzleId = urlParams.get('puzzleid');
-            const dateSelector = document.getElementById('dateSelector');
-            const puzzleContent = document.getElementById('puzzleContent');
+            const date = urlParams.get('date');
+            let xmlSource = 'file';
+            let xmlContent = null;
             
-            // If no puzzleId exists in URL, use default
-            if (!puzzleId) {
-                // Use default puzzle ID for today (May 15, 2025)
-                puzzleId = "20250515-694539";
-                console.log("No puzzle ID provided, using default: " + puzzleId);
+            // Automatically load XML on page load
+            loadXmlData();
+            
+            // Show message function
+            function showMessage(message, type = 'error') {
+                messageContainer.innerHTML = `<div class="${type}-message">${message}</div>`;
+                setTimeout(() => {
+                    messageContainer.innerHTML = '';
+                }, 5000);
             }
             
-            // Function to format date for display
-            function formatDate(dateStr) {
-                const dateObj = new Date(dateStr);
-                return dateObj.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
-            
-            // Function to display puzzle content
-            function displayPuzzle(puzzle) {
-                if (!puzzle) {
-                    puzzleContent.innerHTML = `<div class="error-message">
-                        No newsletter found with the selected ID.
-                    </div>`;
-                    return;
+            // Toggle XML source input based on selection
+            xmlSourceSelect.addEventListener('change', function() {
+                xmlSource = this.value;
+                if (xmlSource === 'file') {
+                    fileInputContainer.style.display = 'block';
+                    directInputContainer.style.display = 'none';
+                } else {
+                    fileInputContainer.style.display = 'none';
+                    directInputContainer.style.display = 'block';
                 }
-                
-                const puzzleDate = puzzle.getAttribute('date');
-                const puzzleId = puzzle.getAttribute('id');
-                const formattedDate = formatDate(puzzleDate);
-                
-                // Check if puzzle has word values
-                const hasWordValues = puzzle.getElementsByTagName('word').length > 0;
-                
-                // Extract puzzle attributes
-                const count = puzzle.getAttribute('count') || 'N/A';
-                const letters = puzzle.getAttribute('letters') || 'N/A';
-                const pangrams = puzzle.getAttribute('pangrams') || 'N/A';
-                const perfectPangrams = puzzle.getAttribute('perfectpangrams') || 'N/A';
-                const queenBee = puzzle.getAttribute('queenbee') || 'N/A';
-                
-                // Get all available words if they exist
-                let wordsList = '';
-                const words = puzzle.getElementsByTagName('word');
-                if (words.length > 0) {
-                    wordsList = '<div class="words-list"><h4>Words in this Puzzle:</h4><ul>';
-                    for (let i = 0; i < words.length; i++) {
-                        const word = words[i];
-                        const wordText = word.textContent;
-                        const points = word.getAttribute('points') || '-';
-                        const isPangram = word.getAttribute('pangram') === 'yes';
+            });
+            
+            // Load XML button click event
+            loadXmlButton.addEventListener('click', loadXmlData);
+            
+            // Date select change event
+            dateSelect.addEventListener('change', function() {
+                const selectedDate = this.value;
+                if (selectedDate) {
+                    // Update URL
+                    const url = new URL(window.location);
+                    url.searchParams.set('date', selectedDate);
+                    window.history.pushState({}, '', url);
+                    
+                    // Format and display date
+                    try {
+                        // Parse date components (format is YYYY-MM-DD)
+                        const [year, month, day] = selectedDate.split('-').map(num => parseInt(num, 10));
+                        // JavaScript months are 0-indexed (0 = January)
+                        const dateObj = new Date(year, month - 1, day);
                         
-                        wordsList += `<li class="${isPangram ? 'pangram' : ''}">
-                            <strong>${wordText}</strong> - ${points} points
-                            ${isPangram ? ' <span class="pangram-tag">Pangram</span>' : ''}
-                        </li>`;
+                        const formattedDate = dateObj.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        dateDisplay.textContent = formattedDate;
+                    } catch (e) {
+                        console.error("Error formatting date:", e);
+                        dateDisplay.textContent = `Date: ${selectedDate}`;
                     }
-                    wordsList += '</ul></div>';
+                    
+                    // Clear the ID display and links
+                    shortDateDisplay.textContent = '';
+                    idDisplay.textContent = '';
+                    linksContainer.innerHTML = '';
+                    
+                    // Load puzzle for selected date
+                    loadPuzzleForDate(selectedDate);
+                } else {
+                    dateDisplay.textContent = 'No date selected';
+                    shortDateDisplay.textContent = '';
+                    idDisplay.textContent = '';
+                    linksContainer.innerHTML = '';
+                    newsletterContainer.innerHTML = '<div class="loading">Select a date to view puzzle</div>';
+                    
+                    // Remove date from URL
+                    const url = new URL(window.location);
+                    url.searchParams.delete('date');
+                    window.history.pushState({}, '', url);
                 }
-                
-                puzzleContent.innerHTML = `
-                    <div class="puzzle-info">
-                        <div>
-                            <strong>Newsletter ID:</strong> ${puzzleId}
-                        </div>
-                        <div>
-                            <strong>Date:</strong> ${formattedDate}
-                        </div>
-                    </div>
-                    
-                    <div class="puzzle-details">
-                        <h3>Puzzle Details</h3>
-                        <div class="details-grid">
-                            <div class="detail-item">
-                                <strong>Letters:</strong> ${letters}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Word Count:</strong> ${count}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Pangrams:</strong> ${pangrams}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Perfect Pangrams:</strong> ${perfectPangrams}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Queen Bee Score:</strong> ${queenBee}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Has Word Values:</strong> 
-                                <span class="${hasWordValues ? 'yes-indicator' : 'no-indicator'}">
-                                    ${hasWordValues ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${wordsList}
-                `;
-            }
+            });
             
-            // Fetch the XML file and populate dropdown
-            fetch('xml/puzzles.xml')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('XML file not found. Please make sure xml/puzzles.xml exists.');
+            // Function to load XML data from selected source
+            async function loadXmlData() {
+                try {
+                    messageContainer.innerHTML = '';
+                    dateSelect.innerHTML = '<option value="">-- Select a date --</option>';
+                    newsletterContainer.innerHTML = '<div class="loading">Loading XML data...</div>';
+                    dateDisplay.textContent = '';
+                    shortDateDisplay.textContent = '';
+                    idDisplay.textContent = '';
+                    linksContainer.innerHTML = '';
+                    
+                    // Get XML content based on selected source
+                    if (xmlSource === 'file') {
+                        const xmlPath = xmlPathInput.value.trim();
+                        if (!xmlPath) {
+                            throw new Error('Please enter a valid XML file path');
+                        }
+                        
+                        const response = await fetch(xmlPath);
+                        if (!response.ok) {
+                            throw new Error(`Failed to load XML file. Status: ${response.status}`);
+                        }
+                        
+                        xmlContent = await response.text();
+                    } else {
+                        xmlContent = directXmlInput.value.trim();
+                        if (!xmlContent) {
+                            throw new Error('Please enter valid XML content');
+                        }
                     }
-                    return response.text();
-                })
-                .then(xmlString => {
+                    
                     // Parse XML
                     const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+                    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+                    
+                    // Check for parsing errors
+                    const parseError = xmlDoc.getElementsByTagName('parsererror');
+                    if (parseError.length > 0) {
+                        throw new Error('XML parsing error: Invalid XML format');
+                    }
+                    
+                    // Get puzzles
+                    const puzzles = xmlDoc.getElementsByTagName('puzzle');
+                    
+                    if (puzzles.length === 0) {
+                        throw new Error('No puzzles found in the XML data');
+                    }
+                    
+                    showMessage(`Successfully loaded ${puzzles.length} puzzles`, 'success');
+                    
+                    // Extract and sort dates (newest first)
+                    const dates = [];
+                    for (let i = 0; i < puzzles.length; i++) {
+                        const puzzleDate = puzzles[i].getAttribute('date');
+                        if (puzzleDate) {
+                            dates.push(puzzleDate);
+                        }
+                    }
+                    
+                    // Sort dates in reverse order (newest first)
+                    dates.sort().reverse();
+                    
+                    // Populate date select
+                    for (const dateStr of dates) {
+                        const option = document.createElement('option');
+                        option.value = dateStr;
+                        option.textContent = dateStr;
+                        dateSelect.appendChild(option);
+                    }
+                    
+                    // Find today's date or closest date
+                    if (dates.length > 0) {
+                        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+                        
+                        // Check if date from URL param exists in our dates
+                        let selectedDate = date && dates.includes(date) ? date : null;
+                        
+                        // If no valid URL param, try to find today's date
+                        if (!selectedDate) {
+                            if (dates.includes(today)) {
+                                // Today's puzzle is available
+                                selectedDate = today;
+                            } else {
+                                // Find closest date (first future date or most recent past date)
+                                // Since dates are sorted newest first, we can find the first date that's <= today
+                                selectedDate = dates.find(d => d <= today) || dates[0];
+                            }
+                        }
+                        
+                        dateSelect.value = selectedDate;
+                        dateSelect.dispatchEvent(new Event('change'));
+                    } else {
+                        newsletterContainer.innerHTML = '<div class="loading">No valid dates found in XML</div>';
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading XML:', error);
+                    showMessage(`Error: ${error.message}`);
+                    newsletterContainer.innerHTML = `<div class="error-message">${error.message}</div>`;
+                }
+            }
+            
+            // Function to load puzzle for a selected date
+            function loadPuzzleForDate(selectedDate) {
+                try {
+                    if (!xmlContent) {
+                        newsletterContainer.innerHTML = '<div class="loading">Please load XML data first</div>';
+                        return;
+                    }
+                    
+                    newsletterContainer.innerHTML = '<div class="loading">Loading puzzle data...</div>';
+                    
+                    // Parse XML content
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
                     
                     // Get all puzzles
                     const puzzles = xmlDoc.getElementsByTagName('puzzle');
+                    let puzzleFound = false;
                     
-                    // Clear loading option
-                    dateSelector.innerHTML = '';
-                    
-                    // Add option for each puzzle date
+                    // Find puzzle for selected date
                     for (let i = 0; i < puzzles.length; i++) {
                         const puzzle = puzzles[i];
-                        const puzzleDate = puzzle.getAttribute('date');
-                        const currentId = puzzle.getAttribute('id');
-                        const formattedDate = formatDate(puzzleDate);
-                        const hasWordValues = puzzle.getElementsByTagName('word').length > 0;
-                        
-                        const option = document.createElement('option');
-                        option.value = currentId;
-                        option.textContent = `${formattedDate} - Has Words: ${hasWordValues ? 'Yes' : 'No'}`;
-                        
-                        // Select current puzzle ID
-                        if (currentId === puzzleId) {
-                            option.selected = true;
-                        }
-                        
-                        dateSelector.appendChild(option);
-                    }
-                    
-                    // If no options added (empty XML), show message
-                    if (dateSelector.options.length === 0) {
-                        const option = document.createElement('option');
-                        option.value = "";
-                        option.textContent = "No dates available in XML";
-                        dateSelector.appendChild(option);
-                    }
-                    
-                    // Find and display the current puzzle
-                    let foundPuzzle = null;
-                    for (let i = 0; i < puzzles.length; i++) {
-                        if (puzzles[i].getAttribute('id') === puzzleId) {
-                            foundPuzzle = puzzles[i];
+                        if (puzzle.getAttribute('date') === selectedDate) {
+                            puzzleFound = true;
+                            
+                            // Extract puzzle attributes
+                            const letters = puzzle.getAttribute('letters') || '';
+                            const letter1 = puzzle.getAttribute('letter1') || '';
+                            const wordCount = puzzle.getAttribute('count') || '0';
+                            const pangramCount = puzzle.getAttribute('pangrams') || '0';
+                            const perfectPangramCount = puzzle.getAttribute('perfectpangrams') || '0';
+                            const queenBee = puzzle.getAttribute('queenbee') || '0';
+                            const bingo = puzzle.getAttribute('bingo') || '';
+                            const puzzleId = puzzle.getAttribute('id') || ''; // Get the puzzle ID
+                            
+                            // Display short date under the formatted date
+                            shortDateDisplay.textContent = selectedDate;
+                            
+                            // Display puzzle ID under the short date
+                            if (puzzleId) {
+                                idDisplay.textContent = `ID: ${puzzleId}`;
+                                
+                                // Create links
+                                linksContainer.innerHTML = `
+                                    <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=${puzzleId}" target="_blank">Sheet</a>
+                                    <a href="https://bee-box.github.io/bee-box/grid.html?puzzleid=${puzzleId}" target="_blank">Grid</a>
+                                    <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=${puzzleId}" target="_blank">Jumble</a>
+                                    <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=${puzzleId}" target="_blank">Peek</a>
+                                `;
+                            } else {
+                                idDisplay.textContent = '';
+                                linksContainer.innerHTML = '';
+                            }
+                            
+                            // Get all words
+                            const wordElements = puzzle.getElementsByTagName('word');
+                            
+                            if (wordElements.length === 0) {
+                                newsletterContainer.innerHTML = '<div class="error-message">No words found for this puzzle</div>';
+                                return;
+                            }
+                            
+                            const words = Array.from(wordElements).map(wordEl => {
+                                return {
+                                    text: wordEl.textContent,
+                                    length: wordEl.getAttribute('length'),
+                                    first: wordEl.getAttribute('first'),
+                                    firsttwo: wordEl.getAttribute('firsttwo'),
+                                    points: wordEl.getAttribute('points'),
+                                    pangram: wordEl.getAttribute('pangram') === 'yes'
+                                };
+                            });
+                            
+                            // Sort words by first letter
+                            const wordsByLetter = {};
+                            words.forEach(word => {
+                                const firstLetter = word.first;
+                                if (!wordsByLetter[firstLetter]) {
+                                    wordsByLetter[firstLetter] = [];
+                                }
+                                wordsByLetter[firstLetter].push(word);
+                            });
+                            
+                            // Create HTML for puzzle display
+                            let puzzleHTML = `
+                                <div class="puzzle-info">
+                                    <div style="text-align: center; margin-bottom: 5px; font-weight: bold;">Today's letters are:</div>
+                                    <div class="letters-display">
+                                        ${Array.from(letters).map(letter => 
+                                            letter === letter1 ? 
+                                            `<span class="center-letter">${letter}</span>` : 
+                                            letter
+                                        ).join(' ')}
+                                    </div>
+                                    <div class="stats">
+                                        <div class="stat-item">Words: ${wordCount}</div>
+                                        <div class="stat-item">Pangrams: ${pangramCount}</div>
+                                        <div class="stat-item">Perfect Pangrams: ${perfectPangramCount}</div>
+                                        <div class="stat-item">Queen Bee Score: ${queenBee}</div>
+                                        ${bingo ? `<div class="stat-item">Bingo: ${bingo}</div>` : ''}
+                                    </div>
+                                    <button id="toggle-view" class="toggle-button">Show All Words</button>
+                                </div>
+                                
+                                <div id="words-by-letter" class="words-by-letter" style="display: none;">
+                                    ${Object.keys(wordsByLetter).sort().map(letter => `
+                                        <div class="letter-section">
+                                            <div class="letter-header">${letter}</div>
+                                            <div class="words-container">
+                                                ${wordsByLetter[letter].map(word => `
+                                                    <div class="word-item ${word.pangram ? 'pangram' : ''}">
+                                                        <span>${word.text}</span>
+                                                        <span class="word-points">${word.points}</span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `;
+                            
+                            newsletterContainer.innerHTML = puzzleHTML;
+                            
+                            // Add toggle functionality
+                            document.getElementById('toggle-view').addEventListener('click', function() {
+                                const wordsContainer = document.getElementById('words-by-letter');
+                                const isVisible = wordsContainer.style.display !== 'none';
+                                wordsContainer.style.display = isVisible ? 'none' : 'block';
+                                this.textContent = isVisible ? 'Show All Words' : 'Hide Words';
+                            });
+                            
                             break;
                         }
                     }
                     
-                    displayPuzzle(foundPuzzle);
-                })
-                .catch(error => {
-                    puzzleContent.innerHTML = `<div class="error-message">
-                        Error loading newsletter data: ${error.message}
-                    </div>`;
+                    if (!puzzleFound) {
+                        newsletterContainer.innerHTML = `<div class="error-message">No puzzle found for date: ${selectedDate}</div>`;
+                    }
                     
-                    // Add error option to dropdown
-                    dateSelector.innerHTML = '';
-                    const option = document.createElement('option');
-                    option.value = "";
-                    option.textContent = "Error loading dates";
-                    dateSelector.appendChild(option);
-                });
-            
-            // Handle dropdown change
-            dateSelector.addEventListener('change', function() {
-                const selectedId = this.value;
-                if (selectedId) {
-                    // Change URL and reload page
-                    window.location.href = `?puzzleid=${selectedId}`;
+                } catch (error) {
+                    console.error('Error loading puzzle:', error);
+                    newsletterContainer.innerHTML = `<div class="error-message">Error loading puzzle: ${error.message}</div>`;
                 }
-            });
+            }
+            
+            // Initial load if URL has date parameter
+            if (date) {
+                loadXmlData();
+            }
         });
     </script>
 </body>
