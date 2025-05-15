@@ -122,6 +122,15 @@
             font-size: 12px;
             margin-left: 5px;
         }
+        .puzzle-image {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .puzzle-image img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
@@ -138,25 +147,12 @@
         <p class="loading">Select a date to load newsletter data...</p>
     </div>
     
-    <div class="puzzle-container">
-        <h3>HTML Markup</h3>
-        <div class="code-box">&lt;html&gt;
-&lt;/html&gt;</div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            let puzzleId = urlParams.get('puzzleid');
+            let selectedDate = urlParams.get('date');
             const dateSelector = document.getElementById('dateSelector');
             const puzzleContent = document.getElementById('puzzleContent');
-            
-            // If no puzzleId exists in URL, use default
-            if (!puzzleId) {
-                // Use default puzzle ID for today (May 15, 2025)
-                puzzleId = "20250515-694539";
-                console.log("No puzzle ID provided, using default: " + puzzleId);
-            }
             
             // Function to format date for display
             function formatDate(dateStr) {
@@ -169,36 +165,66 @@
                 });
             }
             
+            // Function to get month and day from date string for image URL
+            function getMonthDayForImage(dateStr) {
+                const dateObj = new Date(dateStr);
+                // Format month and day with leading zeros
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                return { month, day };
+            }
+            
             // Function to display puzzle content
             function displayPuzzle(puzzle) {
                 if (!puzzle) {
                     puzzleContent.innerHTML = `<div class="error-message">
-                        No newsletter found with the selected ID.
+                        No newsletter found with the selected date.
                     </div>`;
                     return;
                 }
+                
+                // Log puzzle for debugging
+                console.log("Displaying puzzle:", puzzle);
                 
                 const puzzleDate = puzzle.getAttribute('date');
                 const puzzleId = puzzle.getAttribute('id');
                 const formattedDate = formatDate(puzzleDate);
                 
-                // Check if puzzle has word values
-                const hasWordValues = puzzle.getElementsByTagName('word').length > 0;
+                // Get month and day for image URL
+                const { month, day } = getMonthDayForImage(puzzleDate);
+                const imageUrl = `https://bee-box.github.io/bee-box/images/${month}-${day}.png`;
                 
                 // Extract puzzle attributes
-                const count = puzzle.getAttribute('count') || 'N/A';
+                const countStr = puzzle.getAttribute('count') || '0';
+                
+                // Parse count as integer
+                let count = 0;
+                try {
+                    // Remove any non-numeric characters except decimal points
+                    const cleanCountStr = countStr.replace(/[^0-9.]/g, '');
+                    count = cleanCountStr ? parseInt(cleanCountStr) : 0;
+                } catch (e) {
+                    console.warn(`Error parsing count for puzzle ${puzzleId}: ${e}`);
+                    count = 0;
+                }
+                
                 const letters = puzzle.getAttribute('letters') || 'N/A';
                 const pangrams = puzzle.getAttribute('pangrams') || 'N/A';
                 const perfectPangrams = puzzle.getAttribute('perfectpangrams') || 'N/A';
                 const queenBee = puzzle.getAttribute('queenbee') || 'N/A';
                 
+                // A puzzle has words if count is 1 or greater
+                const hasWords = count >= 1;
+                
                 // Get all available words if they exist
+                const wordElements = puzzle.getElementsByTagName('word');
+                console.log("Word elements found:", wordElements.length);
+                
                 let wordsList = '';
-                const words = puzzle.getElementsByTagName('word');
-                if (words.length > 0) {
+                if (wordElements.length > 0) {
                     wordsList = '<div class="words-list"><h4>Words in this Puzzle:</h4><ul>';
-                    for (let i = 0; i < words.length; i++) {
-                        const word = words[i];
+                    for (let i = 0; i < wordElements.length; i++) {
+                        const word = wordElements[i];
                         const wordText = word.textContent;
                         const points = word.getAttribute('points') || '-';
                         const isPangram = word.getAttribute('pangram') === 'yes';
@@ -209,6 +235,13 @@
                         </li>`;
                     }
                     wordsList += '</ul></div>';
+                } else if (hasWords) {
+                    wordsList = `<div class="words-list">
+                        <p>This puzzle has ${count} words:</p>
+                        <p><strong>Letters:</strong> ${letters}</p>
+                        <p><strong>Pangrams:</strong> ${pangrams}</p>
+                        <p>Note: Individual words are not listed in the data.</p>
+                    </div>`;
                 }
                 
                 puzzleContent.innerHTML = `
@@ -219,6 +252,11 @@
                         <div>
                             <strong>Date:</strong> ${formattedDate}
                         </div>
+                    </div>
+                    
+                    <div class="puzzle-image">
+                        <img src="${imageUrl}" alt="Puzzle image for ${month}-${day}" 
+                            onerror="this.onerror=null; this.src='https://bee-box.github.io/bee-box/images/placeholder.png'; this.alt='Image not available';">
                     </div>
                     
                     <div class="puzzle-details">
@@ -240,9 +278,9 @@
                                 <strong>Queen Bee Score:</strong> ${queenBee}
                             </div>
                             <div class="detail-item">
-                                <strong>Has Word Values:</strong> 
-                                <span class="${hasWordValues ? 'yes-indicator' : 'no-indicator'}">
-                                    ${hasWordValues ? 'Yes' : 'No'}
+                                <strong>Has Words:</strong> 
+                                <span class="${hasWords ? 'yes-indicator' : 'no-indicator'}">
+                                    ${hasWords ? 'Yes' : 'No'}
                                 </span>
                             </div>
                         </div>
@@ -261,30 +299,51 @@
                     return response.text();
                 })
                 .then(xmlString => {
+                    console.log("XML loaded, parsing...");
+                    
                     // Parse XML
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
                     
+                    // Check for parsing errors
+                    const parseError = xmlDoc.getElementsByTagName('parsererror');
+                    if (parseError.length > 0) {
+                        console.error("XML parsing error:", parseError[0].textContent);
+                        throw new Error("XML parsing error");
+                    }
+                    
                     // Get all puzzles
                     const puzzles = xmlDoc.getElementsByTagName('puzzle');
+                    console.log("Total puzzles found:", puzzles.length);
+                    
+                    // Sort puzzles by date (most recent first)
+                    const sortedPuzzles = Array.from(puzzles).sort((a, b) => {
+                        const dateA = new Date(a.getAttribute('date'));
+                        const dateB = new Date(b.getAttribute('date'));
+                        return dateB - dateA;
+                    });
+                    
+                    // If no date exists in URL, use the most recent puzzle
+                    if (!selectedDate && sortedPuzzles.length > 0) {
+                        selectedDate = sortedPuzzles[0].getAttribute('date');
+                        console.log("No date provided, using most recent puzzle: " + selectedDate);
+                    }
                     
                     // Clear loading option
                     dateSelector.innerHTML = '';
                     
                     // Add option for each puzzle date
-                    for (let i = 0; i < puzzles.length; i++) {
-                        const puzzle = puzzles[i];
+                    for (let i = 0; i < sortedPuzzles.length; i++) {
+                        const puzzle = sortedPuzzles[i];
                         const puzzleDate = puzzle.getAttribute('date');
-                        const currentId = puzzle.getAttribute('id');
                         const formattedDate = formatDate(puzzleDate);
-                        const hasWordValues = puzzle.getElementsByTagName('word').length > 0;
                         
                         const option = document.createElement('option');
-                        option.value = currentId;
-                        option.textContent = `${formattedDate} - Has Words: ${hasWordValues ? 'Yes' : 'No'}`;
+                        option.value = puzzleDate;
+                        option.textContent = formattedDate;
                         
-                        // Select current puzzle ID
-                        if (currentId === puzzleId) {
+                        // Select current date
+                        if (puzzleDate === selectedDate) {
                             option.selected = true;
                         }
                         
@@ -302,7 +361,7 @@
                     // Find and display the current puzzle
                     let foundPuzzle = null;
                     for (let i = 0; i < puzzles.length; i++) {
-                        if (puzzles[i].getAttribute('id') === puzzleId) {
+                        if (puzzles[i].getAttribute('date') === selectedDate) {
                             foundPuzzle = puzzles[i];
                             break;
                         }
@@ -325,10 +384,10 @@
             
             // Handle dropdown change
             dateSelector.addEventListener('change', function() {
-                const selectedId = this.value;
-                if (selectedId) {
+                const selectedDate = this.value;
+                if (selectedDate) {
                     // Change URL and reload page
-                    window.location.href = `?puzzleid=${selectedId}`;
+                    window.location.href = `?date=${selectedDate}`;
                 }
             });
         });
