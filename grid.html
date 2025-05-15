@@ -1,373 +1,372 @@
-/* Combined CSS for grid with sheet header styles */
-/* ─── Base Styling from grid.css ─── */
-/* Load Custom Font */
-@font-face {
-  font-family: 'Sorts Mill Goudy';
-  src: url('style/SortsMillGoudy-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title id="pageTitle">Loading...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Cache prevention meta tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="style/grid.css">
+  <link rel="icon" href="style/bee.ico" type="image/x-icon" />
+</head>
+<body>
+
+<nav id="navtitle" class="section-box">
+  <div class="nav-container">
+    <div class="nav-left">
+      <h1 id="toolNameHeading">Bee Grid</h1>
+      <div id="navtitleContent" class="date-display"></div>
+    </div>
+    <div class="nav-right" id="navControls">
+      <select id="dateSelector"><option value="">Choose a Day</option></select>
+      <button id="printButton">Print</button>
+      <a href="https://beebox.ghost.io" target="_blank">Home</a>
+      <a href="#" id="subscribePopupBtn" onclick="openSubscribeModal(); return false;">Subscribe</a>
+    </div>
+  </div>
+</nav>
+
+<section id="header" class="section-box">
+  <div id="headerContent" class="loading">Loading...</div>
+</section>
+
+<section id="tool" class="section-box">
+  <div id="toolContent" class="loading">
+    <table id="gridTable"><thead></thead><tbody></tbody></table>
+  </div>
+</section>
+
+<section id="twoletter" class="section-box">
+  <div class="two-letter-list" id="twoLetterList"></div>
+</section>
+
+<footer class="section-box">
+  <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
+</footer>
+
+<div class="modal-overlay" id="subscribeOverlay">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeSubscribeModal()">&times;</button>
+    <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
+  </div>
+</div>
+
+<script>
+const toolName = "Bee Grid";
+
+// Number icons for length indicators
+const numIcons = {
+  1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
+  11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
+};
+
+const invertedNumIcons = {
+  1: "❶", 2: "❷", 3: "❸", 4: "❹", 5: "❺", 6: "❻", 7: "❼", 8: "❽", 9: "❾", 10: "❿",
+  11: "⓫", 12: "⓬", 13: "⓭", 14: "⓮", 15: "⓯", 16: "⓰", 17: "⓱", 18: "⓲", 19: "⓳", 20: "⓴"
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pageTitle').textContent = toolName;
+  document.getElementById('toolNameHeading').textContent = toolName;
+  setupEventListeners();
+  loadPuzzleData();
+});
+
+function openSubscribeModal() {
+  document.getElementById('subscribeOverlay').style.display = 'flex';
+}
+function closeSubscribeModal() {
+  document.getElementById('subscribeOverlay').style.display = 'none';
 }
 
-body {
-  margin: 0 auto;
-  padding: 1rem;
-  max-width: 1200px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f5f5f5;
-  line-height: 1.6;
-  font-size: 16px; /* Base size for web */
+function setupEventListeners() {
+  document.getElementById('dateSelector').addEventListener('change', e => {
+    const d = e.target.value;
+    if (d) {
+      const u = new URL(window.location);
+      u.searchParams.set('date', d);
+      u.searchParams.delete('puzzleid');
+      window.location.href = u.toString();
+    }
+  });
+
+  document.getElementById('printButton').addEventListener('click', () => {
+    window.print();
+  });
 }
 
-.section-box {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-nav { padding-bottom: 1rem; }
-#navtitle { background: #FFDC00; }
-
-.nav-container {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.nav-left {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-right: 1rem;
-  min-width: 200px;
-}
-
-.nav-left h1 { margin: 0; font-size: 1.75rem; }
-.date-display { height: 1.25rem; color: #000; }
-
-.nav-right {
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  align-items: center;
-}
-
-.nav-right a, .nav-right button, .nav-right select {
-  background: #fff;
-  color: #000;
-  border: 1px solid #000;
-  font-size: 0.875rem; /* Standardized */
-  padding: .25rem .5rem;
-  height: 30px;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color .2s, color .2s;
-  text-decoration: none;
-  border-radius: 4px;
-}
-
-.nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
-  background: #000;
-  color: #fff;
-  border-color: #000;
-}
-
-select#dateSelector { min-width: 190px; max-width: 190px; }
-
-#toolContent.loading, #toolContent.error, 
-#headerContent.loading, #headerContent.error,
-#lettersContent.loading, #lettersContent.error { 
-  min-height: 12rem; 
-}
-
-footer {
-  padding-top: 1rem;
-  font-size: 0.875rem; /* Slightly smaller than base */
-  text-align: center;
-  color: #666;
-}
-
-.error { color: #d32f2f; text-align: center; }
-#headerContent p, #lettersContent p { margin: 0; text-align: center; }
-#headerContent p:not(:last-child), #lettersContent p:not(:last-child) { margin-bottom: 0.25rem; }
-
-/* ─── Table Styles ─── */
-table {
-  margin-bottom: 20px;
-  border-collapse: collapse;
-  background-color: #fff;
-  width: 100%;
-}
-
-th, td {
-  border-bottom: 1px solid #ddd;
-  padding: 8px 12px;
-  font-size: 1rem;
-  text-align: center;
-}
-
-th {
-  border-bottom: 2px solid #000;
-  font-weight: bold;
-}
-
-tr:last-child td {
-  border-bottom: 2px solid #000;
-  font-weight: bold;
-}
-
-tr td:last-child {
-  font-weight: bold;
-}
-
-/* ─── Unified table styles for Letters Table ─── */
-.bee-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
-
-.bee-table td {
-  width: 14.28%;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  vertical-align: middle;
-  background-color: #fff;
-}
-
-/* ─── Letters Table ─── */
-.letters-table {
-  margin-bottom: 0.5rem;
-}
-
-.letters-table td {
-  text-align: center;
-  height: 25px;
-  padding: 2px;
-}
-
-.letters-table .wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.letters-table .char {
-  font-size: 1rem; /* Standardized */
-  line-height: 1;
-}
-
-.letters-table .char.bold {
-  font-weight: 700;
-}
-
-.letters-table .count {
-  font-size: 1rem; /* Standardized */
-  margin-left: 2px;
-  line-height: 1;
-  color: #666;
-}
-
-/* Special styling for center letter */
-.letters-table .center-letter {
-  background-color: #FFF8E1;
-}
-
-/* ─── Add Hive SVG Styles from sheet.css ─── */
-/* Horizontal layout for header */
-.header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.header-text {
-  flex: 1;
-}
-
-.hive-container {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-  flex-shrink: 0;
-  cursor: pointer; /* Make hive clickable */
-}
-
-.hive-container:hover {
-  transform: scale(1.02); /* Slight enlarge on hover */
-  transition: transform 0.2s ease;
-}
-
-.hive-container svg {
-  max-width: 240px;
-  height: auto;
-}
-
-/* Make sure the text remains sharp and clear */
-.hive-container svg text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  user-select: none; /* Prevent text selection */
-}
-
-/* Two letter list styles */
-.two-letter-list {
-  font-size: 1rem;
-  margin-top: 20px;
-}
-
-.two-letter-list strong {
-  display: inline-block;
-  margin-bottom: 10px;
-  font-weight: normal;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.modal-content {
-  background: white;
-  width: 95%;
-  max-width: 540px;
-  min-height: 620px;
-  border-radius: 8px;
-  position: relative;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-content iframe {
-  flex: 1;
-  width: 100%;
-  height: 620px;
-  border: none;
-}
-
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #555;
-  z-index: 10001;
-}
-
-/* Media query for mobile devices */
-@media (max-width: 768px) {
-  body {
-    font-size: 14px; /* Base size for mobile */
-    padding: 0.5rem;
-  }
+async function loadPuzzleData() {
+  const headerContent = document.getElementById('headerContent');
+  const toolContent = document.getElementById('toolContent');
   
-  .section-box {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .nav-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .nav-right {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  select#dateSelector {
-    min-width: 150px;
-    max-width: 150px;
-  }
-  
-  .header-flex {
-    flex-direction: column;
-  }
-  
-  .hive-container svg {
-    max-width: 200px;
-  }
-  
-  th, td {
-    padding: 4px 8px;
-    font-size: 0.9rem;
+  [headerContent, toolContent].forEach(el => {
+    el.className = 'loading';
+    el.textContent = 'Loading...';
+  });
+
+  try {
+    // Add cache busting parameter to prevent caching
+    const timestamp = new Date().getTime();
+    const puzzlesUrl = `xml/puzzles.xml?_=${timestamp}`;
+    const res = await fetch(puzzlesUrl, {
+      cache: 'no-store',  // Tell fetch to bypass cache
+      headers: {
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    const xmlText = await res.text();
+    const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+    const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
+    const sorted = puzzles.sort((a, b) => new Date(a.getAttribute('date')) - new Date(b.getAttribute('date')));
+    const mostRecent = sorted[sorted.length - 1];
+
+    const params = new URLSearchParams(window.location.search);
+    const puzzleId = params.get('puzzleid');
+    const date = params.get('date');
+
+    let selected;
+    if (puzzleId && !date) {
+      selected = sorted.find(p => p.getAttribute('id') === puzzleId);
+    } else if (date && !puzzleId) {
+      selected = sorted.find(p => p.getAttribute('date') === date);
+      if (selected === mostRecent) {
+        openSubscribeModal();
+        selected = sorted[sorted.length - 2]; // Second most recent
+      }
+    } else {
+      selected = sorted[sorted.length - 2]; // Second most recent by default
+    }
+
+    if (!selected) throw new Error("No puzzle selected.");
+    populateDateSelector(sorted, selected?.getAttribute('date'));
+    displayPuzzle(selected);
+  } catch (err) {
+    [headerContent, toolContent].forEach(el => {
+      el.className = 'error';
+      el.textContent = 'Unable to load data.';
+    });
+    console.error("Puzzle load error:", err);
   }
 }
 
-/* Print-specific styles */
-@media print {
-  body {
-    font-size: 12px; /* Base size for print */
-    background: white;
-    padding: 0;
-    margin: 0;
-  }
+function populateDateSelector(puzzles, selectedDate) {
+  const sel = document.getElementById('dateSelector');
+  while (sel.options.length > 1) sel.remove(1);
+  [...puzzles].reverse().forEach(p => {
+    const d = p.getAttribute('date');
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    if (d === selectedDate) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function formatDateString(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+}
+
+function displayPuzzle(puzzle) {
+  const rawDate = puzzle.getAttribute('date');
+  const titleDate = formatDateString(rawDate);
+  document.getElementById('navtitleContent').textContent = titleDate;
+
+  const headerContent = document.getElementById('headerContent');
+  const toolContent = document.getElementById('toolContent');
+  toolContent.innerHTML = `<table id="gridTable"><thead></thead><tbody></tbody></table>`;
+
+  // Get puzzle data
+  const counts = [...Array(7)].map((_, i) => ({
+    letter: (puzzle.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
+    count: +puzzle.getAttribute(`letter${i + 1}count`) || 0
+  }));
+  const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
   
-  #navtitle, footer, .modal-overlay {
-    display: none !important;
-  }
+  // Get all letters and sort them (ensuring no duplicates)
+  const allLetters = [...new Set(counts.map(c => c.letter))].filter(Boolean).sort();
   
-  .section-box {
-    box-shadow: none;
-    border: none;
-    padding: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
-  }
+  // Get center letter properly
+  const center = puzzle.getAttribute("letter1").toUpperCase();
   
-  /* Keep the header in horizontal layout */
-  .header-flex {
-    display: flex;
-    flex-direction: row !important;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem !important;
-  }
+  // Create surrounding letters array (all letters except center, sorted alphabetically)
+  const surroundingLetters = allLetters.filter(l => l !== center).sort();
   
-  .header-text {
-    flex: 1;
-  }
-  
-  #headerContent p {
-    white-space: nowrap;
-    line-height: 1.1 !important;
-    margin-bottom: 0.15rem !important;
-  }
-  
-  .hive-container svg {
-    max-width: 180px !important;
+  // Make sure we have exactly 6 surrounding letters
+  while (surroundingLetters.length < 6) {
+    surroundingLetters.push(""); // Fill with blanks if needed
   }
 
-  table, th, td {
-    page-break-inside: avoid;
-  }
+  const globalWords = Array.from(puzzle.getElementsByTagName('word')).map(w => w.textContent);
+  const wordCount = globalWords.length;
+  const pangrams = puzzle.getAttribute("pangrams") || 0;
+  const perfect = puzzle.getAttribute("perfectpangrams") || 0;
+  const bingo = puzzle.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
+  const q = parseInt(puzzle.getAttribute("queenbee") || 0, 10);
+
+  const thresholds = q ? [
+    `Good Start: ${Math.round(q * .02)}`, `Moving Up: ${Math.round(q * .05)}`,
+    `Good: ${Math.round(q * .08)}`, `Solid: ${Math.round(q * .15)}`,
+    `Nice: ${Math.round(q * .25)}`, `Great: ${Math.round(q * .4)}`,
+    `Amazing: ${Math.round(q * .5)}`, `Genius: ${Math.round(q * .7)}`,
+    `Queen Bee: ${q}`
+  ] : [];
+
+  // Create a flex container for the header (from sheet.html)
+  const headerFlex = document.createElement("div");
+  headerFlex.className = "header-flex";
   
-  th, td {
-    padding: 4px 8px;
-  }
+  // Add title text to the left
+  const titleDiv = document.createElement("div");
+  titleDiv.className = "header-text";
+  titleDiv.innerHTML = [
+    `The Completely Unauthorized Games Toolbox presents the ${toolName} for ${titleDate}`,
+    `Words: ${wordCount}, Pangrams: ${pangrams} (${perfect} Perfect), ${bingo}`,
+    thresholds.join(", ")
+  ].map(t => `<p>${t}</p>`).join("");
   
-  /* Change yellow background to gray in print */
-  .hive-container svg polygon[fill="#F7DA21"] {
-    fill: #D0D0D0 !important; /* Medium gray instead of yellow */
-  }
+  // Create SVG for hive
+  const hiveContainer = document.createElement("div");
+  hiveContainer.className = "hive-container";
+  hiveContainer.title = "Click to go to the NY Times Spelling Bee";
+  hiveContainer.addEventListener("click", () => {
+    window.open("https://www.nytimes.com/puzzles/spelling-bee", "_blank");
+  });
+  
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "240");
+  svg.setAttribute("height", "220");
+  svg.setAttribute("viewBox", "-120 -110 240 220");
+  
+  // Set up hexagon data - ensure center is first letter and others are surrounding
+  const hexSize = 40;
+  const hexPositions = [
+    { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
+    { x: 0, y: -70, letter: surroundingLetters[0], fill: "#E6E6E6" },    // Top
+    { x: 60, y: -35, letter: surroundingLetters[1], fill: "#E6E6E6" },   // Top right
+    { x: 60, y: 35, letter: surroundingLetters[2], fill: "#E6E6E6" },    // Bottom right
+    { x: 0, y: 70, letter: surroundingLetters[3], fill: "#E6E6E6" },     // Bottom
+    { x: -60, y: 35, letter: surroundingLetters[4], fill: "#E6E6E6" },   // Bottom left
+    { x: -60, y: -35, letter: surroundingLetters[5], fill: "#E6E6E6" }   // Top left
+  ];
+  
+  // Draw hexagons and letters
+  hexPositions.forEach(pos => {
+    // Create hexagon
+    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    
+    // Calculate points for a hexagon
+    const points = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = pos.x + hexSize * Math.cos(angle);
+      const y = pos.y + hexSize * Math.sin(angle);
+      points.push(`${x},${y}`);
+    }
+    
+    hex.setAttribute("points", points.join(" "));
+    hex.setAttribute("fill", pos.fill);
+    hex.setAttribute("stroke", "#FFFFFF");
+    hex.setAttribute("stroke-width", "2");
+    svg.appendChild(hex);
+    
+    // Create letter
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", pos.x);
+    text.setAttribute("y", pos.y + 2);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("font-size", "24");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
+    text.textContent = pos.letter;
+    svg.appendChild(text);
+  });
+  
+  hiveContainer.appendChild(svg);
+  
+  // Add both elements to the flex container
+  headerFlex.appendChild(titleDiv);
+  headerFlex.appendChild(hiveContainer);
+  headerContent.innerHTML = '';
+  headerContent.appendChild(headerFlex);
+
+  // Continue with the grid display
+  displayGrid(puzzle, allLetters);
 }
+
+function displayGrid(puzzle, allLetters) {
+  const words = Array.from(puzzle.getElementsByTagName('word'));
+  const counts = {}, twoLetterCounts = {}, allLengths = new Set();
+
+  words.forEach(word => {
+    const length = word.getAttribute('length');
+    const first = word.getAttribute('first').toLowerCase();
+    const firsttwo = word.getAttribute('firsttwo').toLowerCase();
+    counts[first] = counts[first] || {};
+    counts[first][length] = (counts[first][length] || 0) + 1;
+    twoLetterCounts[firsttwo] = (twoLetterCounts[firsttwo] || 0) + 1;
+    allLengths.add(length);
+  });
+
+  // Build the grid table
+  const lengths = Array.from(allLengths).sort((a, b) => a - b);
+  const lettersSet = Object.keys(counts).sort();
+
+  let html = '<tr><th></th>' + lengths.map(l => `<th>${l}</th>`).join('') + '<th>Σ</th></tr>';
+  lettersSet.forEach(letter => {
+    let rowSum = 0;
+    html += `<tr><td><b>${letter.toUpperCase()}</b></td>`;
+    lengths.forEach(length => {
+      const val = counts[letter][length];
+      html += `<td>${val ? val : '-'}</td>`;
+      rowSum += val || 0;
+    });
+    html += `<td>${rowSum}</td></tr>`;
+  });
+
+  let totalRow = '<tr><td>Σ</td>';
+  let grandTotal = 0;
+  lengths.forEach(length => {
+    let colTotal = 0;
+    lettersSet.forEach(letter => {
+      colTotal += counts[letter][length] || 0;
+    });
+    totalRow += `<td>${colTotal}</td>`;
+    grandTotal += colTotal;
+  });
+  totalRow += `<td>${grandTotal}</td></tr>`;
+  document.getElementById('gridTable').innerHTML = html + totalRow;
+
+  // Build the two-letter list
+  const twoKeys = Object.keys(twoLetterCounts).sort();
+  const grouped = {};
+  twoKeys.forEach(key => {
+    const first = key[0].toUpperCase();
+    if (!grouped[first]) grouped[first] = [];
+    grouped[first].push(`${key.toUpperCase()}-${twoLetterCounts[key]}`);
+  });
+
+  let twos = '<strong>Two letter list:</strong><br>';
+  Object.values(grouped).forEach(list => {
+    twos += list.join(' ') + '<br>';
+  });
+  document.getElementById('twoLetterList').innerHTML = twos;
+}
+
+// Add cache busting to page refresh
+window.addEventListener('beforeunload', function() {
+  // This is a backup method - it won't always work but can help in some cases
+  const timestamp = new Date().getTime();
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set('_', timestamp);
+  window.location.href = currentUrl.toString();
+});
+</script>
+</body>
+</html>
