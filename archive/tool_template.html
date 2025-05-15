@@ -189,7 +189,7 @@ function displayPuzzle(puzzle) {
   const q = parseInt(puzzle.getAttribute("queenbee") || 0, 10);
 
   const headerLines = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${titleDate}`,
+    `The Completely Unauthorized Games Toolbox presents the ${toolName} for ${titleDate}`,
     `Words: ${globalWords.length}, Pangrams: ${pangrams} (${perfect} Perfect), ${bingo}`,
     q ? `Good Start: ${Math.round(q * .02)}, Moving Up: ${Math.round(q * .05)}, Good: ${Math.round(q * .08)}, Solid: ${Math.round(q * .15)}, Nice: ${Math.round(q * .25)}, Great: ${Math.round(q * .4)}, Amazing: ${Math.round(q * .5)}, Genius: ${Math.round(q * .7)}, Queen Bee: ${q}` : ''
   ];

@@ -166,8 +166,15 @@ function displayPuzzle(p) {
     count: +p.getAttribute(`letter${i + 1}count`) || 0
   }));
   const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
-  const letters = [...counts.map(c => c.letter)].sort();
-  const center = (p.getAttribute("letter1") || letters[0]).toUpperCase();
+  
+  // Center letter should be the first letter attribute
+  const center = p.getAttribute("letter1").toUpperCase();
+  
+  // Get all unique letters from attributes
+  const allLetters = counts.map(c => c.letter).filter(Boolean);
+  
+  // Create an array of letters excluding the center letter, and sort alphabetically
+  const otherLetters = allLetters.filter(letter => letter !== center).sort();
 
   globalWords = [...p.getElementsByTagName("word")].map(w => ({
     text: w.textContent,
@@ -193,7 +200,7 @@ function displayPuzzle(p) {
   const titleDiv = document.createElement("div");
   titleDiv.className = "header-text";
   titleDiv.innerHTML = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Peek for ${formatDateString(rawDate)}`,
+    `The Completely Unauthorized Games Toolbox presents the Bee Peek for ${formatDateString(rawDate)}`,
     `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
     thresh.join(", ")
   ].map(t => `<p>${t}</p>`).join("");
@@ -206,14 +213,15 @@ function displayPuzzle(p) {
   svg.setAttribute("viewBox", "-120 -110 240 220");
 
   const hexSize = 40;
+  // Position the hexagons with center in the middle and other letters alphabetically arranged
   const hexPositions = [
-    { x: 0, y: 0, letter: center, fill: "#A2D729" },
-    { x: 0, y: -70, letter: letters[0], fill: "#E6E6E6" },
-    { x: 60, y: -35, letter: letters[1], fill: "#E6E6E6" },
-    { x: 60, y: 35, letter: letters[2], fill: "#E6E6E6" },
-    { x: 0, y: 70, letter: letters[3], fill: "#E6E6E6" },
-    { x: -60, y: 35, letter: letters[4], fill: "#E6E6E6" },
-    { x: -60, y: -35, letter: letters[5], fill: "#E6E6E6" }
+    { x: 0, y: 0, letter: center, fill: "#A2D729" },          // Center (green)
+    { x: 0, y: -70, letter: otherLetters[0], fill: "#E6E6E6" },    // Top
+    { x: 60, y: -35, letter: otherLetters[1], fill: "#E6E6E6" },   // Top right
+    { x: 60, y: 35, letter: otherLetters[2], fill: "#E6E6E6" },    // Bottom right
+    { x: 0, y: 70, letter: otherLetters[3], fill: "#E6E6E6" },     // Bottom
+    { x: -60, y: 35, letter: otherLetters[4], fill: "#E6E6E6" },   // Bottom left
+    { x: -60, y: -35, letter: otherLetters[5], fill: "#E6E6E6" }   // Top left
   ];
 
   hexPositions.forEach(pos => {
