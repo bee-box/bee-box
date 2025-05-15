@@ -216,7 +216,7 @@ function displayPuzzle(p) {
   const titleDiv = document.createElement("div");
   titleDiv.className = "header-text";
   titleDiv.innerHTML = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Sheet for ${formatDateString(rawDate)}`,
+    `The Completely Unauthorized Games Toolbox presents the Bee Sheet for ${formatDateString(rawDate)}`,
     `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
     thresh.join(", ")
   ].map(t => `<p>${t}</p>`).join("");

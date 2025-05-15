@@ -143,7 +143,7 @@ fetch("xml/puzzles.xml")
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' };
       const formatted = fullDate.toLocaleDateString('en-US', options);
       document.getElementById("worksheetTitle").textContent =
-        `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the Bee Peek for ${formatted}`;
+        `The Completely Unauthorized Games Toolbox presents the Bee Peek for ${formatted}`;
 
       const letters = puzzle.getAttribute("letters");
       const honeycomb = document.getElementById("honeycomb");
