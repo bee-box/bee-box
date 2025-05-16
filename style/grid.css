@@ -60,15 +60,18 @@ nav { padding-bottom: 1rem; }
   align-items: center;
 }
 
-/* Updated button styles with fixed width */
-.nav-right a, .nav-right button {
+/* Fixed width button styles - Updated to ensure consistent sizing */
+.nav-right a, 
+.nav-right button {
   background: #fff;
   color: #000;
   border: 1px solid #000;
   font-size: 0.875rem;
   padding: .25rem .5rem;
   height: 30px;
-  width: 90px; /* Fixed width for all buttons and links */
+  width: 90px; /* Fixed width */
+  min-width: 90px; /* Added min-width to enforce sizing */
+  max-width: 90px; /* Added max-width to enforce sizing */
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
@@ -77,9 +80,11 @@ nav { padding-bottom: 1rem; }
   transition: background-color .2s, color .2s;
   text-decoration: none;
   border-radius: 4px;
+  flex-grow: 0; /* Prevent growth */
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
-/* Separate select styling to handle its unique requirements */
+/* Separate select styling */
 .nav-right select {
   background: #fff;
   color: #000;
@@ -87,11 +92,15 @@ nav { padding-bottom: 1rem; }
   font-size: 0.875rem;
   padding: .25rem .5rem;
   height: 30px;
-  width: 190px; /* Keep the select's width as specified */
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
   box-sizing: border-box;
   cursor: pointer;
   transition: background-color .2s, color .2s;
   border-radius: 4px;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
@@ -324,6 +333,8 @@ footer {
   /* Adjust button width for mobile */
   .nav-right a, .nav-right button {
     width: calc(50% - 0.25rem); /* Two buttons per row with gap */
+    min-width: unset; /* Remove min-width for mobile */
+    max-width: unset; /* Remove max-width for mobile */
   }
   
   select#dateSelector {

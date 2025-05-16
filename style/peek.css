@@ -57,8 +57,9 @@ nav { padding-bottom: 1rem; }
   align-items: center;
 }
 
-/* Updated button styles with fixed width */
-.nav-right a, .nav-right button {
+/* Updated button styles with consistent fixed width */
+.nav-right a, 
+.nav-right button {
   background: #fff;
   color: #000;
   border: 1px solid #000;
@@ -66,6 +67,8 @@ nav { padding-bottom: 1rem; }
   padding: .25rem .5rem;
   height: 30px;
   width: 90px; /* Fixed width for all buttons and links */
+  min-width: 90px; /* Added min-width to enforce sizing */
+  max-width: 90px; /* Added max-width to enforce sizing */
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
@@ -74,6 +77,11 @@ nav { padding-bottom: 1rem; }
   transition: background-color .2s, color .2s;
   text-decoration: none;
   border-radius: 4px;
+  flex-grow: 0; /* Prevent growth */
+  flex-shrink: 0; /* Prevent shrinking */
+  text-align: center; /* Ensure text is centered */
+  overflow: hidden; /* Prevent text overflow */
+  white-space: nowrap; /* Keep text on one line */
 }
 
 /* Separate select styling to handle its unique requirements */
@@ -85,10 +93,14 @@ nav { padding-bottom: 1rem; }
   padding: .25rem .5rem;
   height: 30px;
   width: 190px; /* Keep the select's width as specified */
+  min-width: 190px;
+  max-width: 190px;
   box-sizing: border-box;
   cursor: pointer;
   transition: background-color .2s, color .2s;
   border-radius: 4px;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
@@ -221,6 +233,8 @@ footer {
   /* Adjust button width for mobile */
   .nav-right a, .nav-right button {
     width: calc(50% - 0.25rem); /* Two buttons per row with gap */
+    min-width: unset; /* Remove min-width for mobile */
+    max-width: unset; /* Remove max-width for mobile */
   }
   
   select#dateSelector {
@@ -423,24 +437,34 @@ footer {
     font-size: 24px; /* Keep original size */
   }
   
-  /* Increased font size for word boxes */
+  /* Word boxes for print - no spacing between sections */
   .words-container {
     padding: 0 !important;
+  }
+  
+  .length-group {
+    margin-bottom: 0 !important; /* No spacing between word sections */
+    page-break-inside: avoid !important;
   }
   
   .length-group-header {
     font-size: 16px !important;
     padding: 0.25rem !important;
+    margin-top: 0 !important;
     margin-bottom: 0.25rem !important;
+    background-color: #f0f0f0 !important;
+    border-radius: 0 !important; /* Remove rounded corners */
   }
   
   .words-grid {
     gap: 0.25rem !important;
+    margin-bottom: 0 !important; /* No bottom margin */
   }
   
   .word-box {
     font-size: 16px !important;
     padding: 0.25rem !important;
+    border: 1px solid #aaa !important;
   }
   
   .word-box[style*="background-color"] {
