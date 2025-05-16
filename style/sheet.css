@@ -16,22 +16,38 @@ body {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
+
+/* Custom color variable for this game - using original yellow */
+:root {
+  --bee-highlight: #FFDC00;
+}
+
 nav { padding-bottom: 1rem; }
-#navtitle { background: #FFDC00; }
+#navtitle { background: var(--bee-highlight); }
 .nav-container {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  min-height: 60px; /* Ensure minimum height for vertical centering */
 }
 .nav-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center; /* Center content vertically */
   margin-right: 1rem;
   min-width: 200px;
 }
-.nav-left h1 { margin: 0; font-size: 1.75rem; }
-.date-display { height: 1.25rem; color: #000; }
+.nav-left h1 { 
+  margin: 0 0 5px 0; 
+  font-size: 1.75rem; 
+}
+.date-display { 
+  height: 1.25rem; 
+  color: #000;
+  display: flex;
+  align-items: center;
+}
 .nav-right {
   margin-left: auto;
   display: flex;
@@ -39,13 +55,19 @@ nav { padding-bottom: 1rem; }
   gap: .5rem;
   align-items: center;
 }
-.nav-right a, .nav-right button, .nav-right select {
+
+/* Updated button styles with consistent fixed width */
+.nav-right a, 
+.nav-right button {
   background: #fff;
   color: #000;
   border: 1px solid #000;
-  font-size: 0.875rem; /* Standardized */
+  font-size: 0.875rem;
   padding: .25rem .5rem;
   height: 30px;
+  width: 90px; /* Fixed width for all buttons and links */
+  min-width: 90px; /* Added min-width to enforce sizing */
+  max-width: 90px; /* Added max-width to enforce sizing */
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
@@ -54,7 +76,32 @@ nav { padding-bottom: 1rem; }
   transition: background-color .2s, color .2s;
   text-decoration: none;
   border-radius: 4px;
+  flex-grow: 0; /* Prevent growth */
+  flex-shrink: 0; /* Prevent shrinking */
+  text-align: center; /* Ensure text is centered */
+  overflow: hidden; /* Prevent text overflow */
+  white-space: nowrap; /* Keep text on one line */
 }
+
+/* Separate select styling to handle its unique requirements */
+.nav-right select {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  font-size: 0.875rem;
+  padding: .25rem .5rem;
+  height: 30px;
+  width: 190px; /* Keep the select's width as specified */
+  min-width: 190px;
+  max-width: 190px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color .2s, color .2s;
+  border-radius: 4px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
 .nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
   background: #000;
   color: #fff;
@@ -63,7 +110,14 @@ nav { padding-bottom: 1rem; }
 select#dateSelector { min-width: 190px; max-width: 190px; }
 
 #toolContent.loading, #toolContent.error { min-height: 12rem; }
+.loading, .error { 
+  min-height: 12rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 #toolContent.fade-in { animation: fade .4s ease-in; }
+.fade-in { animation: fade .4s ease-in; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 footer {
@@ -224,23 +278,51 @@ footer {
 }
 
 /* ─── Hive SVG Styles ─── */
+/* Lock the header section height to prevent jumping during load */
+#header.section-box {
+  min-height: 350px; /* Fixed height to prevent layout jumps */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+/* Loading indicator styling specific to header */
+#headerContent.loading {
+  min-height: 310px; /* Match expected content height */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Horizontal layout for header */
 .header-flex {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 2rem; /* Increased gap for more spacing */
+  width: 100%;
 }
 
 .header-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  min-height: 310px; /* Match header content height */
 }
 
 .hive-container {
   display: flex;
   justify-content: center;
+  align-items: center; /* Center vertically */
   margin: 0;
   flex-shrink: 0;
+  width: 280px; /* Fixed width */
+  height: 260px; /* Fixed height */
   cursor: pointer; /* Make hive clickable */
 }
 
@@ -250,7 +332,8 @@ footer {
 }
 
 .hive-container svg {
-  max-width: 240px;
+  max-width: 280px;
+  width: 100%;
   height: auto;
 }
 
@@ -260,7 +343,7 @@ footer {
   user-select: none; /* Prevent text selection */
 }
 
-/* Media query for mobile devices */
+/* Media query for mobile devices - IMPROVED FROM JUMBLE.CSS */
 @media (max-width: 768px) {
   body {
     font-size: 14px; /* Base size for mobile */
@@ -272,25 +355,60 @@ footer {
     margin-bottom: 1rem;
   }
   
+  /* Maintain header height but adjust layout */
+  #header.section-box {
+    min-height: 420px; /* Increased for stacked layout */
+  }
+  
+  #headerContent.loading {
+    min-height: 380px; /* Match expected mobile content height */
+  }
+  
   .nav-container {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center; /* Center items horizontally */
+    text-align: center;
+  }
+  
+  .nav-left {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+    align-items: center; /* Center text */
+    text-align: center;
   }
   
   .nav-right {
     margin-left: 0;
     margin-top: 0.5rem;
     width: 100%;
-    justify-content: space-between;
+    justify-content: center; /* Center buttons */
+  }
+  
+  /* Adjust button width for mobile */
+  .nav-right a, .nav-right button {
+    width: calc(50% - 0.25rem); /* Two buttons per row with gap */
+    min-width: unset; /* Remove min-width for mobile */
+    max-width: unset; /* Remove max-width for mobile */
   }
   
   select#dateSelector {
-    min-width: 150px;
-    max-width: 150px;
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-bottom: 0.5rem;
   }
   
   .header-flex {
     flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .header-text {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 1rem;
   }
   
   .hive-container svg {
@@ -352,7 +470,7 @@ footer {
   /* Highlight center letter */
   .accordion-letter.center-letter {
     color: #000;
-    background-color: #FFDC00;
+    background-color: var(--bee-highlight);
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -413,9 +531,12 @@ footer {
 @media print {
   body {
     font-size: 12px; /* Base size for print */
-    background: white;
+    background: white !important;
     padding: 0;
     margin: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
   }
   
   #navtitle, footer, .modal-overlay {
@@ -427,6 +548,7 @@ footer {
     border: none;
     padding: 0.25rem !important;
     margin-bottom: 0.25rem !important;
+    min-height: unset !important; /* Remove all min-height settings */
   }
   
   /* UPDATED: Keep the header in horizontal layout just like web version */
@@ -436,28 +558,40 @@ footer {
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem !important;
+    min-height: unset !important;
   }
   
   /* Make header text more compact but keep it in its column */
   .header-text {
     flex: 1;
+    min-height: unset !important;
+  }
+  
+  #headerContent {
+    min-height: unset !important;
   }
   
   #headerContent p {
     white-space: nowrap;
     line-height: 1.1 !important;
     margin-bottom: 0.15rem !important;
+    font-size: 13px !important; /* Increased font size */
   }
   
   /* Ensure hive container stays on the right */
   .hive-container {
-    flex-shrink: 0;
+    width: 170px !important; /* Moderate hive size for print */
+    height: 160px !important;
+    min-height: unset !important;
   }
   
-  /* Make hive smaller for print but keep it visible */
   .hive-container svg {
-    max-width: 180px !important;
-    height: auto;
+    max-width: 170px !important;
+  }
+  
+  /* Keep the hive letter size the same as before */
+  .hive-container svg text {
+    font-size: 24px; /* Keep original size */
   }
   
   /* Reduce spacing around tables */
@@ -523,9 +657,12 @@ footer {
     content: "THE END";
     display: block;
     text-align: center;
-    margin-top: 0.5rem !important;
-    font-style: italic;
-    color: #666;
+    font-weight: normal; /* Changed from default to normal */
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+    font-size: 16px !important;
+    font-style: normal !important; /* Removing italic style */
+    color: #000 !important; /* Making it black instead of gray */
   }
   
   #toolContent.fade-in {
@@ -536,540 +673,10 @@ footer {
   .mobile-accordion {
     display: none !important;
   }
-}/* Additional CSS for new table-based layout */
-html { scrollbar-gutter: stable; }
-body {
-  margin: 0 auto;
-  padding: 1rem;
-  max-width: 1200px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f5f5f5;
-  line-height: 1.6;
-  font-size: 16px; /* Base size for web */
-}
-.section-box {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-nav { padding-bottom: 1rem; }
-#navtitle { background: #FFDC00; }
-.nav-container {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.nav-left {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-right: 1rem;
-  min-width: 200px;
-}
-.nav-left h1 { margin: 0; font-size: 1.75rem; }
-.date-display { height: 1.25rem; color: #000; }
-.nav-right {
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  align-items: center;
-}
-.nav-right a, .nav-right button, .nav-right select {
-  background: #fff;
-  color: #000;
-  border: 1px solid #000;
-  font-size: 0.875rem; /* Standardized */
-  padding: .25rem .5rem;
-  height: 30px;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color .2s, color .2s;
-  text-decoration: none;
-  border-radius: 4px;
-}
-.nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
-  background: #000;
-  color: #fff;
-  border-color: #000;
-}
-select#dateSelector { min-width: 190px; max-width: 190px; }
-
-#toolContent.loading, #toolContent.error { min-height: 12rem; }
-#toolContent.fade-in { animation: fade .4s ease-in; }
-@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-
-footer {
-  padding-top: 1rem;
-  font-size: 0.875rem; /* Slightly smaller than base */
-  text-align: center;
-  color: #666;
-}
-.error { color: #d32f2f; text-align: center; }
-#headerContent p, #lettersContent p { margin: 0; text-align: center; }
-#headerContent p:not(:last-child), #lettersContent p:not(:last-child) { margin-bottom: 0.25rem; }
-
-/* ─── Unified table styles for Bee Sheet ─── */
-.bee-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
-.bee-table td {
-  width: 14.28%;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  vertical-align: middle;
-  background-color: #fff;
-}
-
-/* ─── Letters Table ─── */
-.letters-table {
-  margin-bottom: 0.5rem;
-}
-.letters-table td {
-  text-align: center;
-  height: 25px;
-  padding: 2px;
-}
-.letters-table .wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.letters-table .char {
-  font-size: 1rem; /* Standardized */
-  line-height: 1;
-}
-.letters-table .char.bold {
-  font-weight: 700;
-}
-.letters-table .count {
-  font-size: 1rem; /* Standardized */
-  margin-left: 2px;
-  line-height: 1;
-  color: #666;
-}
-/* Special styling for center letter */
-.letters-table .center-letter {
-  background-color: #FFF8E1;
-}
-
-/* ─── Lengths Table ─── */
-.lengths-table {
-  margin-bottom: 0.5rem;
-}
-.lengths-table td {
-  text-align: center;
-  padding: 0.25rem;
-  height: auto;
-  min-height: 30px;
-}
-.lengths-table .icons {
-  font-size: 1rem; /* Standardized */
-  letter-spacing: 0.1rem;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-  line-height: 1.5;
-}
-.length-indicator {
-  display: inline-block;
-  margin-right: 3px;
-  margin-bottom: 3px;
-  transition: transform 0.2s ease, color 0.2s ease;
-  font-size: 1rem; /* Standardized */
-}
-.length-indicator.revealed {
-  color: #000000;
-}
-
-/* ─── Words Table ─── */
-.words-table, .words-table td {
-  border: none;
-}
-.words-table td {
-  vertical-align: top;
-  padding: 0.5rem;
-  height: auto;
-}
-.words-table .wcol {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.word-box {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: monospace;
-  font-size: 1rem; /* Standardized */
-  text-align: left;
-  box-sizing: border-box;
-  transition: background-color 0.2s ease;
-}
-.word-box:hover {
-  background-color: #f9f9f9;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.modal-content {
-  background: white;
-  width: 95%;
-  max-width: 540px;
-  min-height: 620px;
-  border-radius: 8px;
-  position: relative;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.modal-content iframe {
-  flex: 1;
-  width: 100%;
-  height: 620px;
-  border: none;
-}
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #555;
-  z-index: 10001;
-}
-
-/* ─── Hive SVG Styles ─── */
-/* Horizontal layout for header */
-.header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.header-text {
-  flex: 1;
-}
-
-.hive-container {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-  flex-shrink: 0;
-  cursor: pointer; /* Make hive clickable */
-}
-
-.hive-container:hover {
-  transform: scale(1.02); /* Slight enlarge on hover */
-  transition: transform 0.2s ease;
-}
-
-.hive-container svg {
-  max-width: 240px;
-  height: auto;
-}
-
-/* Make sure the text remains sharp and clear */
-.hive-container svg text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  user-select: none; /* Prevent text selection */
-}
-
-/* Mobile specific accordion style (under 768px) */
-@media (max-width: 768px) {
-  /* Hide the regular table structure */
-  .bee-table.words-table {
-    display: none;
-  }
   
-  /* Keep letters and lengths tables visible */
-  .letters-table, .lengths-table {
-    display: table;
-  }
-  
-  /* Show the mobile accordion instead */
-  .mobile-accordion {
-    display: block;
-    margin-top: 10px;
-  }
-  
-  /* Style for accordion items */
-  .accordion-item {
-    margin-bottom: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  
-  /* Header style for each letter */
-  .accordion-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    background-color: #f5f5f5;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .accordion-header:hover {
-    background-color: #eaeaea;
-  }
-  
-  /* Left side of header with letter */
-  .accordion-letter-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  /* Letter display in header */
-  .accordion-letter {
-    font-size: 18px;
-    font-weight: bold;
-    margin-right: 8px;
-  }
-  
-  /* Highlight center letter */
-  .accordion-letter.center-letter {
-    color: #000;
-    background-color: #FFDC00;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* Word count in header */
-  .accordion-count {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  /* Add indicator for expand/collapse */
-  .accordion-indicator {
-    font-size: 18px;
-    transition: transform 0.3s;
-  }
-  
-  /* Rotate indicator when expanded */
-  .accordion-item.active .accordion-indicator {
-    transform: rotate(180deg);
-  }
-  
-  /* Expandable content area */
-  .accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-  }
-  
-  /* When expanded */
-  .accordion-item.active .accordion-content {
-    max-height: 2000px; /* Arbitrary large value */
-  }
-  
-  /* Style for the words inside */
-  .accordion-words {
-    padding: 12px;
-  }
-  
-  /* Word boxes maintain their styling but with more margin for mobile */
-  .accordion-words .word-box {
-    margin-bottom: 10px;
-    width: 100%;
-  }
-}
-
-/* Hide accordion structure on desktop */
-@media (min-width: 769px) {
-  .mobile-accordion {
-    display: none;
-  }
-}
-
-/* Media query for mobile devices */
-@media (max-width: 768px) {
-  body {
-    font-size: 14px; /* Base size for mobile */
-    padding: 0.5rem;
-  }
-  
-  .section-box {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .nav-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .nav-right {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  select#dateSelector {
-    min-width: 150px;
-    max-width: 150px;
-  }
-  
-  .header-flex {
-    flex-direction: column;
-  }
-  
-  .hive-container svg {
-    max-width: 200px;
-  }
-}
-
-/* Print-specific styles */
-@media print {
-  body {
-    font-size: 12px; /* Base size for print */
-    background: white;
-    padding: 0;
-    margin: 0;
-  }
-  
-  #navtitle, footer, .modal-overlay {
-    display: none !important;
-  }
-  
-  .section-box {
-    box-shadow: none;
-    border: none;
-    padding: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
-  }
-  
-  /* UPDATED: Keep the header in horizontal layout just like web version */
-  .header-flex {
-    display: flex;
-    flex-direction: row !important; /* Force row direction */
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem !important;
-  }
-  
-  /* Make header text more compact but keep it in its column */
-  .header-text {
-    flex: 1;
-  }
-  
-  #headerContent p {
-    white-space: nowrap;
-    line-height: 1.1 !important;
-    margin-bottom: 0.15rem !important;
-  }
-  
-  /* Ensure hive container stays on the right */
-  .hive-container {
-    flex-shrink: 0;
-  }
-  
-  /* Make hive smaller for print but keep it visible */
-  .hive-container svg {
-    max-width: 180px !important;
-    height: auto;
-  }
-  
-  /* Reduce spacing around tables */
-  .bee-table {
-    margin-bottom: 0.25rem !important;
-  }
-  
-  /* Make letter table more compact */
-  .letters-table td {
-    height: 20px !important;
-    padding: 1px !important;
-  }
-  
-  /* Keep border styles consistent with web version */
-  /* Letters and length tables retain borders */
-  .letters-table td,
-  .lengths-table td {
-    border: 1px solid #ccc;
-  }
-  
-  /* Words table has no borders, matching web version */
-  .words-table, 
-  .words-table td {
-    border: none;
-    padding: 0.25rem !important;
-  }
-  
-  /* Compact word boxes */
-  .word-box {
-    border: 1px solid #ddd;
-    padding: 0.15rem 0.3rem !important;
-    margin-bottom: 0.1rem !important;
-    line-height: 1.1 !important;
-  }
-  
-  /* Less space between words in columns */
-  .words-table .wcol {
-    gap: 0.1rem !important;
-  }
-  
-  /* Change yellow background to gray in print */
-  .word-box[style*="background-color"] {
-    background-color: #D0D0D0 !important; /* Medium gray instead of yellow */
-  }
-  
-  /* Center hexagon in hive should also be gray in print */
-  .hive-container svg polygon[fill="#F7DA21"] {
-    fill: #D0D0D0 !important; /* Same medium gray */
-  }
-  
-  /* Navigation background */
-  #navtitle {
-    background: none !important;
-  }
-  
-  /* Make sure 'THE END' appears after all other printable content */
-  .combined-container::after {
-    content: "THE END";
-    display: block;
-    text-align: center;
-    margin-top: 0.5rem !important;
-    font-style: italic;
-    color: #666;
-  }
-  
-  #toolContent.fade-in {
-    animation: none;
-  }
-  
-  /* Hide mobile accordion in print */
-  .mobile-accordion {
-    display: none !important;
+  /* Allow print to adapt to portrait/landscape naturally */
+  @page {
+    size: auto;
+    margin: 0.5cm;
   }
 }
