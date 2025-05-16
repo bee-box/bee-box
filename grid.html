@@ -128,16 +128,15 @@ async function loadPuzzleData() {
     const date = params.get('date');
 
     let selected;
-    if (puzzleId && !date) {
+    if (puzzleId) {
+      // Find puzzle by ID parameter
       selected = sorted.find(p => p.getAttribute('id') === puzzleId);
-    } else if (date && !puzzleId) {
+    } else if (date) {
+      // Find puzzle by date parameter
       selected = sorted.find(p => p.getAttribute('date') === date);
-      if (selected === mostRecent) {
-        openSubscribeModal();
-        selected = sorted[sorted.length - 2]; // Second most recent
-      }
     } else {
-      selected = sorted[sorted.length - 2]; // Second most recent by default
+      // Default to most recent puzzle with words
+      selected = mostRecent;
     }
 
     if (!selected) throw new Error("No puzzle selected.");
