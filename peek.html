@@ -44,9 +44,12 @@
 </div>
 
 <script>
+// This is the modified JavaScript code to replace the script section in peek.html
+
 const toolName = "Bee Peek";
 let globalWords = [];
 let revealMode = false;
+let mostRecentPuzzleDate = null; // Store the most recent puzzle date
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("pageTitle").textContent = toolName;
@@ -59,10 +62,18 @@ function setupEventListeners() {
   document.getElementById("dateSelector").addEventListener("change", (e) => {
     const d = e.target.value;
     if (d) {
-      const u = new URL(window.location);
-      u.searchParams.set("date", d);
-      u.searchParams.delete("puzzleid");
-      window.location.href = u.toString();
+      // Check if selected date is the most recent puzzle date
+      if (d === mostRecentPuzzleDate) {
+        // Open subscribe modal when trying to access most recent puzzle
+        openSubscribeModal();
+        // Reset the select to previous value
+        setTimeout(() => populateDateSelector(window.cachedPuzzles, window.currentDisplayedDate), 100);
+      } else {
+        const u = new URL(window.location);
+        u.searchParams.set("date", d);
+        u.searchParams.delete("puzzleid");
+        window.location.href = u.toString();
+      }
     }
   });
 
@@ -109,14 +120,20 @@ async function loadPuzzleData() {
       .filter(p => p.getElementsByTagName("word").length)
       .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
 
+    // Cache puzzles for later use
+    window.cachedPuzzles = puzzles;
+
+    // Get the most recent puzzle date (used to check access restrictions)
+    const mostRecentPuzzle = puzzles.at(-1);
+    mostRecentPuzzleDate = mostRecentPuzzle.getAttribute("date");
+
     const params = new URLSearchParams(window.location.search);
     const puzzleId = params.get("puzzleid");
     const date = params.get("date");
-    const mostRecent = puzzles.at(-1);
 
     let selected;
     if (puzzleId) {
-      // Look for puzzle with matching id attribute
+      // Look for puzzle with matching id attribute - always allow access via puzzleid
       selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
       
       // If not found by id attribute, try finding by the element's id property
@@ -124,18 +141,29 @@ async function loadPuzzleData() {
         selected = puzzles.find(p => p.id === puzzleId);
       }
     } else if (date) {
-      // If date parameter is provided, show that puzzle regardless of whether it's the most recent
-      selected = puzzles.find(p => p.getAttribute("date") === date);
+      // If date parameter is provided, check if it's not the most recent puzzle
+      if (date === mostRecentPuzzleDate) {
+        // If trying to access most recent puzzle by date, show subscribe modal
+        // and use second most recent puzzle instead
+        openSubscribeModal();
+        selected = puzzles.at(-2);
+      } else {
+        // For any other date, show that puzzle
+        selected = puzzles.find(p => p.getAttribute("date") === date);
+      }
     } else {
-      // By default, show the most recent puzzle with words
-      selected = mostRecent;
+      // By default, show the second most recent puzzle with words
+      selected = puzzles.at(-2);
     }
 
     if (!selected) {
-      // If no puzzle is found with the specified id or date, show the most recent one
-      selected = mostRecent;
-      console.warn(`No puzzle found with id=${puzzleId} or date=${date}. Showing most recent puzzle instead.`);
+      // If no puzzle is found with the specified id or date, show the second most recent one
+      selected = puzzles.at(-2);
+      console.warn(`No puzzle found with id=${puzzleId} or date=${date}. Showing second most recent puzzle instead.`);
     }
+    
+    // Keep track of currently displayed date for dropdown reset if needed
+    window.currentDisplayedDate = selected.getAttribute("date");
     
     populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
@@ -224,7 +252,7 @@ function displayPuzzle(p) {
   const hexSize = 40;
   // Position the hexagons with center in the middle and other letters alphabetically arranged
   const hexPositions = [
-    { x: 0, y: 0, letter: center, fill: "#A2D729" },          // Center (green)
+    { x: 0, y: 0, letter: center, fill: "#FFDC00" },          // Center
     { x: 0, y: -70, letter: otherLetters[0], fill: "#E6E6E6" },    // Top
     { x: 60, y: -35, letter: otherLetters[1], fill: "#E6E6E6" },   // Top right
     { x: 60, y: 35, letter: otherLetters[2], fill: "#E6E6E6" },    // Bottom right
