@@ -1,11 +1,11 @@
 /* For mobile accordion in print (if it ever shows) */
-  .accordion-words .word-box {
-    text-align: left !important;
-  }  /* For the two-letter list in print */
-  .two-letter-list {
-    text-align: left !important;
-    justify-content: flex-start !important;
-  }/* Base layout styles */
+.accordion-words .word-box {
+  text-align: left !important;
+}  /* For the two-letter list in print */
+.two-letter-list {
+  text-align: left !important;
+  justify-content: flex-start !important;
+}/* Base layout styles */
 html { scrollbar-gutter: stable; }
 body {
   margin: 0 auto;
@@ -591,17 +591,17 @@ footer {
   }
 }
 
-/* Print-specific styles */
+/* Print-specific styles - UPDATED for better readability */
 @media print {
   body {
-    font-size: 14px; /* Increased base size for print */
+    font-size: 16px; /* Increased base font size for print */
     background: white !important;
     padding: 0;
     margin: 0;
     width: 100%;
     height: 100%;
     max-width: 100%;
-    line-height: 1.3 !important; /* Reduced line height for print */
+    line-height: 1.3 !important;
   }
   
   #navtitle, footer, .modal-overlay {
@@ -611,8 +611,8 @@ footer {
   .section-box {
     box-shadow: none;
     border: none;
-    padding: 0.15rem !important; /* Further reduced padding from 0.2rem */
-    margin-bottom: 0.15rem !important; /* Reduced margin between sections */
+    padding: 0.2rem !important; /* Slightly increased padding */
+    margin-bottom: 0.2rem !important; /* Slightly increased margin */
     min-height: unset !important;
   }
   
@@ -623,7 +623,7 @@ footer {
     margin-bottom: 0.1rem !important; /* Minimal margin after header */
   }
   
-  /* UPDATED: Keep the header in horizontal layout just like web version */
+  /* Keep the header in horizontal layout just like web version */
   .header-flex {
     display: flex;
     flex-direction: row !important;
@@ -645,48 +645,65 @@ footer {
   
   #headerContent p {
     white-space: nowrap;
-    line-height: 1.1 !important; /* Returned to 1.1 for tighter spacing */
-    margin-bottom: 0.1rem !important; /* Reduced margin from 0.15rem */
-    font-size: 13px !important;
+    line-height: 1.1 !important; /* Tight spacing for header text */
+    margin-bottom: 0.1rem !important; /* Minimal margin */
+    font-size: 14px !important; /* Slightly increased from 13px */
   }
   
   /* Ensure hive container stays on the right */
   .hive-container {
-    width: 160px !important; /* Slightly reduced from 170px */
-    height: 150px !important; /* Slightly reduced from 160px */
+    width: 160px !important; /* Slightly reduced from original */
+    height: 150px !important;
     min-height: unset !important;
     margin: 0 !important; /* Remove any margins */
     padding: 0 !important; /* Remove any padding */
   }
   
   .hive-container svg {
-    max-width: 160px !important; /* Reduced from 170px */
+    max-width: 160px !important;
   }
   
-  /* Keep the hive letter size the same as before */
   .hive-container svg text {
-    font-size: 22px !important; /* Slightly reduced from 24px */
+    font-size: 22px !important; /* Good size for letter visibility */
+  }
+  
+  /* ─── Length bubbles (icons) ─── */
+  .length-indicator {
+    font-size: 16px !important; /* Increased from implied smaller size */
+    margin-right: 4px !important; /* More space between indicators */
+    margin-bottom: 4px !important;
+  }
+  
+  .lengths-table .icons {
+    font-size: 16px !important; /* Match length indicator size */
+    line-height: 1.6 !important; /* More space between rows of indicators */
+    padding: 4px 2px !important; /* More padding in the cell */
   }
   
   /* Reduce spacing around tables */
   .bee-table {
-    margin-bottom: 0.15rem !important; /* Reduced from 0.25rem */
+    margin-bottom: 0.15rem !important; /* Compact margin between tables */
     margin-top: 0 !important; /* Remove top margin */
   }
   
-  /* Keep border styles consistent with web version */
   /* Tables retain borders */
   .lengths-table td,
   .letters-table td {
     border: 1px solid #ccc;
-    padding: 0.1rem !important; /* Further reduced padding */
-    height: 18px !important; /* Reduced height for letter cells */
+    padding: 0.15rem !important; /* Increased padding */
+    height: 22px !important; /* Increased height for letter cells */
   }
   
-  /* Make letter table more compact */
+  /* Letter table styling */
   .letters-table td {
-    height: 18px !important; /* Reduced from 20px */
-    padding: 0px !important; /* Removed padding completely */
+    height: 22px !important; /* Increased from 18px */
+    padding: 2px !important; /* Minimal padding */
+  }
+  
+  /* Letter and count display */
+  .letters-table .char,
+  .letters-table .count {
+    font-size: 16px !important; /* Increased font size */
   }
   
   .letters-table {
@@ -701,40 +718,41 @@ footer {
   .words-table, 
   .words-table td {
     border: none;
-    padding: 0.15rem !important; /* Reduced padding */
+    padding: 0.15rem !important; /* Slightly more padding */
   }
   
-  /* Make the words table visible again for printing */
+  /* Make the words table visible for printing */
   .bee-table.words-table {
     display: table !important;
     margin-top: 0.1rem !important; /* Minimal margin */
   }
   
-  /* Compact word boxes */
+  /* Word boxes styling */
   .word-box {
     border: 1px solid #aaa !important;
-    padding: 0.1rem 0.2rem !important; /* Further reduced padding */
-    margin-bottom: 0.05rem !important; /* Minimal margin between words */
-    line-height: 1 !important; /* Tightest line height */
-    font-size: 14px !important; /* Reduced from 16px */
+    padding: 0.15rem 0.25rem !important; /* Increased padding */
+    margin-bottom: 0.1rem !important; /* Small margin between words */
+    line-height: 1.2 !important; /* Slightly more line height */
+    font-size: 16px !important; /* Increased from 14px */
     text-align: left !important; /* Left align text in print mode */
+    font-family: monospace !important; /* Ensure monospace is applied */
   }
   
-  /* Less space between words in columns */
+  /* Space between words in columns */
   .words-table .wcol {
-    gap: 0.05rem !important; /* Reduced gap between words */
+    gap: 0.1rem !important; /* Small gap between words */
     align-items: flex-start !important; /* Left align word containers */
   }
   
-  /* Change yellow background to gray in print */
+  /* Better contrast for revealed words */
   .word-box[style*="background-color"] {
-    background-color: #D0D0D0 !important;
+    background-color: #C0C0C0 !important; /* Darker gray for better contrast */
   }
   
-  /* Center hexagon in hive should also be gray in print */
+  /* Center hexagon in hive should match revealed word color */
   .hive-container svg polygon[fill="#F7DA21"],
   .hive-container svg polygon[fill="#FFDC00"] {
-    fill: #D0D0D0 !important;
+    fill: #C0C0C0 !important;
   }
   
   /* Navigation background */
@@ -748,21 +766,17 @@ footer {
     display: block;
     text-align: center;
     font-weight: normal;
-    margin-top: 0.5rem !important; /* Reduced from 1rem */
-    margin-bottom: 0.5rem !important; /* Reduced from 1rem */
-    font-size: 14px !important; /* Reduced from 16px */
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 14px !important;
     font-style: normal !important;
     color: #000 !important;
   }
   
-  /* Avoid page breaks within word groups */
+  /* Keep tables on the same page */
   .table-section {
     page-break-inside: avoid !important;
-  }
-  
-  /* Reduce spacing in table sections */
-  .table-section {
-    margin-bottom: 0.1rem !important; /* Minimal margin */
+    margin-bottom: 0.2rem !important; /* Slightly more margin for separation */
   }
   
   /* Remove any animations */
@@ -776,9 +790,9 @@ footer {
     display: none !important;
   }
   
-  /* Allow print to adapt to portrait/landscape naturally */
+  /* Page margins */
   @page {
     size: auto;
-    margin: 0.4cm !important; /* Reduced margin from 0.5cm */
+    margin: 0.5cm !important;
   }
 }
