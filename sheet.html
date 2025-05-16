@@ -49,6 +49,21 @@ let globalWords = [];
 let revealMode = false;
 let mostRecentPuzzleDate = null; // Store the most recent puzzle date
 
+// Regular number symbols
+const numIcons = {
+  1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
+  11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
+};
+
+// Inverted/filled number symbols
+const invertedNumIcons = {
+  1: "❶", 2: "❷", 3: "❸", 4: "❹", 5: "❺", 6: "❻", 7: "❼", 8: "❽", 9: "❾", 10: "❿",
+  11: "⓫", 12: "⓬", 13: "⓭", 14: "⓮", 15: "⓯", 16: "⓰", 17: "⓱", 18: "⓲", 19: "⓳", 20: "⓴"
+};
+
+// Map to store reference to length indicators for each word
+let lengthIndicatorsMap = new Map();
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM content loaded, initializing Bee Sheet");
   document.getElementById("pageTitle").textContent = toolName;
@@ -261,6 +276,9 @@ function displayPuzzle(p) {
   const contentSection = document.getElementById("contentSection");
   const headerContent = document.getElementById("headerContent");
   contentSection.innerHTML = headerContent.innerHTML = "";
+  
+  // Reset the length indicators map for the new puzzle
+  lengthIndicatorsMap = new Map();
 
   try {
     const raw = p.getAttribute("date");
@@ -451,11 +469,6 @@ function displayPuzzle(p) {
     const lengthsTableContainer = document.createElement("div");
     lengthsTableContainer.className = "table-section";
     
-    const numIcons = {
-      1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
-      11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
-    };
-
     const lengthsTable = document.createElement("table");
     lengthsTable.className = "bee-table lengths-table";
     const lengthsRow = document.createElement("tr");
@@ -467,12 +480,32 @@ function displayPuzzle(p) {
       const iconsDiv = document.createElement("div");
       iconsDiv.className = "icons";
       
-      const icons = (byLetter[l] || [])
-        .sort((a,b) => a.length - b.length || a.text.localeCompare(b.text))
-        .map(w => numIcons[w.length] || w.length)
-        .join(" ");
+      // Create spans for each word length instead of just text
+      if (byLetter[l] && byLetter[l].length) {
+        byLetter[l]
+          .sort((a,b) => a.length - b.length || a.text.localeCompare(b.text))
+          .forEach(word => {
+            const lengthSpan = document.createElement("span");
+            lengthSpan.className = "length-indicator";
+            lengthSpan.textContent = numIcons[word.length] || word.length;
+            lengthSpan.dataset.word = word.text;
+            lengthSpan.dataset.length = word.length;
+            
+            // Store reference to length indicator for this word
+            if (!lengthIndicatorsMap.has(word.text)) {
+              lengthIndicatorsMap.set(word.text, []);
+            }
+            lengthIndicatorsMap.get(word.text).push(lengthSpan);
+            
+            iconsDiv.appendChild(lengthSpan);
+            
+            // Add a space after each indicator for better spacing
+            iconsDiv.appendChild(document.createTextNode(" "));
+          });
+      } else {
+        iconsDiv.textContent = "–";
+      }
       
-      iconsDiv.textContent = icons || "–";
       cell.appendChild(iconsDiv);
       lengthsRow.appendChild(cell);
     });
@@ -501,18 +534,27 @@ function displayPuzzle(p) {
           box.dataset.word = w.text;
           box.dataset.firsttwo = w.firsttwo;
           box.textContent = revealMode ? w.text : w.firsttwo;
+          
+          // Update click handler to toggle length indicators
           box.addEventListener("click", () => {
             const isRevealed = box.textContent === box.dataset.firsttwo;
             box.textContent = isRevealed ? box.dataset.word : box.dataset.firsttwo;
+            
             if (isRevealed) {
               box.style.backgroundColor = "var(--bee-highlight)";
+              // Update length indicators for this word
+              updateLengthIndicators(box.dataset.word, true);
             } else {
               box.style.backgroundColor = "";
+              // Update length indicators for this word
+              updateLengthIndicators(box.dataset.word, false);
             }
           });
           
           if (revealMode) {
             box.style.backgroundColor = "var(--bee-highlight)";
+            // Set initial state for length indicators if reveal mode is on
+            updateLengthIndicators(w.text, true);
           }
           
           colDiv.appendChild(box);
@@ -576,18 +618,26 @@ function displayPuzzle(p) {
         wordBox.dataset.firsttwo = word.firsttwo;
         wordBox.textContent = revealMode ? word.text : word.firsttwo;
         
+        // Update the click handler for mobile accordion word boxes
         wordBox.addEventListener("click", () => {
           const isRevealed = wordBox.textContent === wordBox.dataset.firsttwo;
           wordBox.textContent = isRevealed ? wordBox.dataset.word : wordBox.dataset.firsttwo;
+          
           if (isRevealed) {
             wordBox.style.backgroundColor = "var(--bee-highlight)";
+            // Update length indicators for this word
+            updateLengthIndicators(wordBox.dataset.word, true);
           } else {
             wordBox.style.backgroundColor = "";
+            // Update length indicators for this word
+            updateLengthIndicators(wordBox.dataset.word, false);
           }
         });
         
         if (revealMode) {
           wordBox.style.backgroundColor = "var(--bee-highlight)";
+          // Set initial state for length indicators if reveal mode is on
+          updateLengthIndicators(word.text, true);
         }
         
         accordionWords.appendChild(wordBox);
@@ -622,10 +672,31 @@ function displayPuzzle(p) {
   }
 }
 
+// Function to update length indicators when words are revealed/hidden
+function updateLengthIndicators(wordText, isRevealed) {
+  const indicators = lengthIndicatorsMap.get(wordText);
+  if (indicators) {
+    indicators.forEach(indicator => {
+      const length = indicator.dataset.length;
+      if (isRevealed) {
+        indicator.textContent = invertedNumIcons[length] || length;
+        indicator.classList.add("revealed");
+      } else {
+        indicator.textContent = numIcons[length] || length;
+        indicator.classList.remove("revealed");
+      }
+    });
+  }
+}
+
+// Updated toggleRevealAll function to update length indicators
 function toggleRevealAll(on) {
   document.querySelectorAll(".word-box").forEach(b => {
     b.textContent = on ? b.dataset.word : b.dataset.firsttwo;
     b.style.backgroundColor = on ? "var(--bee-highlight)" : "";
+    
+    // Update all length indicators based on reveal state
+    updateLengthIndicators(b.dataset.word, on);
   });
 }
 </script>
