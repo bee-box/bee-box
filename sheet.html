@@ -28,8 +28,7 @@
 
 <!-- ───────── PAGE SECTIONS ────────────────────────── -->
 <section id="header" class="section-box"><div id="headerContent" class="loading">Loading...</div></section>
-<section id="lengths" class="section-box"><div id="lengthsContent" class="loading">Loading...</div></section>
-<section id="tool" class="section-box combined-container"><div id="toolContent" class="loading">Loading...</div></section>
+<section id="content" class="section-box combined-container"><div id="contentSection" class="loading">Loading...</div></section>
 
 <footer class="section-box">
   <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
@@ -94,21 +93,32 @@ function setupEventListeners() {
 
   document.getElementById("printButton").addEventListener("click", () => {
     const wordBoxes = document.querySelectorAll(".word-box");
-    wordBoxes.forEach((b) => b.setAttribute("data-print-value", b.textContent));
+    
+    // Store current state of each word box before printing
+    wordBoxes.forEach((b) => {
+      // Save current display text and background color
+      b.setAttribute("data-print-value", b.textContent);
+      b.setAttribute("data-print-bg", b.style.backgroundColor || "");
+    });
 
     window.addEventListener("beforeprint", () => {
+      // Set to print value (current state) before printing
       wordBoxes.forEach(
         (b) => (b.textContent = b.getAttribute("data-print-value"))
       );
     }, { once: true });
 
     window.addEventListener("afterprint", () => {
-      wordBoxes.forEach(
-        (b) =>
-          (b.textContent = revealMode
-            ? b.dataset.word
-            : b.dataset.firsttwo)
-      );
+      // Restore to same state after printing (don't reset)
+      wordBoxes.forEach(b => {
+        // Keep the same text that was there before printing
+        b.textContent = b.getAttribute("data-print-value");
+        
+        // If it was revealed (had background color), keep it revealed
+        if (b.getAttribute("data-print-bg")) {
+          b.style.backgroundColor = b.getAttribute("data-print-bg");
+        }
+      });
     }, { once: true });
 
     window.print();
@@ -122,7 +132,7 @@ function setupEventListeners() {
 }
 
 async function loadPuzzleData() {
-  const els = ["toolContent", "lengthsContent", "headerContent"].map(id => document.getElementById(id));
+  const els = ["contentSection", "headerContent"].map(id => document.getElementById(id));
   els.forEach(el => { el.className = "loading"; el.textContent = "Loading..."; });
 
   try {
@@ -248,10 +258,9 @@ function formatDateString(str) {
 function displayPuzzle(p) {
   console.log("Displaying puzzle:", p);
   
-  const toolContent = document.getElementById("toolContent");
-  const lengthsContent = document.getElementById("lengthsContent");
+  const contentSection = document.getElementById("contentSection");
   const headerContent = document.getElementById("headerContent");
-  toolContent.innerHTML = lengthsContent.innerHTML = headerContent.innerHTML = "";
+  contentSection.innerHTML = headerContent.innerHTML = "";
 
   try {
     const raw = p.getAttribute("date");
@@ -397,30 +406,88 @@ function displayPuzzle(p) {
     headerFlex.appendChild(hiveContainer);
     headerContent.appendChild(headerFlex);
 
-    // Create the lengths table
+    // Create the combined content section with letters, lengths, and words
+    const contentContainer = document.createElement("div");
+    contentContainer.className = "content-container";
+    
+    // Create tables container
+    const tablesContainer = document.createElement("div");
+    tablesContainer.className = "tables-container";
+    
+    // 1. Create the letters table
+    const lettersTableContainer = document.createElement("div");
+    lettersTableContainer.className = "table-section";
+    
+    const lettersTable = document.createElement("table");
+    lettersTable.className = "bee-table letters-table";
+    const lettersRow = document.createElement("tr");
+    
+    lettersAll.forEach(l => {
+      const cell = document.createElement("td");
+      cell.className = l === boldLetter ? 'center-letter' : '';
+      
+      const wrapper = document.createElement("div");
+      wrapper.className = "wrapper";
+      
+      const charSpan = document.createElement("span");
+      charSpan.className = `char ${l === boldLetter ? "bold" : ""}`;
+      charSpan.textContent = l;
+      
+      const countSpan = document.createElement("span");
+      countSpan.className = "count";
+      countSpan.textContent = (byLetter[l] || []).length;
+      
+      wrapper.appendChild(charSpan);
+      wrapper.appendChild(countSpan);
+      cell.appendChild(wrapper);
+      lettersRow.appendChild(cell);
+    });
+    
+    lettersTable.appendChild(lettersRow);
+    lettersTableContainer.appendChild(lettersTable);
+    tablesContainer.appendChild(lettersTableContainer);
+    
+    // 2. Create the lengths table
+    const lengthsTableContainer = document.createElement("div");
+    lengthsTableContainer.className = "table-section";
+    
     const numIcons = {
       1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
       11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
     };
 
-    lengthsContent.innerHTML = `
-      <table class="bee-table lengths-table">
-        <tr>
-          ${lettersAll.map(l => {
-            const icons = (byLetter[l] || [])
-              .sort((a,b) => a.length - b.length || a.text.localeCompare(b.text))
-              .map(w => numIcons[w.length] || w.length)
-              .join(" ");
-            return `<td class="cell"><div class="icons">${icons || "–"}</div></td>`;
-          }).join("")}
-        </tr>
-      </table>
-    `;
-
-    // Create words table - desktop view
+    const lengthsTable = document.createElement("table");
+    lengthsTable.className = "bee-table lengths-table";
+    const lengthsRow = document.createElement("tr");
+    
+    lettersAll.forEach(l => {
+      const cell = document.createElement("td");
+      cell.className = "cell";
+      
+      const iconsDiv = document.createElement("div");
+      iconsDiv.className = "icons";
+      
+      const icons = (byLetter[l] || [])
+        .sort((a,b) => a.length - b.length || a.text.localeCompare(b.text))
+        .map(w => numIcons[w.length] || w.length)
+        .join(" ");
+      
+      iconsDiv.textContent = icons || "–";
+      cell.appendChild(iconsDiv);
+      lengthsRow.appendChild(cell);
+    });
+    
+    lengthsTable.appendChild(lengthsRow);
+    lengthsTableContainer.appendChild(lengthsTable);
+    tablesContainer.appendChild(lengthsTableContainer);
+    
+    // 3. Create words table - desktop view
+    const wordsTableContainer = document.createElement("div");
+    wordsTableContainer.className = "table-section";
+    
     const wordsTable = document.createElement("table");
     wordsTable.className = "bee-table words-table";
-    const row = document.createElement("tr");
+    const wordsRow = document.createElement("tr");
 
     lettersAll.forEach(l => {
       const td = document.createElement("td");
@@ -453,11 +520,14 @@ function displayPuzzle(p) {
       }
 
       td.appendChild(colDiv);
-      row.appendChild(td);
+      wordsRow.appendChild(td);
     });
 
-    wordsTable.appendChild(row);
-    toolContent.appendChild(wordsTable);
+    wordsTable.appendChild(wordsRow);
+    wordsTableContainer.appendChild(wordsTable);
+    tablesContainer.appendChild(wordsTableContainer);
+    
+    contentContainer.appendChild(tablesContainer);
     
     // Create mobile accordion view
     const mobileAccordion = document.createElement("div");
@@ -535,16 +605,17 @@ function displayPuzzle(p) {
       mobileAccordion.appendChild(accordionItem);
     });
     
-    toolContent.appendChild(mobileAccordion);
+    contentContainer.appendChild(mobileAccordion);
+    contentSection.appendChild(contentContainer);
     
     // Add fade-in class for smooth appearance
-    [headerContent, lengthsContent, toolContent].forEach(el => el.classList.add("fade-in"));
+    [headerContent, contentSection].forEach(el => el.classList.add("fade-in"));
     
     console.log("Puzzle display complete");
     
   } catch (error) {
     console.error("Error displaying puzzle:", error);
-    [headerContent, lengthsContent, toolContent].forEach(el => {
+    [headerContent, contentSection].forEach(el => {
       el.className = "error";
       el.innerHTML = `<p>⚠️ Error displaying puzzle: ${error.message}</p>`;
     });

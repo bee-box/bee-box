@@ -1,4 +1,11 @@
-/* Additional CSS for new table-based layout */
+/* For mobile accordion in print (if it ever shows) */
+  .accordion-words .word-box {
+    text-align: left !important;
+  }  /* For the two-letter list in print */
+  .two-letter-list {
+    text-align: left !important;
+    justify-content: flex-start !important;
+  }/* Base layout styles */
 html { scrollbar-gutter: stable; }
 body {
   margin: 0 auto;
@@ -130,6 +137,91 @@ footer {
 #headerContent p { margin: 0; text-align: center; }
 #headerContent p:not(:last-child) { margin-bottom: 0.25rem; }
 
+/* ─── Hive SVG Styles ─── */
+/* Lock the header section height to prevent jumping during load */
+#header.section-box {
+  min-height: 350px; /* Fixed height to prevent layout jumps */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+/* Loading indicator styling specific to header */
+#headerContent.loading {
+  min-height: 310px; /* Match expected content height */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Horizontal layout for header */
+.header-flex {
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: space-between;
+  gap: 2rem; /* Increased gap for more spacing */
+  width: 100%;
+}
+
+.header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  min-height: 310px; /* Match header content height */
+}
+
+.hive-container {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center vertically */
+  margin: 0;
+  flex-shrink: 0;
+  width: 280px; /* Fixed width */
+  height: 260px; /* Fixed height */
+  cursor: pointer; /* Make hive clickable */
+}
+
+.hive-container:hover {
+  transform: scale(1.02); /* Slight enlarge on hover */
+  transition: transform 0.2s ease;
+}
+
+.hive-container svg {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+}
+
+/* Make sure the text remains sharp and clear */
+.hive-container svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none; /* Prevent text selection */
+}
+
+/* Info Section Styling */
+/* Tables container layout */
+.tables-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.table-section {
+  width: 100%;
+}
+
+.content-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ─── Unified table styles for Bee Sheet ─── */
 .bee-table {
   width: 100%;
@@ -141,8 +233,45 @@ footer {
   width: 14.28%;
   border: 1px solid #ddd;
   padding: 0.5rem;
-  vertical-align: middle;
+  vertical-align: middle; /* Center content vertically */
   background-color: #fff;
+  text-align: center; /* Center content horizontally */
+}
+
+/* ─── Letters Table ─── */
+.letters-table {
+  margin-bottom: 0.5rem;
+}
+.letters-table td {
+  text-align: center;
+  height: 25px;
+  padding: 2px;
+  vertical-align: middle; /* Ensure vertical centering */
+}
+.letters-table .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* Center horizontally */
+}
+.letters-table .char {
+  font-size: 1rem; /* Standardized */
+  line-height: 1;
+  text-align: center; /* Ensure centered text */
+}
+.letters-table .char.bold {
+  font-weight: 700;
+}
+.letters-table .count {
+  font-size: 1rem; /* Standardized */
+  margin-left: 2px;
+  line-height: 1;
+  color: #666;
+  text-align: center; /* Ensure centered text */
+}
+/* Special styling for center letter */
+.letters-table .center-letter {
+  background-color: #FFF8E1;
 }
 
 /* ─── Lengths Table ─── */
@@ -154,6 +283,7 @@ footer {
   padding: 0.25rem;
   height: auto;
   min-height: 30px;
+  vertical-align: middle; /* Ensure vertical centering */
 }
 .lengths-table .icons {
   font-size: 1rem; /* Standardized */
@@ -162,6 +292,11 @@ footer {
   overflow: visible;
   text-overflow: clip;
   line-height: 1.5;
+  text-align: center; /* Ensure centered text */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center icons horizontally */
+  align-items: center; /* Center icons vertically */
 }
 .length-indicator {
   display: inline-block;
@@ -169,9 +304,32 @@ footer {
   margin-bottom: 3px;
   transition: transform 0.2s ease, color 0.2s ease;
   font-size: 1rem; /* Standardized */
+  text-align: center; /* Ensure centered text */
 }
 .length-indicator.revealed {
   color: #000000;
+}
+
+/* ─── Two-Letter Starts Table ─── */
+.two-letter-table {
+  margin-bottom: 0.5rem;
+}
+.two-letter-table td {
+  text-align: center;
+  padding: 0.25rem;
+  vertical-align: middle; /* Center content vertically */
+}
+.two-letter-list {
+  font-size: 0.875rem;
+  letter-spacing: 0.05rem;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.5;
+  text-align: center; /* Ensure centered text */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center content horizontally */
 }
 
 /* ─── Words Table ─── */
@@ -179,14 +337,17 @@ footer {
   border: none;
 }
 .words-table td {
-  vertical-align: top;
+  vertical-align: top; /* Keep top alignment for words */
   padding: 0.5rem;
   height: auto;
+  position: relative;
 }
 .words-table .wcol {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center; /* Center words horizontally */
+  width: 100%;
 }
 .word-box {
   width: 100%;
@@ -196,7 +357,7 @@ footer {
   cursor: pointer;
   font-family: monospace;
   font-size: 1rem; /* Standardized */
-  text-align: left;
+  text-align: center; /* Changed from left to center */
   box-sizing: border-box;
   transition: background-color 0.2s ease;
 }
@@ -245,73 +406,7 @@ footer {
   z-index: 10001;
 }
 
-/* ─── Hive SVG Styles ─── */
-/* Lock the header section height to prevent jumping during load */
-#header.section-box {
-  min-height: 350px; /* Fixed height to prevent layout jumps */
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-
-/* Loading indicator styling specific to header */
-#headerContent.loading {
-  min-height: 310px; /* Match expected content height */
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Horizontal layout for header */
-.header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem; /* Increased gap for more spacing */
-  width: 100%;
-}
-
-.header-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Center content vertically */
-  min-height: 310px; /* Match header content height */
-}
-
-.hive-container {
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Center vertically */
-  margin: 0;
-  flex-shrink: 0;
-  width: 280px; /* Fixed width */
-  height: 260px; /* Fixed height */
-  cursor: pointer; /* Make hive clickable */
-}
-
-.hive-container:hover {
-  transform: scale(1.02); /* Slight enlarge on hover */
-  transition: transform 0.2s ease;
-}
-
-.hive-container svg {
-  max-width: 280px;
-  width: 100%;
-  height: auto;
-}
-
-/* Make sure the text remains sharp and clear */
-.hive-container svg text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  user-select: none; /* Prevent text selection */
-}
-
-/* Media query for mobile devices - IMPROVED FROM JUMBLE.CSS */
+/* Media query for mobile devices */
 @media (max-width: 768px) {
   body {
     font-size: 14px; /* Base size for mobile */
@@ -388,8 +483,9 @@ footer {
     display: none;
   }
   
-  /* Keep lengths table visible */
-  .lengths-table {
+  /* Keep tables visible */
+  .lengths-table,
+  .letters-table {
     display: table;
   }
   
@@ -498,13 +594,14 @@ footer {
 /* Print-specific styles */
 @media print {
   body {
-    font-size: 12px; /* Base size for print */
+    font-size: 14px; /* Increased base size for print */
     background: white !important;
     padding: 0;
     margin: 0;
     width: 100%;
     height: 100%;
     max-width: 100%;
+    line-height: 1.3 !important; /* Reduced line height for print */
   }
   
   #navtitle, footer, .modal-overlay {
@@ -514,18 +611,25 @@ footer {
   .section-box {
     box-shadow: none;
     border: none;
-    padding: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
-    min-height: unset !important; /* Remove all min-height settings */
+    padding: 0.15rem !important; /* Further reduced padding from 0.2rem */
+    margin-bottom: 0.15rem !important; /* Reduced margin between sections */
+    min-height: unset !important;
+  }
+  
+  /* Reduce header section height */
+  #header.section-box {
+    min-height: unset !important;
+    padding: 0.15rem !important; /* Reduced padding */
+    margin-bottom: 0.1rem !important; /* Minimal margin after header */
   }
   
   /* UPDATED: Keep the header in horizontal layout just like web version */
   .header-flex {
     display: flex;
-    flex-direction: row !important; /* Force row direction */
+    flex-direction: row !important;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem !important;
+    gap: 0.3rem !important; /* Reduced gap from 0.5rem */
     min-height: unset !important;
   }
   
@@ -541,71 +645,96 @@ footer {
   
   #headerContent p {
     white-space: nowrap;
-    line-height: 1.1 !important;
-    margin-bottom: 0.15rem !important;
-    font-size: 13px !important; /* Increased font size */
+    line-height: 1.1 !important; /* Returned to 1.1 for tighter spacing */
+    margin-bottom: 0.1rem !important; /* Reduced margin from 0.15rem */
+    font-size: 13px !important;
   }
   
   /* Ensure hive container stays on the right */
   .hive-container {
-    width: 170px !important; /* Moderate hive size for print */
-    height: 160px !important;
+    width: 160px !important; /* Slightly reduced from 170px */
+    height: 150px !important; /* Slightly reduced from 160px */
     min-height: unset !important;
+    margin: 0 !important; /* Remove any margins */
+    padding: 0 !important; /* Remove any padding */
   }
   
   .hive-container svg {
-    max-width: 170px !important;
+    max-width: 160px !important; /* Reduced from 170px */
   }
   
   /* Keep the hive letter size the same as before */
   .hive-container svg text {
-    font-size: 24px; /* Keep original size */
+    font-size: 22px !important; /* Slightly reduced from 24px */
   }
   
   /* Reduce spacing around tables */
   .bee-table {
-    margin-bottom: 0.25rem !important;
+    margin-bottom: 0.15rem !important; /* Reduced from 0.25rem */
+    margin-top: 0 !important; /* Remove top margin */
   }
   
   /* Keep border styles consistent with web version */
-  /* Length tables retain borders */
-  .lengths-table td {
+  /* Tables retain borders */
+  .lengths-table td,
+  .letters-table td {
     border: 1px solid #ccc;
+    padding: 0.1rem !important; /* Further reduced padding */
+    height: 18px !important; /* Reduced height for letter cells */
+  }
+  
+  /* Make letter table more compact */
+  .letters-table td {
+    height: 18px !important; /* Reduced from 20px */
+    padding: 0px !important; /* Removed padding completely */
+  }
+  
+  .letters-table {
+    margin-bottom: 0.1rem !important; /* Reduced margin */
+  }
+  
+  .lengths-table {
+    margin-bottom: 0.1rem !important; /* Reduced margin */
   }
   
   /* Words table has no borders, matching web version */
   .words-table, 
   .words-table td {
     border: none;
-    padding: 0.25rem !important;
+    padding: 0.15rem !important; /* Reduced padding */
   }
   
   /* Make the words table visible again for printing */
   .bee-table.words-table {
     display: table !important;
+    margin-top: 0.1rem !important; /* Minimal margin */
   }
   
   /* Compact word boxes */
   .word-box {
-    border: 1px solid #ddd;
-    padding: 0.15rem 0.3rem !important;
-    margin-bottom: 0.1rem !important;
-    line-height: 1.1 !important;
+    border: 1px solid #aaa !important;
+    padding: 0.1rem 0.2rem !important; /* Further reduced padding */
+    margin-bottom: 0.05rem !important; /* Minimal margin between words */
+    line-height: 1 !important; /* Tightest line height */
+    font-size: 14px !important; /* Reduced from 16px */
+    text-align: left !important; /* Left align text in print mode */
   }
   
   /* Less space between words in columns */
   .words-table .wcol {
-    gap: 0.1rem !important;
+    gap: 0.05rem !important; /* Reduced gap between words */
+    align-items: flex-start !important; /* Left align word containers */
   }
   
   /* Change yellow background to gray in print */
   .word-box[style*="background-color"] {
-    background-color: #D0D0D0 !important; /* Medium gray instead of yellow */
+    background-color: #D0D0D0 !important;
   }
   
   /* Center hexagon in hive should also be gray in print */
-  .hive-container svg polygon[fill="#F7DA21"] {
-    fill: #D0D0D0 !important; /* Same medium gray */
+  .hive-container svg polygon[fill="#F7DA21"],
+  .hive-container svg polygon[fill="#FFDC00"] {
+    fill: #D0D0D0 !important;
   }
   
   /* Navigation background */
@@ -618,16 +747,28 @@ footer {
     content: "THE END";
     display: block;
     text-align: center;
-    font-weight: normal; /* Changed from default to normal */
-    margin-top: 1rem !important;
-    margin-bottom: 1rem !important;
-    font-size: 16px !important;
-    font-style: normal !important; /* Removing italic style */
-    color: #000 !important; /* Making it black instead of gray */
+    font-weight: normal;
+    margin-top: 0.5rem !important; /* Reduced from 1rem */
+    margin-bottom: 0.5rem !important; /* Reduced from 1rem */
+    font-size: 14px !important; /* Reduced from 16px */
+    font-style: normal !important;
+    color: #000 !important;
   }
   
-  #toolContent.fade-in {
-    animation: none;
+  /* Avoid page breaks within word groups */
+  .table-section {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Reduce spacing in table sections */
+  .table-section {
+    margin-bottom: 0.1rem !important; /* Minimal margin */
+  }
+  
+  /* Remove any animations */
+  #toolContent.fade-in,
+  .fade-in {
+    animation: none !important;
   }
   
   /* Hide mobile accordion in print */
@@ -638,6 +779,6 @@ footer {
   /* Allow print to adapt to portrait/landscape naturally */
   @page {
     size: auto;
-    margin: 0.5cm;
+    margin: 0.4cm !important; /* Reduced margin from 0.5cm */
   }
 }
