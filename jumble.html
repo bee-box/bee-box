@@ -109,8 +109,8 @@ async function loadPuzzleData() {
 
   try {
     const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
-    // Remove the filter for puzzles with words - all puzzles should be accessible
     const puzzles = [...xml.querySelectorAll("puzzle")]
+      .filter(p => p.getElementsByTagName("word").length)
       .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
 
     const params = new URLSearchParams(window.location.search);
@@ -120,14 +120,14 @@ async function loadPuzzleData() {
 
     let selected;
     if (puzzleId) {
-      // Find puzzle by ID directly
-      selected = puzzles.find(p => p.id === puzzleId || p.getAttribute("id") === puzzleId);
+      // Find puzzle by ID - need to use getAttribute("id") to match the id in XML
+      selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
     } else if (date) {
       // Find puzzle by date
       selected = puzzles.find(p => p.getAttribute("date") === date);
     } else {
-      // Use most recent puzzle that has words by default
-      selected = puzzles.filter(p => p.getElementsByTagName("word").length > 0).at(-1) || mostRecent;
+      // Use most recent puzzle by default
+      selected = mostRecent;
     }
 
     if (!selected) throw new Error("No puzzle selected.");
@@ -164,20 +164,6 @@ function displayPuzzle(p) {
   const rawDate = p.getAttribute("date");
   document.getElementById("navtitleContent").textContent = formatDateString(rawDate);
 
-  // Handle puzzles with no words gracefully
-  const wordElements = [...p.getElementsByTagName("word")];
-  if (wordElements.length === 0) {
-    // Display message when there are no words
-    headerContent.innerHTML = `<div class="header-flex">
-      <div class="header-text">
-        <p>The Completely Unauthorized Games Toolbox presents the Bee Jumble for ${formatDateString(rawDate)}</p>
-        <p>No words available for this puzzle yet.</p>
-      </div>
-    </div>`;
-    combinedContent.innerHTML = `<div class="no-words-message">This puzzle does not contain any words yet.</div>`;
-    return;
-  }
-
   const counts = [...Array(7)].map((_, i) => ({
     letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
     count: +p.getAttribute(`letter${i + 1}count`) || 0
@@ -193,7 +179,7 @@ function displayPuzzle(p) {
   // Create an array of letters excluding the center letter, and sort alphabetically
   const otherLetters = allLetters.filter(letter => letter !== center).sort();
 
-  globalWords = wordElements.map(w => ({
+  globalWords = [...p.getElementsByTagName("word")].map(w => ({
     text: w.textContent,
     length: +w.getAttribute("length"),
     first: w.getAttribute("first").toUpperCase(),
@@ -219,7 +205,7 @@ function displayPuzzle(p) {
   titleDiv.className = "header-text";
   titleDiv.innerHTML = [
     `The Completely Unauthorized Games Toolbox presents the Bee Jumble for ${formatDateString(rawDate)}`,
-    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams") || 0} (${p.getAttribute("perfectpangrams") || 0} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
+    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
     thresh.join(", ")
   ].map(t => `<p>${t}</p>`).join("");
   
@@ -247,9 +233,6 @@ function displayPuzzle(p) {
   
   // Draw hexagons and letters
   hexPositions.forEach(pos => {
-    // Skip if letter is undefined (in case there are fewer than 7 letters)
-    if (!pos.letter) return;
-    
     // Create hexagon
     const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     
