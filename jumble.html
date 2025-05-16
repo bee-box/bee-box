@@ -80,15 +80,31 @@ function setupEventListeners() {
 
   document.getElementById("printButton").addEventListener("click", () => {
     const wordBoxes = document.querySelectorAll(".word-box");
-    wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
+    
+    // Store current state of each word box before printing
+    wordBoxes.forEach((b) => {
+      // Save current display text and background color
+      b.setAttribute("data-print-value", b.textContent);
+      b.setAttribute("data-print-bg", b.style.backgroundColor || "");
+    });
 
     window.addEventListener("beforeprint", () => {
-      wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
+      // Set to print value (current state) before printing
+      wordBoxes.forEach(
+        (b) => (b.textContent = b.getAttribute("data-print-value"))
+      );
     }, { once: true });
 
     window.addEventListener("afterprint", () => {
+      // Restore to same state after printing (don't reset)
       wordBoxes.forEach(b => {
-        b.textContent = revealMode ? b.dataset.word : b.dataset.jumbled;
+        // Keep the same text that was there before printing
+        b.textContent = b.getAttribute("data-print-value");
+        
+        // If it was revealed (had background color), keep it revealed
+        if (b.getAttribute("data-print-bg")) {
+          b.style.backgroundColor = b.getAttribute("data-print-bg");
+        }
       });
     }, { once: true });
 
