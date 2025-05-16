@@ -22,7 +22,7 @@ body {
 
 /* Navigation Styling */
 nav { padding-bottom: 1rem; }
-#navtitle { background: #FFDC00; }
+#navtitle { background: #0023FF; }
 
 .nav-container {
   display: flex;
@@ -108,13 +108,10 @@ footer {
   justify-content: center;
   margin: 0;
   flex-shrink: 0;
-  cursor: pointer; /* Make hive clickable */
+  /* Removed cursor pointer */
 }
 
-.hive-container:hover {
-  transform: scale(1.02); /* Slight enlarge on hover */
-  transition: transform 0.2s ease;
-}
+/* Removed hover effect */
 
 .hive-container svg {
   max-width: 240px;

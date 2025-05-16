@@ -232,10 +232,7 @@ function displayPuzzle(puzzle) {
   // Create SVG for hive
   const hiveContainer = document.createElement("div");
   hiveContainer.className = "hive-container";
-  hiveContainer.title = "Click to go to the NY Times Spelling Bee";
-  hiveContainer.addEventListener("click", () => {
-    window.open("https://www.nytimes.com/puzzles/spelling-bee", "_blank");
-  });
+  // Removed the title attribute and click event listener
   
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("width", "240");
