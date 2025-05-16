@@ -27,7 +27,8 @@
   <div id="headerContent" class="loading">Loading...</div>
 </section>
 
-<section id="combinedSection" class="section-box">
+<!-- 🔧 CHANGED: Added 'combined-container' class -->
+<section id="combinedSection" class="section-box combined-container">
   <div id="combinedContent" class="loading">Loading...</div>
 </section>
 
@@ -41,10 +42,14 @@
     <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
   </div>
 </div>
+
 <script>
+// This is the modified JavaScript code to replace the script section in jumble.html
+
 const toolName = "Bee Jumble";
 let globalWords = [];
 let revealMode = false;
+let mostRecentPuzzleDate = null; // Store the most recent puzzle date
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("pageTitle").textContent = toolName;
@@ -57,32 +62,35 @@ function setupEventListeners() {
   document.getElementById("dateSelector").addEventListener("change", (e) => {
     const d = e.target.value;
     if (d) {
-      const u = new URL(window.location);
-      u.searchParams.set("date", d);
-      u.searchParams.delete("puzzleid");
-      window.location.href = u.toString();
+      // Check if selected date is the most recent puzzle date
+      if (d === mostRecentPuzzleDate) {
+        // Open subscribe modal when trying to access most recent puzzle
+        openSubscribeModal();
+        // Reset the select to previous value
+        setTimeout(() => populateDateSelector(window.cachedPuzzles, window.currentDisplayedDate), 100);
+      } else {
+        const u = new URL(window.location);
+        u.searchParams.set("date", d);
+        u.searchParams.delete("puzzleid");
+        window.location.href = u.toString();
+      }
     }
   });
 
   document.getElementById("printButton").addEventListener("click", () => {
-    // Store current word states for printing
     const wordBoxes = document.querySelectorAll(".word-box");
     wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
 
-    // Set up handlers for before and after printing
     window.addEventListener("beforeprint", () => {
-      // Use the stored value for printing
       wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
     }, { once: true });
 
     window.addEventListener("afterprint", () => {
-      // Reset to proper state after printing
       wordBoxes.forEach(b => {
         b.textContent = revealMode ? b.dataset.word : b.dataset.jumbled;
       });
     }, { once: true });
 
-    // Trigger the browser's print dialog
     window.print();
   });
 
@@ -96,7 +104,6 @@ function setupEventListeners() {
 function openSubscribeModal() {
   document.getElementById("subscribeOverlay").style.display = "flex";
 }
-
 function closeSubscribeModal() {
   document.getElementById("subscribeOverlay").style.display = "none";
 }
@@ -108,51 +115,56 @@ async function loadPuzzleData() {
   header.textContent = content.textContent = "Loading...";
 
   try {
-    const response = await fetch("xml/puzzles.xml");
-    const xmlText = await response.text();
-    const xml = new DOMParser().parseFromString(xmlText, "application/xml");
-    
+    const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
     const puzzles = [...xml.querySelectorAll("puzzle")]
       .filter(p => p.getElementsByTagName("word").length)
       .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
 
+    // Cache puzzles for later use
+    window.cachedPuzzles = puzzles;
+
+    // Get the most recent puzzle date (used to check access restrictions)
+    const mostRecentPuzzle = puzzles.at(-1);
+    mostRecentPuzzleDate = mostRecentPuzzle.getAttribute("date");
+
     const params = new URLSearchParams(window.location.search);
     const puzzleId = params.get("puzzleid");
     const date = params.get("date");
-    const mostRecent = puzzles.at(-1);
 
-    let selected = null;
-    
-    // First priority: Find by puzzle ID
+    let selected;
     if (puzzleId) {
-      // Try looking for the specific lowercase "id" attribute first
+      // Look for puzzle with matching id attribute - always allow access via puzzleid
       selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
       
-      // If not found through direct ID match, check all attributes as fallback
+      // If not found by id attribute, try finding by the element's id property
       if (!selected) {
-        for (let puzzle of puzzles) {
-          for (let attr of puzzle.attributes) {
-            if (attr.value === puzzleId) {
-              selected = puzzle;
-              break;
-            }
-          }
-          if (selected) break;
-        }
+        selected = puzzles.find(p => p.id === puzzleId);
       }
-    }
-    
-    // Second priority: Find by date
-    if (!selected && date) {
-      selected = puzzles.find(p => p.getAttribute("date") === date);
-    }
-    
-    // Third priority: Use most recent puzzle
-    if (!selected) {
-      selected = mostRecent;
+    } else if (date) {
+      // If date parameter is provided, check if it's not the most recent puzzle
+      if (date === mostRecentPuzzleDate) {
+        // If trying to access most recent puzzle by date, show subscribe modal
+        // and use second most recent puzzle instead
+        openSubscribeModal();
+        selected = puzzles.at(-2);
+      } else {
+        // For any other date, show that puzzle
+        selected = puzzles.find(p => p.getAttribute("date") === date);
+      }
+    } else {
+      // By default, show the second most recent puzzle with words
+      selected = puzzles.at(-2);
     }
 
-    if (!selected) throw new Error("No puzzle selected.");
+    if (!selected) {
+      // If no puzzle is found with the specified id or date, show the second most recent one
+      selected = puzzles.at(-2);
+      console.warn(`No puzzle found with id=${puzzleId} or date=${date}. Showing second most recent puzzle instead.`);
+    }
+    
+    // Keep track of currently displayed date for dropdown reset if needed
+    window.currentDisplayedDate = selected.getAttribute("date");
+    
     populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
   } catch (err) {
@@ -206,6 +218,7 @@ function displayPuzzle(p) {
     length: +w.getAttribute("length"),
     first: w.getAttribute("first").toUpperCase(),
     jumbled: w.getAttribute("jumbled"),
+    firsttwo: w.getAttribute("firsttwo"),
     revealed: false
   }));
 
@@ -218,11 +231,9 @@ function displayPuzzle(p) {
     `Queen Bee: ${q}`
   ] : [];
 
-  // Create a flex container for the header
   const headerFlex = document.createElement("div");
   headerFlex.className = "header-flex";
-  
-  // Add title text to the left
+
   const titleDiv = document.createElement("div");
   titleDiv.className = "header-text";
   titleDiv.innerHTML = [
@@ -230,21 +241,18 @@ function displayPuzzle(p) {
     `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
     thresh.join(", ")
   ].map(t => `<p>${t}</p>`).join("");
-  
-  // Create SVG for hive - NON-CLICKABLE VERSION
+
   const hiveContainer = document.createElement("div");
   hiveContainer.className = "hive-container";
-  
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("width", "240");
   svg.setAttribute("height", "220");
   svg.setAttribute("viewBox", "-120 -110 240 220");
-  
-  // Set up hexagon data
+
   const hexSize = 40;
   // Position the hexagons with center in the middle and other letters alphabetically arranged
   const hexPositions = [
-    { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
+    { x: 0, y: 0, letter: center, fill: "#FFDC00" },          // Center
     { x: 0, y: -70, letter: otherLetters[0], fill: "#E6E6E6" },    // Top
     { x: 60, y: -35, letter: otherLetters[1], fill: "#E6E6E6" },   // Top right
     { x: 60, y: 35, letter: otherLetters[2], fill: "#E6E6E6" },    // Bottom right
@@ -252,13 +260,9 @@ function displayPuzzle(p) {
     { x: -60, y: 35, letter: otherLetters[4], fill: "#E6E6E6" },   // Bottom left
     { x: -60, y: -35, letter: otherLetters[5], fill: "#E6E6E6" }   // Top left
   ];
-  
-  // Draw hexagons and letters
+
   hexPositions.forEach(pos => {
-    // Create hexagon
     const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    
-    // Calculate points for a hexagon
     const points = [];
     for (let i = 0; i < 6; i++) {
       const angle = (Math.PI / 3) * i;
@@ -266,14 +270,12 @@ function displayPuzzle(p) {
       const y = pos.y + hexSize * Math.sin(angle);
       points.push(`${x},${y}`);
     }
-    
     hex.setAttribute("points", points.join(" "));
-    hex.setAttribute("fill", pos.fill === "#F7DA21" ? "#FFA726" : pos.fill); // Use new color for center
+    hex.setAttribute("fill", pos.fill);
     hex.setAttribute("stroke", "#FFFFFF");
     hex.setAttribute("stroke-width", "2");
     svg.appendChild(hex);
-    
-    // Create letter
+
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", pos.x);
     text.setAttribute("y", pos.y + 2);
@@ -285,19 +287,14 @@ function displayPuzzle(p) {
     text.textContent = pos.letter;
     svg.appendChild(text);
   });
-  
+
   hiveContainer.appendChild(svg);
-  
-  // Add both elements to the flex container
   headerFlex.appendChild(titleDiv);
   headerFlex.appendChild(hiveContainer);
   headerContent.appendChild(headerFlex);
 
-  // Create a single container for all words
   const wordsContainer = document.createElement("div");
   wordsContainer.className = "words-container";
-  
-  // Group words by length
   const wordsByLength = {};
   globalWords.forEach(word => {
     if (!wordsByLength[word.length]) {
@@ -305,446 +302,55 @@ function displayPuzzle(p) {
     }
     wordsByLength[word.length].push(word);
   });
-  
-  // Sort word lengths numerically
+
   const lengths = Object.keys(wordsByLength).map(Number).sort((a, b) => a - b);
-  
-  // Create a section for each length group
   lengths.forEach(length => {
     const lengthGroup = document.createElement("div");
     lengthGroup.className = "length-group";
-    
-    // Create header for this length group
+
     const lengthHeader = document.createElement("div");
     lengthHeader.className = "length-group-header";
     lengthHeader.textContent = `${length}-letter words (${wordsByLength[length].length})`;
     lengthGroup.appendChild(lengthHeader);
-    
-    // Create grid for words of this length
+
     const wordsGrid = document.createElement("div");
     wordsGrid.className = "words-grid";
-    
-    // Sort words by jumbled text alphabetically
-    const sortedWords = [...wordsByLength[length]].sort((a, b) => 
-      a.jumbled.localeCompare(b.jumbled)
+
+    const sortedWords = [...wordsByLength[length]].sort((a, b) =>
+      a.text.localeCompare(b.text)
     );
-    
-    // Add word boxes to the grid
+
     sortedWords.forEach(word => {
       const box = document.createElement("div");
       box.className = "word-box";
       box.dataset.word = word.text;
       box.dataset.jumbled = word.jumbled;
       box.textContent = revealMode ? word.text : word.jumbled;
-      
+
       box.addEventListener("click", () => {
         const isRevealed = box.textContent === box.dataset.jumbled;
         box.textContent = isRevealed ? box.dataset.word : box.dataset.jumbled;
-        
-        // Change background color to our custom orange-yellow when the word is revealed
         box.style.backgroundColor = isRevealed ? "var(--jumble-highlight)" : "";
       });
-      
+
       if (revealMode) {
-        box.style.backgroundColor = "var(--jumble-highlight)"; // Use custom color when in reveal mode
+        box.style.backgroundColor = "var(--jumble-highlight)";
       }
-      
+
       wordsGrid.appendChild(box);
     });
-    
+
     lengthGroup.appendChild(wordsGrid);
     wordsContainer.appendChild(lengthGroup);
   });
-  
+
   combinedContent.appendChild(wordsContainer);
 }
 
 function toggleRevealAll(on) {
   document.querySelectorAll(".word-box").forEach(b => {
     b.textContent = on ? b.dataset.word : b.dataset.jumbled;
-    b.style.backgroundColor = on ? "var(--jumble-highlight)" : ""; // Use custom color
-  });
-}
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title id="pageTitle">Bee Jumble</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style/jumble.css">
-</head>
-<body>
-<nav id="navtitle" class="section-box">
-  <div class="nav-container">
-    <div class="nav-left">
-      <h1 id="toolNameHeading">Bee Jumble</h1>
-      <div id="navtitleContent" class="date-display"></div>
-    </div>
-    <div class="nav-right" id="navControls">
-      <select id="dateSelector"><option value="">Choose a Day</option></select>
-      <button id="printButton">Print</button>
-      <button id="revealButton">Reveal</button>
-      <a href="https://beebox.ghost.io" target="_blank">Home</a>
-      <a href="#" id="subscribePopupBtn" onclick="openSubscribeModal(); return false;">Subscribe</a>
-    </div>
-  </div>
-</nav>
-
-<section id="header" class="section-box">
-  <div id="headerContent" class="loading">Loading...</div>
-</section>
-
-<section id="combinedSection" class="section-box">
-  <div id="combinedContent" class="loading">Loading...</div>
-</section>
-
-<footer class="section-box">
-  <p>Made by Kevin Kolb · <a href="https://beebox.ghost.io" target="_blank">beebox.ghost.io</a></p>
-</footer>
-
-<div class="modal-overlay" id="subscribeOverlay">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeSubscribeModal()">&times;</button>
-    <iframe src="https://beebox.ghost.io/subscribe/" title="Subscribe Form"></iframe>
-  </div>
-</div>
-<script>
-const toolName = "Bee Jumble";
-let globalWords = [];
-let revealMode = false;
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("pageTitle").textContent = toolName;
-  document.getElementById("toolNameHeading").textContent = toolName;
-  setupEventListeners();
-  loadPuzzleData();
-});
-
-function setupEventListeners() {
-  document.getElementById("dateSelector").addEventListener("change", (e) => {
-    const d = e.target.value;
-    if (d) {
-      const u = new URL(window.location);
-      u.searchParams.set("date", d);
-      u.searchParams.delete("puzzleid");
-      window.location.href = u.toString();
-    }
-  });
-
-  document.getElementById("printButton").addEventListener("click", () => {
-    // Store current word states for printing
-    const wordBoxes = document.querySelectorAll(".word-box");
-    wordBoxes.forEach(b => b.setAttribute("data-print-value", b.textContent));
-
-    // Set up handlers for before and after printing
-    window.addEventListener("beforeprint", () => {
-      // Use the stored value for printing
-      wordBoxes.forEach(b => b.textContent = b.getAttribute("data-print-value"));
-    }, { once: true });
-
-    window.addEventListener("afterprint", () => {
-      // Reset to proper state after printing
-      wordBoxes.forEach(b => {
-        b.textContent = revealMode ? b.dataset.word : b.dataset.jumbled;
-      });
-    }, { once: true });
-
-    // Trigger the browser's print dialog
-    window.print();
-  });
-
-  document.getElementById("revealButton").addEventListener("click", () => {
-    revealMode = !revealMode;
-    toggleRevealAll(revealMode);
-    document.getElementById("revealButton").textContent = revealMode ? "Hide" : "Reveal";
-  });
-}
-
-function openSubscribeModal() {
-  document.getElementById("subscribeOverlay").style.display = "flex";
-}
-
-function closeSubscribeModal() {
-  document.getElementById("subscribeOverlay").style.display = "none";
-}
-
-async function loadPuzzleData() {
-  const header = document.getElementById("headerContent");
-  const content = document.getElementById("combinedContent");
-  header.className = content.className = "loading";
-  header.textContent = content.textContent = "Loading...";
-
-  try {
-    // Fetch the XML
-    const response = await fetch("xml/puzzles.xml");
-    const xmlText = await response.text();
-    
-    // Look for ID pattern in the raw XML to understand the format
-    const idPattern = /puzzle\s+id=["']([^"']+)["']/;
-    const idMatches = xmlText.match(new RegExp(idPattern, 'g')) || [];
-    if (idMatches.length > 0) {
-      console.log("ID format examples from XML:", idMatches.slice(0, 3));
-    }
-    
-    const xml = new DOMParser().parseFromString(xmlText, "application/xml");
-    const puzzles = [...xml.querySelectorAll("puzzle")]
-      .filter(p => p.getElementsByTagName("word").length)
-      .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
-
-    const params = new URLSearchParams(window.location.search);
-    const puzzleId = params.get("puzzleid");
-    const date = params.get("date");
-    const mostRecent = puzzles.at(-1);
-    
-    console.log("URL Parameters:", {puzzleId, date});
-
-    let selected = null;
-    
-    if (puzzleId) {
-      console.log("Looking for puzzle with ID:", puzzleId);
-      
-      // First try direct match
-      selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
-      
-      // If not found, try a more flexible approach -
-      // Find by any attribute containing the specified ID value
-      if (!selected) {
-        for (let puzzle of puzzles) {
-          for (let attr of puzzle.attributes) {
-            if (attr.value === puzzleId) {
-              console.log(`Found puzzle with ${attr.name}="${puzzleId}"`);
-              selected = puzzle;
-              break;
-            }
-          }
-          if (selected) break;
-        }
-      }
-    }
-    
-    // If we didn't find by ID, try by date
-    if (!selected && date) {
-      selected = puzzles.find(p => p.getAttribute("date") === date);
-    }
-    
-    // If still no match, use most recent
-    if (!selected) {
-      selected = mostRecent;
-    }
-
-    if (!selected) throw new Error("No puzzle selected.");
-    populateDateSelector(puzzles, selected.getAttribute("date"));
-    displayPuzzle(selected);
-  } catch (err) {
-    header.innerHTML = `<p>⚠️ Error loading puzzle data.</p>`;
-    content.innerHTML = "";
-    console.error("Puzzle load error:", err);
-  }
-}
-
-function populateDateSelector(puzzles, selectedDate) {
-  const s = document.getElementById("dateSelector");
-  while (s.options.length > 1) s.remove(1);
-  [...puzzles].reverse().forEach(p => {
-    const d = p.getAttribute("date");
-    s.add(new Option(d, d, d === selectedDate, d === selectedDate));
-  });
-}
-
-function formatDateString(str) {
-  const [y, m, d] = str.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
-    weekday: "long", year: "numeric", month: "long", day: "numeric"
-  });
-}
-
-function displayPuzzle(p) {
-  const combinedContent = document.getElementById("combinedContent");
-  const headerContent = document.getElementById("headerContent");
-  combinedContent.innerHTML = headerContent.innerHTML = "";
-
-  const rawDate = p.getAttribute("date");
-  document.getElementById("navtitleContent").textContent = formatDateString(rawDate);
-
-  const counts = [...Array(7)].map((_, i) => ({
-    letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
-    count: +p.getAttribute(`letter${i + 1}count`) || 0
-  }));
-  const countMap = Object.fromEntries(counts.map(c => [c.letter, c.count]));
-  
-  // Center letter should be the first letter attribute
-  const center = p.getAttribute("letter1").toUpperCase();
-  
-  // Get all unique letters from attributes
-  const allLetters = counts.map(c => c.letter).filter(Boolean);
-  
-  // Create an array of letters excluding the center letter, and sort alphabetically
-  const otherLetters = allLetters.filter(letter => letter !== center).sort();
-
-  globalWords = [...p.getElementsByTagName("word")].map(w => ({
-    text: w.textContent,
-    length: +w.getAttribute("length"),
-    first: w.getAttribute("first").toUpperCase(),
-    jumbled: w.getAttribute("jumbled"),
-    revealed: false
-  }));
-
-  const q = +p.getAttribute("queenbee") || 0;
-  const thresh = q ? [
-    `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
-    `Good: ${Math.round(q * 0.08)}`, `Solid: ${Math.round(q * 0.15)}`,
-    `Nice: ${Math.round(q * 0.25)}`, `Great: ${Math.round(q * 0.40)}`,
-    `Amazing: ${Math.round(q * 0.50)}`, `Genius: ${Math.round(q * 0.70)}`,
-    `Queen Bee: ${q}`
-  ] : [];
-
-  // Create a flex container for the header
-  const headerFlex = document.createElement("div");
-  headerFlex.className = "header-flex";
-  
-  // Add title text to the left
-  const titleDiv = document.createElement("div");
-  titleDiv.className = "header-text";
-  titleDiv.innerHTML = [
-    `The Completely Unauthorized Games Toolbox presents the Bee Jumble for ${formatDateString(rawDate)}`,
-    `Words: ${globalWords.length}, Pangrams: ${p.getAttribute("pangrams")} (${p.getAttribute("perfectpangrams")} Perfect), ${p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO"}`,
-    thresh.join(", ")
-  ].map(t => `<p>${t}</p>`).join("");
-  
-  // Create SVG for hive - NON-CLICKABLE VERSION
-  const hiveContainer = document.createElement("div");
-  hiveContainer.className = "hive-container";
-  
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "240");
-  svg.setAttribute("height", "220");
-  svg.setAttribute("viewBox", "-120 -110 240 220");
-  
-  // Set up hexagon data
-  const hexSize = 40;
-  // Position the hexagons with center in the middle and other letters alphabetically arranged
-  const hexPositions = [
-    { x: 0, y: 0, letter: center, fill: "#F7DA21" },          // Center (yellow)
-    { x: 0, y: -70, letter: otherLetters[0], fill: "#E6E6E6" },    // Top
-    { x: 60, y: -35, letter: otherLetters[1], fill: "#E6E6E6" },   // Top right
-    { x: 60, y: 35, letter: otherLetters[2], fill: "#E6E6E6" },    // Bottom right
-    { x: 0, y: 70, letter: otherLetters[3], fill: "#E6E6E6" },     // Bottom
-    { x: -60, y: 35, letter: otherLetters[4], fill: "#E6E6E6" },   // Bottom left
-    { x: -60, y: -35, letter: otherLetters[5], fill: "#E6E6E6" }   // Top left
-  ];
-  
-  // Draw hexagons and letters
-  hexPositions.forEach(pos => {
-    // Create hexagon
-    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    
-    // Calculate points for a hexagon
-    const points = [];
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
-      const x = pos.x + hexSize * Math.cos(angle);
-      const y = pos.y + hexSize * Math.sin(angle);
-      points.push(`${x},${y}`);
-    }
-    
-    hex.setAttribute("points", points.join(" "));
-    hex.setAttribute("fill", pos.fill === "#F7DA21" ? "#FFA726" : pos.fill); // Use new color for center
-    hex.setAttribute("stroke", "#FFFFFF");
-    hex.setAttribute("stroke-width", "2");
-    svg.appendChild(hex);
-    
-    // Create letter
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", pos.x);
-    text.setAttribute("y", pos.y + 2);
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("dominant-baseline", "middle");
-    text.setAttribute("font-size", "24");
-    text.setAttribute("font-weight", "bold");
-    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
-    text.textContent = pos.letter;
-    svg.appendChild(text);
-  });
-  
-  hiveContainer.appendChild(svg);
-  
-  // Add both elements to the flex container
-  headerFlex.appendChild(titleDiv);
-  headerFlex.appendChild(hiveContainer);
-  headerContent.appendChild(headerFlex);
-
-  // Create a single container for all words
-  const wordsContainer = document.createElement("div");
-  wordsContainer.className = "words-container";
-  
-  // Group words by length
-  const wordsByLength = {};
-  globalWords.forEach(word => {
-    if (!wordsByLength[word.length]) {
-      wordsByLength[word.length] = [];
-    }
-    wordsByLength[word.length].push(word);
-  });
-  
-  // Sort word lengths numerically
-  const lengths = Object.keys(wordsByLength).map(Number).sort((a, b) => a - b);
-  
-  // Create a section for each length group
-  lengths.forEach(length => {
-    const lengthGroup = document.createElement("div");
-    lengthGroup.className = "length-group";
-    
-    // Create header for this length group
-    const lengthHeader = document.createElement("div");
-    lengthHeader.className = "length-group-header";
-    lengthHeader.textContent = `${length}-letter words (${wordsByLength[length].length})`;
-    lengthGroup.appendChild(lengthHeader);
-    
-    // Create grid for words of this length
-    const wordsGrid = document.createElement("div");
-    wordsGrid.className = "words-grid";
-    
-    // Sort words by jumbled text alphabetically
-    const sortedWords = [...wordsByLength[length]].sort((a, b) => 
-      a.jumbled.localeCompare(b.jumbled)
-    );
-    
-    // Add word boxes to the grid
-    sortedWords.forEach(word => {
-      const box = document.createElement("div");
-      box.className = "word-box";
-      box.dataset.word = word.text;
-      box.dataset.jumbled = word.jumbled;
-      box.textContent = revealMode ? word.text : word.jumbled;
-      
-      box.addEventListener("click", () => {
-        const isRevealed = box.textContent === box.dataset.jumbled;
-        box.textContent = isRevealed ? box.dataset.word : box.dataset.jumbled;
-        
-        // Change background color to our custom orange-yellow when the word is revealed
-        box.style.backgroundColor = isRevealed ? "var(--jumble-highlight)" : "";
-      });
-      
-      if (revealMode) {
-        box.style.backgroundColor = "var(--jumble-highlight)"; // Use custom color when in reveal mode
-      }
-      
-      wordsGrid.appendChild(box);
-    });
-    
-    lengthGroup.appendChild(wordsGrid);
-    wordsContainer.appendChild(lengthGroup);
-  });
-  
-  combinedContent.appendChild(wordsContainer);
-}
-
-function toggleRevealAll(on) {
-  document.querySelectorAll(".word-box").forEach(b => {
-    b.textContent = on ? b.dataset.word : b.dataset.jumbled;
-    b.style.backgroundColor = on ? "var(--jumble-highlight)" : ""; // Use custom color
+    b.style.backgroundColor = on ? "var(--jumble-highlight)" : "";
   });
 }
 </script>

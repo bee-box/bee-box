@@ -17,9 +17,9 @@ body {
   margin-bottom: 1.5rem;
 }
 
-/* Custom color for this game - more orange-yellow */
+/* Custom color for this game - changed to yellow-green */
 :root {
-  --jumble-highlight: #FFA726; /* Orange-yellow shade */
+  --jumble-highlight: #8A2BE2;
 }
 
 /* Navigation styles */
@@ -27,18 +27,28 @@ nav { padding-bottom: 1rem; }
 #navtitle { background: var(--jumble-highlight); }
 .nav-container {
   display: flex;
-  align-items: center;
+  align-items: center; /* Center vertically */
   flex-wrap: wrap;
+  min-height: 60px; /* Ensure minimum height for vertical centering */
 }
 .nav-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center; /* Center content vertically */
   margin-right: 1rem;
   min-width: 200px;
 }
-.nav-left h1 { margin: 0; font-size: 1.75rem; }
-.date-display { height: 1.25rem; color: #000; }
+.nav-left h1 { 
+  margin: 0 0 5px 0; 
+  font-size: 1.75rem; 
+}
+.date-display { 
+  height: 1.25rem; 
+  color: #000; 
+  display: flex;
+  align-items: center;
+}
 .nav-right {
   margin-left: auto;
   display: flex;
@@ -46,13 +56,19 @@ nav { padding-bottom: 1rem; }
   gap: .5rem;
   align-items: center;
 }
-.nav-right a, .nav-right button, .nav-right select {
+
+/* Updated button styles with consistent fixed width */
+.nav-right a, 
+.nav-right button {
   background: #fff;
   color: #000;
   border: 1px solid #000;
   font-size: 0.875rem;
   padding: .25rem .5rem;
   height: 30px;
+  width: 90px; /* Fixed width for all buttons and links */
+  min-width: 90px; /* Added min-width to enforce sizing */
+  max-width: 90px; /* Added max-width to enforce sizing */
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
@@ -61,7 +77,32 @@ nav { padding-bottom: 1rem; }
   transition: background-color .2s, color .2s;
   text-decoration: none;
   border-radius: 4px;
+  flex-grow: 0; /* Prevent growth */
+  flex-shrink: 0; /* Prevent shrinking */
+  text-align: center; /* Ensure text is centered */
+  overflow: hidden; /* Prevent text overflow */
+  white-space: nowrap; /* Keep text on one line */
 }
+
+/* Separate select styling to handle its unique requirements */
+.nav-right select {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  font-size: 0.875rem;
+  padding: .25rem .5rem;
+  height: 30px;
+  width: 190px; /* Keep the select's width as specified */
+  min-width: 190px;
+  max-width: 190px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color .2s, color .2s;
+  border-radius: 4px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
 .nav-right a:hover, .nav-right button:hover, .nav-right select:hover {
   background: #000;
   color: #fff;
@@ -70,7 +111,12 @@ nav { padding-bottom: 1rem; }
 select#dateSelector { min-width: 190px; max-width: 190px; }
 
 /* Content styling */
-.loading, .error { min-height: 12rem; }
+.loading, .error { 
+  min-height: 12rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .fade-in { animation: fade .4s ease-in; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -85,28 +131,152 @@ footer {
 #headerContent p:not(:last-child) { margin-bottom: 0.25rem; }
 
 /* Hive SVG Styles - NON-CLICKABLE VERSION */
-.header-flex {
+/* Lock the header section height to prevent jumping during load */
+#header.section-box {
+  min-height: 350px; /* Fixed height to prevent layout jumps */
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: center;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
+
+/* Loading indicator styling specific to header */
+#headerContent.loading {
+  min-height: 310px; /* Match expected content height */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: space-between;
+  gap: 2rem; /* Increased from 1rem */
+  width: 100%;
+}
+
 .header-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  min-height: 310px; /* Match header content height */
 }
+
 .hive-container {
   display: flex;
+  align-items: center; /* Center vertically */
   justify-content: center;
   margin: 0;
   flex-shrink: 0;
+  width: 280px; /* Fixed width */
+  height: 260px; /* Fixed height */
 }
 .hive-container svg {
-  max-width: 240px;
+  max-width: 280px; /* Increased from 240px */
+  width: 100%;
   height: auto;
 }
 .hive-container svg text {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   user-select: none;
+}
+
+/* Mobile layout for the hive - NEW ADDITION */
+@media (max-width: 768px) {
+  /* Maintain header height but adjust layout */
+  #header.section-box {
+    min-height: 420px; /* Increased for stacked layout */
+  }
+  
+  #headerContent.loading {
+    min-height: 380px; /* Match expected mobile content height */
+  }
+  
+  /* Maintain fixed height for combined container on mobile */
+  #combinedSection.section-box {
+    min-height: 450px; /* Increased for mobile */
+  }
+  
+  #combinedContent.loading {
+    min-height: 420px; /* Match expected mobile content height */
+  }
+  
+  .header-flex {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .header-text {
+    text-align: center;
+    min-height: auto;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .hive-container {
+    width: 240px; /* Consistent with grid.css */
+    height: 220px;
+    margin: 0 auto; /* Center horizontally */
+  }
+  
+  .hive-container svg {
+    max-width: 240px;
+  }
+  
+  /* Adjust button width for mobile */
+  .nav-right a, .nav-right button {
+    width: calc(50% - 0.25rem); /* Two buttons per row with gap */
+    min-width: unset; /* Remove min-width for mobile */
+    max-width: unset; /* Remove max-width for mobile */
+  }
+  
+  select#dateSelector {
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .nav-container {
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+    text-align: center;
+  }
+  
+  .nav-left {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+    align-items: center; /* Center text */
+    text-align: center;
+  }
+  
+  .nav-right {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center; /* Center buttons */
+  }
+}
+
+/* Fixed height for combined container */
+#combinedSection.section-box {
+  min-height: 400px; /* Fixed height to prevent jumping */
+  box-sizing: border-box;
+}
+
+#combinedContent.loading {
+  min-height: 370px; /* Match expected content height */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Single column words container */
@@ -115,13 +285,11 @@ footer {
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
+  width: 100%;
 }
-
-/* Length group styling */
 .length-group {
   margin-bottom: 1rem;
 }
-
 .length-group-header {
   font-weight: bold;
   padding: 0.5rem;
@@ -129,16 +297,12 @@ footer {
   border-radius: 4px;
   margin-bottom: 0.5rem;
 }
-
-/* Words grid for each length group - exactly 4 per row */
 .words-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
   width: 100%;
 }
-
-/* Word box styling */
 .word-box {
   padding: 0.5rem;
   border: 1px solid #ddd;
@@ -150,9 +314,15 @@ footer {
   box-sizing: border-box;
   transition: background-color 0.2s ease;
 }
-
 .word-box:hover {
   background-color: #f9f9f9;
+}
+
+/* Mobile layout for word grid - ADDITIONAL IMPROVEMENT */
+@media (max-width: 640px) {
+  .words-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* Modal Styles */
@@ -196,135 +366,16 @@ footer {
   z-index: 10001;
 }
 
-/* Mobile accordion styles */
-.mobile-accordion {
-  display: none;
-}
-.accordion-item {
-  margin-bottom: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.accordion-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  background-color: #f5f5f5;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.accordion-header:hover {
-  background-color: #eaeaea;
-}
-.accordion-letter-container {
-  display: flex;
-  align-items: center;
-}
-.accordion-letter {
-  font-size: 18px;
-  font-weight: bold;
-  margin-right: 8px;
-}
-.accordion-letter.center-letter {
-  color: #000;
-  background-color: var(--jumble-highlight);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.accordion-count {
-  font-size: 14px;
-  color: #666;
-}
-.accordion-indicator {
-  font-size: 18px;
-  transition: transform 0.3s;
-}
-.accordion-item.active .accordion-indicator {
-  transform: rotate(180deg);
-}
-.accordion-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out;
-}
-.accordion-item.active .accordion-content {
-  max-height: 2000px;
-}
-.accordion-words {
-  padding: 12px;
-}
-.accordion-words .word-box {
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-/* Mobile adjustments - still keep 4 per row */
-@media (max-width: 768px) {
-  body {
-    font-size: 14px;
-    padding: 0.5rem;
-  }
-  .section-box {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-  .nav-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .nav-right {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: 100%;
-    justify-content: space-between;
-  }
-  select#dateSelector {
-    min-width: 150px;
-    max-width: 150px;
-  }
-  .header-flex {
-    flex-direction: column;
-  }
-  .hive-container svg {
-    max-width: 200px;
-  }
-  
-  .words-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.25rem;
-  }
-  
-  .word-box {
-    padding: 0.25rem;
-    font-size: 0.9rem;
-  }
-  
-  /* Show the mobile accordion on very small screens */
-  @media (max-width: 480px) {
-    .words-container {
-      display: none;
-    }
-    
-    .mobile-accordion {
-      display: block;
-      margin-top: 10px;
-    }
-  }
-}
-
 /* Print-specific styles */
 @media print {
   body {
-    font-size: 12px;
-    background: white;
+    font-size: 14px; /* Increased base size for print */
+    background: white !important;
     padding: 0;
     margin: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
   }
   
   #navtitle, footer, .modal-overlay {
@@ -334,85 +385,108 @@ footer {
   .section-box {
     box-shadow: none;
     border: none;
-    padding: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
+    padding: 0.2rem !important; /* Slight padding */
+    margin-bottom: 0.25rem !important; /* Small margin between sections */
+    min-height: unset !important; /* Remove all min-height settings */
   }
   
-  /* Header layout for print */
+  /* Reduce header section height */
+  #header.section-box {
+    min-height: unset !important;
+    padding: 0.2rem !important;
+  }
+  
+  /* Adjusted header flex for more compact print layout */
   .header-flex {
     display: flex;
     flex-direction: row !important;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem !important;
+    gap: 0.5rem !important; /* Moderate gap */
+    min-height: unset !important;
   }
   
   .header-text {
     flex: 1;
+    min-height: unset !important;
+  }
+  
+  #headerContent {
+    min-height: unset !important;
   }
   
   #headerContent p {
     white-space: nowrap;
-    line-height: 1.1 !important;
-    margin-bottom: 0.15rem !important;
+    line-height: 1.2 !important; /* Readable line height */
+    margin-bottom: 0.15rem !important; /* Small margin */
+    font-size: 13px !important; /* Increased font size */
   }
   
-  /* Make hive smaller for print */
   .hive-container {
-    flex-shrink: 0;
+    width: 170px !important; /* Moderate hive size for print */
+    height: 160px !important;
+    min-height: unset !important;
   }
   
   .hive-container svg {
-    max-width: 180px !important;
-    height: auto;
+    max-width: 170px !important;
   }
   
-  /* Words layout for print */
+  /* Keep the hive letter size the same as before */
+  .hive-container svg text {
+    font-size: 24px; /* Keep original size */
+  }
+  
+  /* Word boxes for print - no spacing between sections */
   .words-container {
-    padding: 0.25rem !important;
+    padding: 0 !important;
   }
   
   .length-group {
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0 !important; /* No spacing between word sections */
+    page-break-inside: avoid !important;
   }
   
   .length-group-header {
+    font-size: 16px !important;
     padding: 0.25rem !important;
+    margin-top: 0 !important;
     margin-bottom: 0.25rem !important;
-    font-size: 0.9rem !important;
+    background-color: #f0f0f0 !important;
+    border-radius: 0 !important; /* Remove rounded corners */
   }
   
   .words-grid {
     gap: 0.25rem !important;
+    margin-bottom: 0 !important; /* No bottom margin */
   }
   
   .word-box {
-    padding: 0.15rem 0.3rem !important;
-    margin-bottom: 0.1rem !important;
-    line-height: 1.1 !important;
-    font-size: 0.9rem !important;
+    font-size: 16px !important;
+    padding: 0.25rem !important;
+    border: 1px solid #aaa !important;
   }
   
-  /* Change highlighted areas to gray in print */
   .word-box[style*="background-color"] {
     background-color: #D0D0D0 !important;
   }
   
-  /* Make the center hexagon gray in print */
-  .hive-container svg polygon[fill="#FFA726"] {
-    fill: #D0D0D0 !important;
-  }
-  
+  /* THE END text at the end of the content - not bold */
   .combined-container::after {
     content: "THE END";
     display: block;
     text-align: center;
-    margin-top: 0.5rem !important;
-    font-style: italic;
-    color: #666;
+    font-weight: normal; /* Changed from default to normal */
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+    font-size: 16px !important;
+    font-style: normal !important; /* Removing italic style */
+    color: #000 !important; /* Making it black instead of gray */
   }
   
-  .mobile-accordion {
-    display: none !important;
+  /* Allow print to adapt to portrait/landscape naturally */
+  @page {
+    size: auto;
+    margin: 0.5cm;
   }
 }
