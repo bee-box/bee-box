@@ -115,9 +115,15 @@ async function loadPuzzleData() {
     const mostRecent = puzzles.at(-1);
 
     let selected;
-    if (puzzleId && !date) {
-      selected = puzzles.find(p => p.id === puzzleId);
-    } else if (date && !puzzleId) {
+    if (puzzleId) {
+      // Look for puzzle with matching id attribute
+      selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
+      
+      // If not found by id attribute, try finding by the element's id property
+      if (!selected) {
+        selected = puzzles.find(p => p.id === puzzleId);
+      }
+    } else if (date) {
       // If date parameter is provided, show that puzzle regardless of whether it's the most recent
       selected = puzzles.find(p => p.getAttribute("date") === date);
     } else {
@@ -125,7 +131,12 @@ async function loadPuzzleData() {
       selected = mostRecent;
     }
 
-    if (!selected) throw new Error("No puzzle selected.");
+    if (!selected) {
+      // If no puzzle is found with the specified id or date, show the most recent one
+      selected = mostRecent;
+      console.warn(`No puzzle found with id=${puzzleId} or date=${date}. Showing most recent puzzle instead.`);
+    }
+    
     populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
   } catch (err) {
