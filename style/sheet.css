@@ -127,8 +127,8 @@ footer {
   color: #666;
 }
 .error { color: #d32f2f; text-align: center; }
-#headerContent p, #lettersContent p { margin: 0; text-align: center; }
-#headerContent p:not(:last-child), #lettersContent p:not(:last-child) { margin-bottom: 0.25rem; }
+#headerContent p { margin: 0; text-align: center; }
+#headerContent p:not(:last-child) { margin-bottom: 0.25rem; }
 
 /* ─── Unified table styles for Bee Sheet ─── */
 .bee-table {
@@ -143,38 +143,6 @@ footer {
   padding: 0.5rem;
   vertical-align: middle;
   background-color: #fff;
-}
-
-/* ─── Letters Table ─── */
-.letters-table {
-  margin-bottom: 0.5rem;
-}
-.letters-table td {
-  text-align: center;
-  height: 25px;
-  padding: 2px;
-}
-.letters-table .wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.letters-table .char {
-  font-size: 1rem; /* Standardized */
-  line-height: 1;
-}
-.letters-table .char.bold {
-  font-weight: 700;
-}
-.letters-table .count {
-  font-size: 1rem; /* Standardized */
-  margin-left: 2px;
-  line-height: 1;
-  color: #666;
-}
-/* Special styling for center letter */
-.letters-table .center-letter {
-  background-color: #FFF8E1;
 }
 
 /* ─── Lengths Table ─── */
@@ -420,8 +388,8 @@ footer {
     display: none;
   }
   
-  /* Keep letters and lengths tables visible */
-  .letters-table, .lengths-table {
+  /* Keep lengths table visible */
+  .lengths-table {
     display: table;
   }
   
@@ -599,15 +567,8 @@ footer {
     margin-bottom: 0.25rem !important;
   }
   
-  /* Make letter table more compact */
-  .letters-table td {
-    height: 20px !important;
-    padding: 1px !important;
-  }
-  
   /* Keep border styles consistent with web version */
-  /* Letters and length tables retain borders */
-  .letters-table td,
+  /* Length tables retain borders */
   .lengths-table td {
     border: 1px solid #ccc;
   }

@@ -28,7 +28,6 @@
 
 <!-- ───────── PAGE SECTIONS ────────────────────────── -->
 <section id="header" class="section-box"><div id="headerContent" class="loading">Loading...</div></section>
-<section id="letters" class="section-box"><div id="lettersContent" class="loading">Loading...</div></section>
 <section id="lengths" class="section-box"><div id="lengthsContent" class="loading">Loading...</div></section>
 <section id="tool" class="section-box combined-container"><div id="toolContent" class="loading">Loading...</div></section>
 
@@ -52,10 +51,19 @@ let revealMode = false;
 let mostRecentPuzzleDate = null; // Store the most recent puzzle date
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM content loaded, initializing Bee Sheet");
   document.getElementById("pageTitle").textContent = toolName;
   document.getElementById("toolNameHeading").textContent = toolName;
   setupEventListeners();
-  loadPuzzleData();
+  
+  console.log("Starting data load");
+  loadPuzzleData().catch(err => {
+    console.error("Error in main data loading process:", err);
+    document.querySelectorAll(".loading").forEach(el => {
+      el.className = "error";
+      el.innerHTML = `<p>⚠️ Error loading puzzle data: ${err.message}</p>`;
+    });
+  });
 });
 
 function openSubscribeModal() {
@@ -114,20 +122,41 @@ function setupEventListeners() {
 }
 
 async function loadPuzzleData() {
-  const els = ["toolContent", "lettersContent", "lengthsContent", "headerContent"].map(id => document.getElementById(id));
+  const els = ["toolContent", "lengthsContent", "headerContent"].map(id => document.getElementById(id));
   els.forEach(el => { el.className = "loading"; el.textContent = "Loading..."; });
 
   try {
-    const xml = new DOMParser().parseFromString(await (await fetch("xml/puzzles.xml")).text(), "application/xml");
+    // Fetch the XML data
+    const response = await fetch("xml/puzzles.xml");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch puzzles: ${response.status} ${response.statusText}`);
+    }
+    
+    const xmlText = await response.text();
+    const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+    
+    // Check for parsing errors
+    const parseError = xml.querySelector("parsererror");
+    if (parseError) {
+      throw new Error("XML parsing error: " + parseError.textContent);
+    }
+    
+    // Get all puzzles and sort by date
     const puzzles = [...xml.querySelectorAll("puzzle")]
       .filter(p => p.getElementsByTagName("word").length)
       .sort((a, b) => new Date(a.getAttribute("date")) - new Date(b.getAttribute("date")));
+    
+    if (puzzles.length === 0) {
+      throw new Error("No puzzles found in the XML");
+    }
+
+    console.log(`Found ${puzzles.length} puzzles`);
 
     // Cache puzzles for later use
     window.cachedPuzzles = puzzles;
 
     // Get the most recent puzzle date (used to check access restrictions)
-    const mostRecentPuzzle = puzzles.at(-1);
+    const mostRecentPuzzle = puzzles[puzzles.length - 1];
     mostRecentPuzzleDate = mostRecentPuzzle.getAttribute("date");
 
     const params = new URLSearchParams(window.location.search);
@@ -137,31 +166,34 @@ async function loadPuzzleData() {
     let selected;
     if (puzzleId) {
       // Look for puzzle with matching id attribute
-      selected = puzzles.find((x) => x.id === puzzleId);
+      selected = puzzles.find((p) => p.getAttribute("id") === puzzleId);
       
       // If not found by id attribute, try finding by the element's id property
       if (!selected) {
-        selected = puzzles.find(p => p.getAttribute("id") === puzzleId);
+        selected = puzzles.find(p => p.id === puzzleId);
       }
+      
+      console.log(`Selected puzzle by id: ${puzzleId}`, selected ? "found" : "not found");
     } else if (date) {
       // If date parameter is provided, check if it's the most recent puzzle
-      if (date === mostRecentPuzzleDate) {
+      selected = puzzles.find((p) => p.getAttribute("date") === date);
+      
+      if (selected === mostRecentPuzzle) {
         // If trying to access most recent puzzle by date, show subscribe modal
-        // and use second most recent puzzle instead
         openSubscribeModal();
-        selected = puzzles.at(-2);
-      } else {
-        // For any other date, show that puzzle
-        selected = puzzles.find((x) => x.getAttribute("date") === date);
+        selected = puzzles[puzzles.length - 2]; // Second most recent
       }
+      
+      console.log(`Selected puzzle by date: ${date}`, selected ? "found" : "not found");
     } else {
       // By default, show the second most recent puzzle
-      selected = puzzles.at(-2);
+      selected = puzzles[puzzles.length - 2];
+      console.log("Using default puzzle (second most recent)");
     }
 
     if (!selected) {
       // If no puzzle is found with the specified id or date, show the second most recent one
-      selected = puzzles.at(-2);
+      selected = puzzles[puzzles.length - 2];
       console.warn(`No puzzle found with id=${puzzleId} or date=${date}. Showing second most recent puzzle instead.`);
     }
     
@@ -171,18 +203,39 @@ async function loadPuzzleData() {
     populateDateSelector(puzzles, selected.getAttribute("date"));
     displayPuzzle(selected);
   } catch (err) {
-    els.forEach(el => { el.className = "error"; el.textContent = "Unable to load data."; });
     console.error("Puzzle load error:", err);
+    els.forEach(el => { 
+      el.className = "error"; 
+      el.innerHTML = `<p>⚠️ Error loading puzzle data: ${err.message}</p>
+                     <p>Check the console for details.</p>`; 
+    });
   }
 }
 
 function populateDateSelector(puzzles, selectedDate) {
   const s = document.getElementById("dateSelector");
-  while (s.options.length > 1) s.remove(1);
-  [...puzzles].reverse().forEach(p => {
+  console.log("Populating date selector with", puzzles.length, "puzzles, selected:", selectedDate);
+  
+  // Clear existing options except the first "Choose a Day" option
+  while (s.options.length > 1) {
+    s.remove(1);
+  }
+  
+  // Add dates in reverse chronological order (newest first)
+  const puzzleArray = Array.from(puzzles); // Convert to array if it's not already
+  puzzleArray.reverse().forEach(p => {
     const d = p.getAttribute("date");
-    s.add(new Option(d, d, d === selectedDate, d === selectedDate));
+    if (!d) {
+      console.warn("Puzzle missing date attribute", p);
+      return;
+    }
+    const option = new Option(d, d, d === selectedDate, d === selectedDate);
+    s.add(option);
   });
+  
+  if (s.options.length <= 1) {
+    console.warn("No dates were added to the selector");
+  }
 }
 
 function formatDateString(str) {
@@ -193,285 +246,309 @@ function formatDateString(str) {
 }
 
 function displayPuzzle(p) {
+  console.log("Displaying puzzle:", p);
+  
   const toolContent = document.getElementById("toolContent");
   const lengthsContent = document.getElementById("lengthsContent");
   const headerContent = document.getElementById("headerContent");
-  const lettersContent = document.getElementById("lettersContent");
-  toolContent.innerHTML = lengthsContent.innerHTML = headerContent.innerHTML = lettersContent.innerHTML = "";
+  toolContent.innerHTML = lengthsContent.innerHTML = headerContent.innerHTML = "";
 
-  const raw = p.getAttribute("date");
-  document.getElementById("navtitleContent").textContent = formatDateString(raw);
-
-  const countsArr = [...Array(7)].map((_, i) => ({
-    letter: (p.getAttribute(`letter${i + 1}`) || "").toUpperCase(),
-    count: +p.getAttribute(`letter${i + 1}count`) || 0
-  }));
-  const countsMap = Object.fromEntries(countsArr.map(o => [o.letter, o.count]));
-
-  const lettersAll = (p.getAttribute("letters") || "").toUpperCase().split("").sort();
-  const boldLetter = (p.getAttribute("letter1") || lettersAll[0]).toUpperCase();
-
-  // Create the header with hive SVG
-  const headerFlex = document.createElement("div");
-  headerFlex.className = "header-flex";
-
-  const titleDiv = document.createElement("div");
-  titleDiv.className = "header-text";
-  
-  const pang = p.getAttribute("pangrams") || 0;
-  const perf = p.getAttribute("perfectpangrams") || 0;
-  const bingo = p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
-  const q = +p.getAttribute("queenbee") || 0;
-  const thresh = q ? [
-    `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
-    `Good: ${Math.round(q * 0.08)}`, `Solid: ${Math.round(q * 0.15)}`,
-    `Nice: ${Math.round(q * 0.25)}`, `Great: ${Math.round(q * 0.40)}`,
-    `Amazing: ${Math.round(q * 0.50)}`, `Genius: ${Math.round(q * 0.70)}`,
-    `Queen Bee: ${q}`
-  ] : [];
-  
-  titleDiv.innerHTML = [
-    `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${formatDateString(raw)}`,
-    `Words: ${globalWords.length}, Pangrams: ${pang} (${perf} Perfect), ${bingo}`,
-    thresh.join(", ")
-  ].map(t => `<p>${t}</p>`).join("");
-  
-  // Create the hive container and SVG
-  const hiveContainer = document.createElement("div");
-  hiveContainer.className = "hive-container";
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "280");
-  svg.setAttribute("height", "260");
-  svg.setAttribute("viewBox", "-120 -110 240 220");
-
-  const hexSize = 40;
-  // Create an array of the available letters with the center letter first
-  const centerLetter = boldLetter;
-  const otherLetters = lettersAll.filter(l => l !== centerLetter).sort();
-  
-  // Define positions for hexagons in the hive
-  const hexPositions = [
-    { x: 0, y: 0, letter: centerLetter, fill: "#FFDC00" },     // Center
-    { x: 0, y: -70, letter: otherLetters[0], fill: "#E6E6E6" }, // Top
-    { x: 60, y: -35, letter: otherLetters[1], fill: "#E6E6E6" }, // Top right
-    { x: 60, y: 35, letter: otherLetters[2], fill: "#E6E6E6" },  // Bottom right
-    { x: 0, y: 70, letter: otherLetters[3], fill: "#E6E6E6" },   // Bottom
-    { x: -60, y: 35, letter: otherLetters[4], fill: "#E6E6E6" }, // Bottom left
-    { x: -60, y: -35, letter: otherLetters[5], fill: "#E6E6E6" } // Top left
-  ];
-
-  // Create hexagons and text
-  hexPositions.forEach(pos => {
-    if (!pos.letter) return; // Skip if no letter assigned
+  try {
+    const raw = p.getAttribute("date");
+    if (!raw) {
+      throw new Error("Puzzle is missing date attribute");
+    }
     
-    // Create hexagon
-    const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    const points = [];
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
-      const x = pos.x + hexSize * Math.cos(angle);
-      const y = pos.y + hexSize * Math.sin(angle);
-      points.push(`${x},${y}`);
+    document.getElementById("navtitleContent").textContent = formatDateString(raw);
+
+    const countsArr = [...Array(7)].map((_, i) => {
+      const letterAttr = `letter${i + 1}`;
+      const countAttr = `letter${i + 1}count`;
+      return {
+        letter: (p.getAttribute(letterAttr) || "").toUpperCase(),
+        count: +p.getAttribute(countAttr) || 0
+      };
+    });
+    const countsMap = Object.fromEntries(countsArr.map(o => [o.letter, o.count]));
+
+    // Get all letters
+    let lettersAll;
+    if (p.getAttribute("letters")) {
+      lettersAll = p.getAttribute("letters").toUpperCase().split("").sort();
+    } else {
+      // Extract from letter1-letter7 attributes
+      lettersAll = countsArr.map(c => c.letter).filter(Boolean).sort();
     }
-    hex.setAttribute("points", points.join(" "));
-    hex.setAttribute("fill", pos.fill);
-    hex.setAttribute("stroke", "#FFFFFF");
-    hex.setAttribute("stroke-width", "2");
-    svg.appendChild(hex);
-
-    // Create text
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", pos.x);
-    text.setAttribute("y", pos.y + 2); // Small adjustment for vertical centering
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("dominant-baseline", "middle");
-    text.setAttribute("font-size", "24");
-    text.setAttribute("font-weight", "bold");
-    text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
-    text.textContent = pos.letter;
-    svg.appendChild(text);
-  });
-
-  hiveContainer.appendChild(svg);
-  headerFlex.appendChild(titleDiv);
-  headerFlex.appendChild(hiveContainer);
-  headerContent.appendChild(headerFlex);
-
-  // Create the letters table
-  lettersContent.innerHTML = `
-    <table class="bee-table letters-table">
-      <tr>
-        ${lettersAll.map(l => `
-          <td class="${l === boldLetter ? 'center-letter' : ''}">
-            <div class="wrapper">
-              <span class="char ${l === boldLetter ? "bold" : ""}">${l}</span>
-              <span class="count">${countsMap[l] ?? 0}</span>
-            </div>
-          </td>`).join("")}
-      </tr>
-    </table>
-  `;
-
-  // Load words
-  globalWords = [...p.getElementsByTagName("word")].map(w => ({
-    text: w.textContent,
-    length: +w.getAttribute("length") || w.textContent.length,
-    first: (w.getAttribute("first") || w.textContent[0]).toUpperCase(),
-    firsttwo: w.getAttribute("firsttwo") || w.textContent.slice(0, 2),
-    revealed: false
-  }));
-  
-  // Group words by first letter
-  const byLetter = {};
-  globalWords.forEach(w => {
-    if (!byLetter[w.first]) {
-      byLetter[w.first] = [];
+    
+    if (!lettersAll.length) {
+      throw new Error("No letters found in puzzle data");
     }
-    byLetter[w.first].push(w);
-  });
+    
+    const boldLetter = (p.getAttribute("letter1") || lettersAll[0]).toUpperCase();
 
-  // Create the lengths table
-  const numIcons = {
-    1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
-    11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
-  };
+    // Load words
+    const wordElements = p.getElementsByTagName("word");
+    if (!wordElements.length) {
+      throw new Error("No words found in puzzle data");
+    }
+    
+    console.log(`Found ${wordElements.length} words in puzzle data`);
+    
+    globalWords = [...wordElements].map(w => ({
+      text: w.textContent,
+      length: +w.getAttribute("length") || w.textContent.length,
+      first: (w.getAttribute("first") || w.textContent[0]).toUpperCase(),
+      firsttwo: w.getAttribute("firsttwo") || w.textContent.slice(0, 2),
+      revealed: false
+    }));
+    
+    // Group words by first letter
+    const byLetter = {};
+    globalWords.forEach(w => {
+      if (!byLetter[w.first]) {
+        byLetter[w.first] = [];
+      }
+      byLetter[w.first].push(w);
+    });
 
-  lengthsContent.innerHTML = `
-    <table class="bee-table lengths-table">
-      <tr>
-        ${lettersAll.map(l => {
-          const icons = (byLetter[l] || [])
-            .sort((a,b) => a.length - b.length || a.text.localeCompare(b.text))
-            .map(w => numIcons[w.length] || w.length)
-            .join(" ");
-          return `<td class="cell"><div class="icons">${icons || "–"}</div></td>`;
-        }).join("")}
-      </tr>
-    </table>
-  `;
+    // Create the header with hive SVG
+    const headerFlex = document.createElement("div");
+    headerFlex.className = "header-flex";
 
-  // Create words table - desktop view
-  const wordsTable = document.createElement("table");
-  wordsTable.className = "bee-table words-table";
-  const row = document.createElement("tr");
+    const titleDiv = document.createElement("div");
+    titleDiv.className = "header-text";
+    
+    const pang = p.getAttribute("pangrams") || 0;
+    const perf = p.getAttribute("perfectpangrams") || 0;
+    const bingo = p.getAttribute("bingo") === "BINGO" ? "BINGO" : "NO BINGO";
+    const q = +p.getAttribute("queenbee") || 0;
+    const thresh = q ? [
+      `Good Start: ${Math.round(q * 0.02)}`, `Moving Up: ${Math.round(q * 0.05)}`,
+      `Good: ${Math.round(q * 0.08)}`, `Solid: ${Math.round(q * 0.15)}`,
+      `Nice: ${Math.round(q * 0.25)}`, `Great: ${Math.round(q * 0.40)}`,
+      `Amazing: ${Math.round(q * 0.50)}`, `Genius: ${Math.round(q * 0.70)}`,
+      `Queen Bee: ${q}`
+    ] : [];
+    
+    titleDiv.innerHTML = [
+      `The Completely Unauthorized NY Times Spelling Bee Toolbox presents the ${toolName} for ${formatDateString(raw)}`,
+      `Words: ${globalWords.length}, Pangrams: ${pang} (${perf} Perfect), ${bingo}`,
+      thresh.join(", ")
+    ].map(t => `<p>${t}</p>`).join("");
+    
+    // Create the hive container and SVG
+    const hiveContainer = document.createElement("div");
+    hiveContainer.className = "hive-container";
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "280");
+    svg.setAttribute("height", "260");
+    svg.setAttribute("viewBox", "-120 -110 240 220");
 
-  lettersAll.forEach(l => {
-    const td = document.createElement("td");
-    const colDiv = document.createElement("div");
-    colDiv.className = "wcol";
+    const hexSize = 40;
+    // Create an array of the available letters with the center letter first
+    const centerLetter = boldLetter;
+    const otherLetters = lettersAll.filter(l => l !== centerLetter).sort();
+    
+    // Define positions for hexagons in the hive
+    const hexPositions = [
+      { x: 0, y: 0, letter: centerLetter, fill: "#FFDC00" },     // Center
+      { x: 0, y: -70, letter: otherLetters[0], fill: "#E6E6E6" }, // Top
+      { x: 60, y: -35, letter: otherLetters[1], fill: "#E6E6E6" }, // Top right
+      { x: 60, y: 35, letter: otherLetters[2], fill: "#E6E6E6" },  // Bottom right
+      { x: 0, y: 70, letter: otherLetters[3], fill: "#E6E6E6" },   // Bottom
+      { x: -60, y: 35, letter: otherLetters[4], fill: "#E6E6E6" }, // Bottom left
+      { x: -60, y: -35, letter: otherLetters[5], fill: "#E6E6E6" } // Top left
+    ];
 
-    if (byLetter[l]) {
-      byLetter[l].sort((a,b) => a.text.localeCompare(b.text)).forEach(w => {
-        const box = document.createElement("div");
-        box.className = "word-box";
-        box.dataset.word = w.text;
-        box.dataset.firsttwo = w.firsttwo;
-        box.textContent = revealMode ? w.text : w.firsttwo;
-        box.addEventListener("click", () => {
-          const isRevealed = box.textContent === box.dataset.firsttwo;
-          box.textContent = isRevealed ? box.dataset.word : box.dataset.firsttwo;
-          if (isRevealed) {
+    // Create hexagons and text
+    hexPositions.forEach(pos => {
+      if (!pos.letter) return; // Skip if no letter assigned
+      
+      // Create hexagon
+      const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      const points = [];
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i;
+        const x = pos.x + hexSize * Math.cos(angle);
+        const y = pos.y + hexSize * Math.sin(angle);
+        points.push(`${x},${y}`);
+      }
+      hex.setAttribute("points", points.join(" "));
+      hex.setAttribute("fill", pos.fill);
+      hex.setAttribute("stroke", "#FFFFFF");
+      hex.setAttribute("stroke-width", "2");
+      svg.appendChild(hex);
+
+      // Create text
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", pos.x);
+      text.setAttribute("y", pos.y + 2); // Small adjustment for vertical centering
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.setAttribute("font-size", "24");
+      text.setAttribute("font-weight", "bold");
+      text.setAttribute("font-family", "'Helvetica Neue', Arial, sans-serif");
+      text.textContent = pos.letter;
+      svg.appendChild(text);
+    });
+
+    hiveContainer.appendChild(svg);
+    headerFlex.appendChild(titleDiv);
+    headerFlex.appendChild(hiveContainer);
+    headerContent.appendChild(headerFlex);
+
+    // Create the lengths table
+    const numIcons = {
+      1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤", 6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
+      11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮", 16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳"
+    };
+
+    lengthsContent.innerHTML = `
+      <table class="bee-table lengths-table">
+        <tr>
+          ${lettersAll.map(l => {
+            const icons = (byLetter[l] || [])
+              .sort((a,b) => a.length - b.length || a.text.localeCompare(b.text))
+              .map(w => numIcons[w.length] || w.length)
+              .join(" ");
+            return `<td class="cell"><div class="icons">${icons || "–"}</div></td>`;
+          }).join("")}
+        </tr>
+      </table>
+    `;
+
+    // Create words table - desktop view
+    const wordsTable = document.createElement("table");
+    wordsTable.className = "bee-table words-table";
+    const row = document.createElement("tr");
+
+    lettersAll.forEach(l => {
+      const td = document.createElement("td");
+      const colDiv = document.createElement("div");
+      colDiv.className = "wcol";
+
+      if (byLetter[l]) {
+        byLetter[l].sort((a,b) => a.text.localeCompare(b.text)).forEach(w => {
+          const box = document.createElement("div");
+          box.className = "word-box";
+          box.dataset.word = w.text;
+          box.dataset.firsttwo = w.firsttwo;
+          box.textContent = revealMode ? w.text : w.firsttwo;
+          box.addEventListener("click", () => {
+            const isRevealed = box.textContent === box.dataset.firsttwo;
+            box.textContent = isRevealed ? box.dataset.word : box.dataset.firsttwo;
+            if (isRevealed) {
+              box.style.backgroundColor = "var(--bee-highlight)";
+            } else {
+              box.style.backgroundColor = "";
+            }
+          });
+          
+          if (revealMode) {
             box.style.backgroundColor = "var(--bee-highlight)";
+          }
+          
+          colDiv.appendChild(box);
+        });
+      }
+
+      td.appendChild(colDiv);
+      row.appendChild(td);
+    });
+
+    wordsTable.appendChild(row);
+    toolContent.appendChild(wordsTable);
+    
+    // Create mobile accordion view
+    const mobileAccordion = document.createElement("div");
+    mobileAccordion.className = "mobile-accordion";
+    
+    lettersAll.forEach(letter => {
+      if (!byLetter[letter] || !byLetter[letter].length) return;
+      
+      const accordionItem = document.createElement("div");
+      accordionItem.className = "accordion-item";
+      
+      const accordionHeader = document.createElement("div");
+      accordionHeader.className = "accordion-header";
+      
+      const letterContainer = document.createElement("div");
+      letterContainer.className = "accordion-letter-container";
+      
+      const letterSpan = document.createElement("div");
+      letterSpan.className = `accordion-letter ${letter === boldLetter ? 'center-letter' : ''}`;
+      letterSpan.textContent = letter;
+      
+      const countSpan = document.createElement("span");
+      countSpan.className = "accordion-count";
+      countSpan.textContent = `${byLetter[letter].length} words`;
+      
+      const indicator = document.createElement("div");
+      indicator.className = "accordion-indicator";
+      indicator.textContent = "▼";
+      
+      letterContainer.appendChild(letterSpan);
+      letterContainer.appendChild(countSpan);
+      
+      accordionHeader.appendChild(letterContainer);
+      accordionHeader.appendChild(indicator);
+      
+      const accordionContent = document.createElement("div");
+      accordionContent.className = "accordion-content";
+      
+      const accordionWords = document.createElement("div");
+      accordionWords.className = "accordion-words";
+      
+      byLetter[letter].sort((a,b) => a.text.localeCompare(b.text)).forEach(word => {
+        const wordBox = document.createElement("div");
+        wordBox.className = "word-box";
+        wordBox.dataset.word = word.text;
+        wordBox.dataset.firsttwo = word.firsttwo;
+        wordBox.textContent = revealMode ? word.text : word.firsttwo;
+        
+        wordBox.addEventListener("click", () => {
+          const isRevealed = wordBox.textContent === wordBox.dataset.firsttwo;
+          wordBox.textContent = isRevealed ? wordBox.dataset.word : wordBox.dataset.firsttwo;
+          if (isRevealed) {
+            wordBox.style.backgroundColor = "var(--bee-highlight)";
           } else {
-            box.style.backgroundColor = "";
+            wordBox.style.backgroundColor = "";
           }
         });
         
         if (revealMode) {
-          box.style.backgroundColor = "var(--bee-highlight)";
+          wordBox.style.backgroundColor = "var(--bee-highlight)";
         }
         
-        colDiv.appendChild(box);
-      });
-    }
-
-    td.appendChild(colDiv);
-    row.appendChild(td);
-  });
-
-  wordsTable.appendChild(row);
-  toolContent.appendChild(wordsTable);
-  
-  // Create mobile accordion view
-  const mobileAccordion = document.createElement("div");
-  mobileAccordion.className = "mobile-accordion";
-  
-  lettersAll.forEach(letter => {
-    if (!byLetter[letter] || !byLetter[letter].length) return;
-    
-    const accordionItem = document.createElement("div");
-    accordionItem.className = "accordion-item";
-    
-    const accordionHeader = document.createElement("div");
-    accordionHeader.className = "accordion-header";
-    
-    const letterContainer = document.createElement("div");
-    letterContainer.className = "accordion-letter-container";
-    
-    const letterSpan = document.createElement("div");
-    letterSpan.className = `accordion-letter ${letter === boldLetter ? 'center-letter' : ''}`;
-    letterSpan.textContent = letter;
-    
-    const countSpan = document.createElement("span");
-    countSpan.className = "accordion-count";
-    countSpan.textContent = `${byLetter[letter].length} words`;
-    
-    const indicator = document.createElement("div");
-    indicator.className = "accordion-indicator";
-    indicator.textContent = "▼";
-    
-    letterContainer.appendChild(letterSpan);
-    letterContainer.appendChild(countSpan);
-    
-    accordionHeader.appendChild(letterContainer);
-    accordionHeader.appendChild(indicator);
-    
-    const accordionContent = document.createElement("div");
-    accordionContent.className = "accordion-content";
-    
-    const accordionWords = document.createElement("div");
-    accordionWords.className = "accordion-words";
-    
-    byLetter[letter].sort((a,b) => a.text.localeCompare(b.text)).forEach(word => {
-      const wordBox = document.createElement("div");
-      wordBox.className = "word-box";
-      wordBox.dataset.word = word.text;
-      wordBox.dataset.firsttwo = word.firsttwo;
-      wordBox.textContent = revealMode ? word.text : word.firsttwo;
-      
-      wordBox.addEventListener("click", () => {
-        const isRevealed = wordBox.textContent === wordBox.dataset.firsttwo;
-        wordBox.textContent = isRevealed ? wordBox.dataset.word : wordBox.dataset.firsttwo;
-        if (isRevealed) {
-          wordBox.style.backgroundColor = "var(--bee-highlight)";
-        } else {
-          wordBox.style.backgroundColor = "";
-        }
+        accordionWords.appendChild(wordBox);
       });
       
-      if (revealMode) {
-        wordBox.style.backgroundColor = "var(--bee-highlight)";
-      }
+      accordionContent.appendChild(accordionWords);
+      accordionItem.appendChild(accordionHeader);
+      accordionItem.appendChild(accordionContent);
       
-      accordionWords.appendChild(wordBox);
+      // Add click handler for accordion
+      accordionHeader.addEventListener("click", () => {
+        accordionItem.classList.toggle("active");
+      });
+      
+      mobileAccordion.appendChild(accordionItem);
     });
     
-    accordionContent.appendChild(accordionWords);
-    accordionItem.appendChild(accordionHeader);
-    accordionItem.appendChild(accordionContent);
+    toolContent.appendChild(mobileAccordion);
     
-    // Add click handler for accordion
-    accordionHeader.addEventListener("click", () => {
-      accordionItem.classList.toggle("active");
+    // Add fade-in class for smooth appearance
+    [headerContent, lengthsContent, toolContent].forEach(el => el.classList.add("fade-in"));
+    
+    console.log("Puzzle display complete");
+    
+  } catch (error) {
+    console.error("Error displaying puzzle:", error);
+    [headerContent, lengthsContent, toolContent].forEach(el => {
+      el.className = "error";
+      el.innerHTML = `<p>⚠️ Error displaying puzzle: ${error.message}</p>`;
     });
-    
-    mobileAccordion.appendChild(accordionItem);
-  });
-  
-  toolContent.appendChild(mobileAccordion);
-  
-  // Add fade-in class for smooth appearance
-  [headerContent, lettersContent, lengthsContent, toolContent].forEach(el => el.classList.add("fade-in"));
+  }
 }
 
 function toggleRevealAll(on) {
