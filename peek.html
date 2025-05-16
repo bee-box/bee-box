@@ -118,13 +118,11 @@ async function loadPuzzleData() {
     if (puzzleId && !date) {
       selected = puzzles.find(p => p.id === puzzleId);
     } else if (date && !puzzleId) {
+      // If date parameter is provided, show that puzzle regardless of whether it's the most recent
       selected = puzzles.find(p => p.getAttribute("date") === date);
-      if (selected === mostRecent) {
-        openSubscribeModal();
-        selected = puzzles.at(-2);
-      }
     } else {
-      selected = puzzles.at(-2);
+      // By default, show the most recent puzzle with words
+      selected = mostRecent;
     }
 
     if (!selected) throw new Error("No puzzle selected.");
