@@ -82,14 +82,21 @@
             font-style: italic;
             color: #7f8c8d;
         }
-        .csv-line {
-            color: #2980b9;
-        }
-        .bracketed-line {
+        .status-start {
             color: #27ae60;
+            font-weight: bold;
+        }
+        .status-success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .status-failure {
+            color: #e74c3c;
+            font-weight: bold;
         }
         .separator-line {
             color: #e74c3c;
+            margin: 10px 0;
         }
         .error-message {
             color: #e74c3c;
@@ -117,7 +124,11 @@
         .log-line {
             margin-bottom: 2px;
             padding: 3px 0;
-            border-bottom: 1px dotted #eee;
+        }
+        .log-group {
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -211,56 +222,112 @@
             
             // Split logs into lines and apply highlighting/filtering
             const lines = rawLogData.split('\n');
-            let formattedLines = [];
             
-            lines.forEach(line => {
+            // Group logs by run (every 2-3 entries with a separator)
+            const logGroups = [];
+            let currentGroup = [];
+            
+            // Skip header line
+            let skipFirst = true;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
                 // Skip empty lines
-                if (!line.trim()) return;
+                if (!line) continue;
                 
-                // Check if line matches filters
-                const lineMatches = 
-                    (!filterText || line.toLowerCase().includes(filterText)) &&
-                    (!dateText || line.includes(dateText));
-                
-                if (!lineMatches) return;
-                
-                // Apply formatting based on line type
-                let formattedLine = '';
-                
-                if (line.match(/^\d{14},/) || line.match(/^\d{4}-\d{2}-\d{2}/) || line.includes(",WORKFLOW_") || line.includes(",HARVEST_") || line.includes(",WAXER_") || line.includes(",GIT_")) {
-                    // CSV format
-                    formattedLine = `<div class="log-line csv-line">${formatTimestampsInLine(line)}</div>`;
-                } else if (line.match(/^\[[\d-]+ [\d:]+/)) {
-                    // Bracketed format
-                    formattedLine = `<div class="log-line bracketed-line">${formatTimestampsInLine(line)}</div>`;
-                } else if (line.includes('─────')) {
-                    // Separator
-                    formattedLine = `<div class="log-line separator-line">${line}</div>`;
-                } else {
-                    // Regular line
-                    formattedLine = `<div class="log-line">${formatTimestampsInLine(line)}</div>`;
+                // Skip header line
+                if (skipFirst) {
+                    skipFirst = false;
+                    continue;
                 }
                 
-                formattedLines.push(formattedLine);
-            });
+                // If we find a separator, start a new group (but don't add the separator)
+                if (line.includes('─────────')) {
+                    if (currentGroup.length > 0) {
+                        logGroups.push(currentGroup);
+                        currentGroup = [];
+                    }
+                    continue;
+                }
+                
+                // Add the line to the current group
+                currentGroup.push(line);
+            }
             
-            // Reverse the lines to show newest first
-            formattedLines.reverse();
+            // Add the last group if not empty
+            if (currentGroup.length > 0) {
+                logGroups.push(currentGroup);
+            }
+            
+            // Filter and format groups
+            const filteredGroups = [];
+            
+            for (const group of logGroups) {
+                // Check if any line in the group matches the filters
+                const groupMatches = group.some(line => {
+                    return (!filterText || line.toLowerCase().includes(filterText)) &&
+                           (!dateText || line.includes(dateText));
+                });
+                
+                if (!groupMatches) continue;
+                
+                // Format the group
+                const formattedGroup = [];
+                
+                for (const line of group) {
+                    // Parse CSV line: TIMESTAMP,STATUS,MESSAGE
+                    const parts = line.split(',');
+                    
+                    if (parts.length >= 3) {
+                        const timestamp = parts[0];
+                        const status = parts[1];
+                        // Join remaining parts in case the message contains commas
+                        let message = parts.slice(2).join(',');
+                        
+                        // Remove quotes if present
+                        if (message.startsWith('"') && message.endsWith('"')) {
+                            message = message.substring(1, message.length - 1);
+                        }
+                        
+                        // Determine status class
+                        let statusClass = '';
+                        if (status === 'START') {
+                            statusClass = 'status-start';
+                        } else if (status === 'SUCCESS') {
+                            statusClass = 'status-success';
+                        } else if (status === 'FAILURE') {
+                            statusClass = 'status-failure';
+                        }
+                        
+                        const formattedLine = `
+                            <div class="log-line">
+                                <span class="timestamp">${timestamp}</span> - 
+                                <span class="${statusClass}">${status}</span>: ${message}
+                            </div>
+                        `;
+                        
+                        formattedGroup.push(formattedLine);
+                    } else {
+                        // Fallback for non-standard format
+                        formattedGroup.push(`<div class="log-line">${line}</div>`);
+                    }
+                }
+                
+                if (formattedGroup.length > 0) {
+                    filteredGroups.push(`<div class="log-group">${formattedGroup.join('')}</div>`);
+                }
+            }
+            
+            // Reverse groups to show newest first
+            filteredGroups.reverse();
             
             // Show results or no matches message
-            if (formattedLines.length > 0) {
-                logContent.innerHTML = formattedLines.join('');
+            if (filteredGroups.length > 0) {
+                logContent.innerHTML = filteredGroups.join('');
             } else {
                 logContent.innerHTML = `<div class="error-message">No log entries match your filters.</div>`;
             }
-        }
-        
-        // Format timestamps in a line
-        function formatTimestampsInLine(line) {
-            // Highlight ISO date/time patterns
-            return line
-                .replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g, match => `<span class="timestamp">${match}</span>`)
-                .replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]/g, (_, match) => `[<span class="timestamp">${match}</span>]`);
         }
         
         // Toggle auto-refresh

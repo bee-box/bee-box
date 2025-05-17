@@ -30,128 +30,33 @@ jobs:
       - name: 📁 Create log folder
         run: mkdir -p log
 
-      - name: 🕒 Generate run ID and start time
+      - name: 🕒 Log workflow start
         run: |
           RUN_ID=$(date -u +"%Y%m%d%H%M%S")
-          RUN_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          RUN_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "RUN_TIME=$RUN_TIME" >> $GITHUB_ENV
           
           # Create log file with headers if it doesn't exist
           if [ ! -f log/log.txt ]; then
-            echo "RUN_ID,RUN_TIME,EVENT,STATUS,DETAILS" > log/log.txt
+            echo "TIMESTAMP,STATUS,MESSAGE" > log/log.txt
           fi
           
           # Log start event
-          echo "$RUN_ID,$RUN_TIME,WORKFLOW_START,SUCCESS,\"Workflow started\"" >> log/log.txt
-          
-          # Add console-style log entry for the log viewer
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          echo "[$TIMESTAMP] [INFO] 🚀 Workflow started: Run ID $RUN_ID" >> log/log.txt
+          echo "$RUN_TIME,START,\"Workflow started\"" >> log/log.txt
 
       - name: 🐝 Run harvest.py
         id: harvest
-        run: |
-          START_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
-          echo "$RUN_ID,$START_TIME,HARVEST_START,INFO,\"Starting harvest.py\"" >> log/log.txt
-          
-          # Add console-style log entry
-          echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [START] 🟡 START HARVEST RUN" >> log/log.txt
-          
-          # Run the script and capture output
-          if OUTPUT=$(python code/harvest.py 2>&1); then
-            STATUS="SUCCESS"
-            MESSAGE="harvest.py completed successfully"
-          else
-            STATUS="FAILURE"
-            MESSAGE="harvest.py failed with exit code $?"
-            # Add error log entry
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [ERROR] ❌ Harvest failed with exit code $?" >> log/log.txt
-          fi
-          
-          END_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
-          
-          # Log the outcome
-          echo "$RUN_ID,$END_TIME,HARVEST_END,$STATUS,\"$MESSAGE\"" >> log/log.txt
-          
-          # Add console-style log for end of harvest
-          if [ "$STATUS" = "SUCCESS" ]; then
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [END] ✅ END HARVEST RUN - Completed successfully" >> log/log.txt
-          else
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [END] ❌ END HARVEST RUN - Failed" >> log/log.txt
-          fi
-          
-          # Format and log any output line by line
-          ESCAPED_OUTPUT=$(echo "$OUTPUT" | sed 's/"/""/g')
-          echo "$RUN_ID,$END_TIME,HARVEST_OUTPUT,INFO,\"$ESCAPED_OUTPUT\"" >> log/log.txt
-          
-          # Also write each line of output with timestamp for better log viewer display
-          echo "$OUTPUT" | while IFS= read -r line; do
-            if [[ "$line" != *"["*"]"* ]]; then  # Only add timestamp if it doesn't already have one
-              echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] $line" >> log/log.txt
-            else
-              echo "$line" >> log/log.txt
-            fi
-          done
-          
-          # Exit with failure if the script failed
-          if [ "$STATUS" = "FAILURE" ]; then
-            exit 1
-          fi
+        run: python code/harvest.py
+        continue-on-error: false
 
       - name: 🕯️ Run waxer.py
         id: waxer
-        run: |
-          START_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
-          echo "$RUN_ID,$START_TIME,WAXER_START,INFO,\"Starting waxer.py\"" >> log/log.txt
-          
-          # Add console-style log entry
-          echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] 🕯 Starting waxer process..." >> log/log.txt
-          
-          # Run the script and capture output
-          if OUTPUT=$(python code/waxer.py 2>&1); then
-            STATUS="SUCCESS"
-            MESSAGE="waxer.py completed successfully"
-          else
-            STATUS="FAILURE"
-            MESSAGE="waxer.py failed with exit code $?"
-            # Add error log entry
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [ERROR] ❌ Waxer failed with exit code $?" >> log/log.txt
-          fi
-          
-          END_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
-          
-          # Log the outcome
-          echo "$RUN_ID,$END_TIME,WAXER_END,$STATUS,\"$MESSAGE\"" >> log/log.txt
-          
-          # Add console-style log for end of waxer
-          if [ "$STATUS" = "SUCCESS" ]; then
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] ✅ Wax complete." >> log/log.txt
-          else
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] ❌ Wax failed." >> log/log.txt
-          fi
-          
-          # Format and log any output line by line
-          ESCAPED_OUTPUT=$(echo "$OUTPUT" | sed 's/"/""/g')
-          echo "$RUN_ID,$END_TIME,WAXER_OUTPUT,INFO,\"$ESCAPED_OUTPUT\"" >> log/log.txt
-          
-          # Also write each line of output with timestamp for better log viewer display
-          echo "$OUTPUT" | while IFS= read -r line; do
-            if [[ "$line" != *"["*"]"* ]]; then  # Only add timestamp if it doesn't already have one
-              echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] $line" >> log/log.txt
-            else
-              echo "$line" >> log/log.txt
-            fi
-          done
-          
-          # Exit with failure if the script failed
-          if [ "$STATUS" = "FAILURE" ]; then
-            exit 1
-          fi
+        run: python code/waxer.py
+        continue-on-error: false
 
       - name: 🚀 Commit and push updated files
         run: |
-          END_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          RUN_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -159,23 +64,31 @@ jobs:
           
           # Check if there are changes to commit
           if git diff --cached --quiet; then
-            echo "$RUN_ID,$END_TIME,GIT_COMMIT,INFO,\"No changes to commit\"" >> log/log.txt
-            echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] 📝 No changes to commit" >> log/log.txt
+            echo "$RUN_TIME,SUCCESS,\"No changes to commit\"" >> log/log.txt
           else
             git commit -m "chore: Bee update + log for $(date +'%Y-%m-%d')"
             
             if git push; then
-              echo "$RUN_ID,$END_TIME,GIT_PUSH,SUCCESS,\"Changes pushed successfully\"" >> log/log.txt
-              echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [SUCCESS] 📤 Changes pushed successfully" >> log/log.txt
+              echo "$RUN_TIME,SUCCESS,\"Changes pushed successfully\"" >> log/log.txt
             else
-              echo "$RUN_ID,$END_TIME,GIT_PUSH,FAILURE,\"Failed to push changes\"" >> log/log.txt
-              echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [ERROR] ❌ Failed to push changes" >> log/log.txt
+              echo "$RUN_TIME,FAILURE,\"Failed to push changes\"" >> log/log.txt
+              exit 1
             fi
           fi
           
           # Log workflow completion
-          echo "$RUN_ID,$END_TIME,WORKFLOW_END,SUCCESS,\"Workflow completed\"" >> log/log.txt
-          echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] [INFO] 🏁 Workflow completed" >> log/log.txt
-          
-          # Add separator for readability in logs
+          echo "$RUN_TIME,SUCCESS,\"Workflow completed\"" >> log/log.txt
           echo "────────────────────────────────────────────────────────────" >> log/log.txt
+
+      - name: 📝 Log workflow failure
+        if: failure()
+        run: |
+          RUN_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          echo "$RUN_TIME,FAILURE,\"Workflow failed\"" >> log/log.txt
+          echo "────────────────────────────────────────────────────────────" >> log/log.txt
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add log/log.txt
+          git commit -m "chore: Log workflow failure for $(date +'%Y-%m-%d')"
+          git push || true
