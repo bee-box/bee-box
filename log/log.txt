@@ -467,3 +467,46 @@ ModuleNotFoundError: No module named 'pytz'
 [2025-05-17 02:28:31] ⚠️ Puzzle for 2025-05-13 already populated. Skipping.
 [2025-05-17 02:28:32] ✅ Wax complete.
 ✅ waxer.py completed successfully
+=== Workflow run at Sat May 17 12:01:21 UTC 2025 UTC ===
+--- Running harvest.py ---
+[2025-05-17 07:01:21 CDT] [START] 🟡 START HARVEST RUN
+[2025-05-17 07:01:21 CDT] [INFO] Running on system: posix, Python: 3.13.3
+[2025-05-17 07:01:21 CDT] [INFO] ▶️ Starting operation: Backing up XML file
+[2025-05-17 07:01:21 CDT] [INFO] Backup created: xml/backups/words.xml.bak
+[2025-05-17 07:01:21 CDT] [INFO] ⏹️ Operation completed: Backing up XML file
+[2025-05-17 07:01:21 CDT] [INFO] ▶️ Starting operation: Loading existing dates from XML
+[2025-05-17 07:01:21 CDT] [INFO] Found 2566 existing puzzle dates in XML
+[2025-05-17 07:01:21 CDT] [INFO] ⏹️ Operation completed: Loading existing dates
+[2025-05-17 07:01:21 CDT] [INFO] ℹ️ Puzzle for 2025-05-17 already exists in XML
+[2025-05-17 07:01:21 CDT] [END] 🔚 END HARVEST RUN - No action needed
+────────────────────────────────────────────────────────────
+
+[2025-05-17 07:01:21 CDT] [INFO] Total execution time: 0.06 seconds
+[2025-05-17 07:01:21 CDT] [START] 🟡 START HARVEST RUN
+[2025-05-17 07:01:21 CDT] [INFO] Running on system: posix, Python: 3.13.3
+[2025-05-17 07:01:21 CDT] [INFO] ▶️ Starting operation: Backing up XML file
+[2025-05-17 07:01:21 CDT] [INFO] Backup created: xml/backups/words.xml.bak
+[2025-05-17 07:01:21 CDT] [INFO] ⏹️ Operation completed: Backing up XML file
+[2025-05-17 07:01:21 CDT] [INFO] ▶️ Starting operation: Loading existing dates from XML
+[2025-05-17 07:01:21 CDT] [INFO] Found 2566 existing puzzle dates in XML
+[2025-05-17 07:01:21 CDT] [INFO] ⏹️ Operation completed: Loading existing dates
+[2025-05-17 07:01:21 CDT] [INFO] ℹ️ Puzzle for 2025-05-17 already exists in XML
+[2025-05-17 07:01:21 CDT] [END] 🔚 END HARVEST RUN - No action needed
+[2025-05-17 07:01:21 CDT] [INFO] Total execution time: 0.06 seconds
+✅ harvest.py completed successfully
+--- Running waxer.py ---
+[2025-05-17 07:01:21] 🕯 Starting waxer process...
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-17 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-16 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-15 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-14 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-13 already populated. Skipping.
+[2025-05-17 07:01:22] ✅ Wax complete.
+[2025-05-17 07:01:21] 🕯 Starting waxer process...
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-17 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-16 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-15 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-14 already populated. Skipping.
+[2025-05-17 07:01:21] ⚠️ Puzzle for 2025-05-13 already populated. Skipping.
+[2025-05-17 07:01:22] ✅ Wax complete.
+✅ waxer.py completed successfully
