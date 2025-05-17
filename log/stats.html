@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Log Viewer</title>
+    <style>
+        body {
+            font-family: monospace;
+            line-height: 1.5;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .top-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .banner-button {
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            text-decoration: none;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toolbox-button {
+            background-color: #7B68EE;
+        }
+        .toolbox-button:hover {
+            background-color: #6A5ACD;
+        }
+        .analytics-button {
+            background-color: #4285F4;
+        }
+        .analytics-button:hover {
+            background-color: #3367D6;
+        }
+        .actions-button {
+            background-color: #2EA44F;
+        }
+        .actions-button:hover {
+            background-color: #22863A;
+        }
+        .button-icon {
+            margin-right: 10px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #logContent {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        .csv-line {
+            color: #2980b9;
+        }
+        .bracketed-line {
+            color: #27ae60;
+        }
+        .separator-line {
+            color: #e74c3c;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin: 20px 0;
+            padding: 10px;
+            border-left: 4px solid #e74c3c;
+            background-color: #fdedeb;
+        }
+        .timestamp {
+            color: #8e44ad;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            margin-right: 10px;
+        }
+        .filter-controls {
+            margin-bottom: 10px;
+        }
+        #dateFilter {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        .log-line {
+            margin-bottom: 2px;
+            padding: 3px 0;
+            border-bottom: 1px dotted #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="https://beebox.ghost.io/" target="_blank" class="banner-button toolbox-button">
+            <span class="button-icon">🧰</span> Toolbox
+        </a>
+        <a href="https://analytics.google.com/analytics/web/#/p403067039/reports/intelligenthome" target="_blank" class="banner-button analytics-button">
+            <span class="button-icon">📊</span> Analytics
+        </a>
+        <a href="https://github.com/bee-box/bee-box/actions/workflows/run_harvest.yaml" target="_blank" class="banner-button actions-button">
+            <span class="button-icon">🚀</span> Run Actions
+        </a>
+    </div>
+    
+    <h1>Simple Log Viewer</h1>
+    
+    <div class="controls">
+        <div class="filter-controls">
+            <input type="text" id="filterInput" placeholder="Filter logs...">
+            <input type="text" id="dateFilter" placeholder="Filter by date (YYYY-MM-DD)">
+            <button id="clearFilterBtn">Clear Filters</button>
+        </div>
+        <button id="refreshBtn">Refresh Logs</button>
+        <button id="autoRefreshBtn">Enable Auto-Refresh</button>
+        <div class="status" id="statusMessage">Ready</div>
+    </div>
+    
+    <div id="logContent">Loading logs...</div>
+
+    <script>
+        // Configuration
+        const logFilePath = 'log.txt';
+        const refreshInterval = 30000; // 30 seconds
+        
+        // State variables
+        let autoRefreshEnabled = false;
+        let autoRefreshTimer = null;
+        let rawLogData = '';
+        
+        // DOM elements
+        const logContent = document.getElementById('logContent');
+        const statusMessage = document.getElementById('statusMessage');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const autoRefreshBtn = document.getElementById('autoRefreshBtn');
+        const filterInput = document.getElementById('filterInput');
+        const dateFilter = document.getElementById('dateFilter');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        
+        // Load and display logs
+        async function loadLogs() {
+            try {
+                statusMessage.textContent = 'Loading logs...';
+                refreshBtn.disabled = true;
+                
+                const response = await fetch(logFilePath + '?t=' + new Date().getTime());
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load log file: ${response.status} ${response.statusText}`);
+                }
+                
+                rawLogData = await response.text();
+                
+                // Display logs with current filters
+                displayFilteredLogs();
+                
+                statusMessage.textContent = `Last updated: ${new Date().toLocaleString()}`;
+                refreshBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                logContent.innerHTML = `<div class="error-message">
+                    <p>Error loading log file: ${error.message}</p>
+                    <p>Make sure log.txt exists in the same folder as this HTML file.</p>
+                </div>`;
+                statusMessage.textContent = `Error: ${error.message}`;
+                refreshBtn.disabled = false;
+            }
+        }
+        
+        // Display logs with filtering
+        function displayFilteredLogs() {
+            if (!rawLogData) {
+                logContent.textContent = 'No log data available.';
+                return;
+            }
+            
+            const filterText = filterInput.value.toLowerCase();
+            const dateText = dateFilter.value;
+            
+            // Split logs into lines and apply highlighting/filtering
+            const lines = rawLogData.split('\n');
+            let formattedLines = [];
+            
+            lines.forEach(line => {
+                // Skip empty lines
+                if (!line.trim()) return;
+                
+                // Check if line matches filters
+                const lineMatches = 
+                    (!filterText || line.toLowerCase().includes(filterText)) &&
+                    (!dateText || line.includes(dateText));
+                
+                if (!lineMatches) return;
+                
+                // Apply formatting based on line type
+                let formattedLine = '';
+                
+                if (line.match(/^\d{14},/) || line.match(/^\d{4}-\d{2}-\d{2}/) || line.includes(",WORKFLOW_") || line.includes(",HARVEST_") || line.includes(",WAXER_") || line.includes(",GIT_")) {
+                    // CSV format
+                    formattedLine = `<div class="log-line csv-line">${formatTimestampsInLine(line)}</div>`;
+                } else if (line.match(/^\[[\d-]+ [\d:]+/)) {
+                    // Bracketed format
+                    formattedLine = `<div class="log-line bracketed-line">${formatTimestampsInLine(line)}</div>`;
+                } else if (line.includes('─────')) {
+                    // Separator
+                    formattedLine = `<div class="log-line separator-line">${line}</div>`;
+                } else {
+                    // Regular line
+                    formattedLine = `<div class="log-line">${formatTimestampsInLine(line)}</div>`;
+                }
+                
+                formattedLines.push(formattedLine);
+            });
+            
+            // Reverse the lines to show newest first
+            formattedLines.reverse();
+            
+            // Show results or no matches message
+            if (formattedLines.length > 0) {
+                logContent.innerHTML = formattedLines.join('');
+            } else {
+                logContent.innerHTML = `<div class="error-message">No log entries match your filters.</div>`;
+            }
+        }
+        
+        // Format timestamps in a line
+        function formatTimestampsInLine(line) {
+            // Highlight ISO date/time patterns
+            return line
+                .replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g, match => `<span class="timestamp">${match}</span>`)
+                .replace(/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]/g, (_, match) => `[<span class="timestamp">${match}</span>]`);
+        }
+        
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            
+            if (autoRefreshEnabled) {
+                autoRefreshBtn.textContent = 'Disable Auto-Refresh';
+                autoRefreshBtn.style.backgroundColor = '#e74c3c';
+                autoRefreshTimer = setInterval(loadLogs, refreshInterval);
+                statusMessage.textContent = `Auto-refresh enabled (every ${refreshInterval/1000} seconds)`;
+            } else {
+                autoRefreshBtn.textContent = 'Enable Auto-Refresh';
+                autoRefreshBtn.style.backgroundColor = '#3498db';
+                clearInterval(autoRefreshTimer);
+                statusMessage.textContent = 'Auto-refresh disabled';
+            }
+        }
+        
+        // Event listeners
+        refreshBtn.addEventListener('click', loadLogs);
+        autoRefreshBtn.addEventListener('click', toggleAutoRefresh);
+        
+        filterInput.addEventListener('input', displayFilteredLogs);
+        dateFilter.addEventListener('input', displayFilteredLogs);
+        clearFilterBtn.addEventListener('click', function() {
+            filterInput.value = '';
+            dateFilter.value = '';
+            displayFilteredLogs();
+        });
+        
+        // Initialize
+        loadLogs();
+    </script>
+</body>
+</html>
