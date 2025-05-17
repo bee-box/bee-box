@@ -11,7 +11,7 @@ on:
 jobs:
   harvest_and_wax:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
@@ -30,33 +30,99 @@ jobs:
       - name: 📁 Create log folder
         run: mkdir -p log
 
-      - name: 🕒 Log workflow start time
-        run: echo "=== Workflow run at $(date -u) UTC ===" >> log/log.txt
+      - name: 🕒 Generate run ID and start time
+        run: |
+          RUN_ID=$(date -u +"%Y%m%d%H%M%S")
+          RUN_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "RUN_TIME=$RUN_TIME" >> $GITHUB_ENV
+          
+          # Create log file with headers if it doesn't exist
+          if [ ! -f log/log.txt ]; then
+            echo "RUN_ID,RUN_TIME,EVENT,STATUS,DETAILS" > log/log.txt
+          fi
+          
+          # Log start event
+          echo "$RUN_ID,$RUN_TIME,WORKFLOW_START,SUCCESS,\"Workflow started\"" >> log/log.txt
 
       - name: 🐝 Run harvest.py
+        id: harvest
         run: |
-          echo "--- Running harvest.py ---" | tee -a log/log.txt
-          if python code/harvest.py 2>&1 | tee -a log/log.txt; then
-            echo "✅ harvest.py completed successfully" | tee -a log/log.txt
+          START_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          echo "$RUN_ID,$RUN_TIME,HARVEST_START,INFO,\"Starting harvest.py\"" >> log/log.txt
+          
+          # Run the script and capture output
+          if OUTPUT=$(python code/harvest.py 2>&1); then
+            STATUS="SUCCESS"
+            MESSAGE="harvest.py completed successfully"
           else
-            echo "❌ harvest.py failed" | tee -a log/log.txt
+            STATUS="FAILURE"
+            MESSAGE="harvest.py failed with exit code $?"
+          fi
+          
+          END_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          
+          # Log the outcome
+          echo "$RUN_ID,$END_TIME,HARVEST_END,$STATUS,\"$MESSAGE\"" >> log/log.txt
+          
+          # Log any output (escaped for CSV)
+          ESCAPED_OUTPUT=$(echo "$OUTPUT" | sed 's/"/""/g')
+          echo "$RUN_ID,$END_TIME,HARVEST_OUTPUT,INFO,\"$ESCAPED_OUTPUT\"" >> log/log.txt
+          
+          # Exit with failure if the script failed
+          if [ "$STATUS" = "FAILURE" ]; then
             exit 1
           fi
 
       - name: 🕯️ Run waxer.py
+        id: waxer
         run: |
-          echo "--- Running waxer.py ---" | tee -a log/log.txt
-          if python code/waxer.py 2>&1 | tee -a log/log.txt; then
-            echo "✅ waxer.py completed successfully" | tee -a log/log.txt
+          START_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          echo "$RUN_ID,$RUN_TIME,WAXER_START,INFO,\"Starting waxer.py\"" >> log/log.txt
+          
+          # Run the script and capture output
+          if OUTPUT=$(python code/waxer.py 2>&1); then
+            STATUS="SUCCESS"
+            MESSAGE="waxer.py completed successfully"
           else
-            echo "❌ waxer.py failed" | tee -a log/log.txt
+            STATUS="FAILURE"
+            MESSAGE="waxer.py failed with exit code $?"
+          fi
+          
+          END_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          
+          # Log the outcome
+          echo "$RUN_ID,$END_TIME,WAXER_END,$STATUS,\"$MESSAGE\"" >> log/log.txt
+          
+          # Log any output (escaped for CSV)
+          ESCAPED_OUTPUT=$(echo "$OUTPUT" | sed 's/"/""/g')
+          echo "$RUN_ID,$END_TIME,WAXER_OUTPUT,INFO,\"$ESCAPED_OUTPUT\"" >> log/log.txt
+          
+          # Exit with failure if the script failed
+          if [ "$STATUS" = "FAILURE" ]; then
             exit 1
           fi
 
-      - name: 🚀 Commit and push updated XML + log
+      - name: 🚀 Commit and push updated files
         run: |
+          END_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
+          
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add xml/words.xml xml/puzzles.xml log/log.txt
-          git diff --quiet --cached || git commit -m "chore: Bee update + log for $(date +'%Y-%m-%d')"
-          git push || echo "Nothing to push or push failed."
+          
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "$RUN_ID,$END_TIME,GIT_COMMIT,INFO,\"No changes to commit\"" >> log/log.txt
+          else
+            git commit -m "chore: Bee update + log for $(date +'%Y-%m-%d')"
+            
+            if git push; then
+              echo "$RUN_ID,$END_TIME,GIT_PUSH,SUCCESS,\"Changes pushed successfully\"" >> log/log.txt
+            else
+              echo "$RUN_ID,$END_TIME,GIT_PUSH,FAILURE,\"Failed to push changes\"" >> log/log.txt
+            fi
+          fi
+          
+          # Log workflow completion
+          echo "$RUN_ID,$END_TIME,WORKFLOW_END,SUCCESS,\"Workflow completed\"" >> log/log.txt
