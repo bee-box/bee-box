@@ -732,6 +732,46 @@ def wax():
     except Exception as e:
         # Get full traceback
         tb = traceback.format_exc()
+        log_simple(f"Waxer process failed - {str(e)}\n{tb}", "FAILURE")
+        return False
+
+if __name__ == "__main__":
+    try:
+        # Print environment info for debugging
+        log_simple(f"Python version: {sys.version}", "INFO")
+        log_simple(f"Current directory: {os.getcwd()}", "INFO")
+        log_simple(f"Script path: {os.path.abspath(__file__)}", "INFO")
+        
+        # Run the main function
+        success = wax()
+        if not success:
+            log_simple("Exiting with code 1 due to processing failure", "FAILURE")
+            sys.exit(1)
+    except Exception as e:
+        tb = traceback.format_exc()
+        log_simple(f"Waxer process failed - unhandled exception: {str(e)}\n{tb}", "FAILURE")
+        sys.exit(1)", "INFO")
+        
+        # Apply proper indentation
+        indent(puzzles_root)
+        
+        # Write updated XML to file
+        log_simple(f"Writing updated puzzles to {PUZZLES_XML}", "INFO")
+        puzzles_tree.write(PUZZLES_XML, encoding="utf-8", xml_declaration=True)
+        
+        # Verify file was written successfully
+        if os.path.exists(PUZZLES_XML) and os.path.getsize(PUZZLES_XML) > 0:
+            log_simple(f"Successfully wrote {os.path.getsize(PUZZLES_XML)} bytes to {PUZZLES_XML}", "INFO")
+        else:
+            log_simple(f"File write verification failed for {PUZZLES_XML}", "FAILURE")
+            return False
+        
+        log_simple("Waxer process completed successfully", "SUCCESS")
+        return True
+        
+    except Exception as e:
+        # Get full traceback
+        tb = traceback.format_exc()
         log_simple(f"Waxer process failed - unhandled exception: {str(e)}\n{tb}", "FAILURE")
         sys.exit(1) process failed - {str(e)}\n{tb}", "FAILURE")
         return False
