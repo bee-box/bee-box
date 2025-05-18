@@ -601,7 +601,7 @@ footer {
   }
 }
 
-/* Print-specific styles - UPDATED for better readability */
+/* Print-specific styles - UPDATED for better readability and to prevent page breaks */
 @media print {
   body {
     font-size: 16px; /* Increased base font size for print */
@@ -612,6 +612,49 @@ footer {
     height: 100%;
     max-width: 100%;
     line-height: 1.3 !important;
+    /* Scale content slightly to fit on one page */
+    transform-origin: top left;
+    transform: scale(0.95);
+    /* Prevent overflow to additional pages */
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  /* Prevent page breaks for ALL important elements */
+  .section-box,
+  .bee-table,
+  .bee-table tr,
+  .bee-table td,
+  .tables-container,
+  .content-container,
+  .table-section,
+  .word-box,
+  .header-flex,
+  .header-text,
+  #header,
+  #content,
+  .accordion-item,
+  .accordion-content,
+  .wcol,
+  .combined-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Firefox-specific fixes */
+  @-moz-document url-prefix() {
+    body {
+      height: 100%;
+      overflow: visible;
+    }
+    
+    .section-box,
+    .tables-container,
+    .content-container,
+    .table-section {
+      display: inline-block !important;
+      width: 100%;
+    }
   }
   
   #navtitle, footer, .modal-overlay {
@@ -624,6 +667,11 @@ footer {
     padding: 0.2rem !important; /* Slightly increased padding */
     margin-bottom: 0.2rem !important; /* Slightly increased margin */
     min-height: unset !important;
+  }
+  
+  /* Make the content more compact to better fit on one page */
+  .table-section + .table-section {
+    margin-top: 0.1rem !important;
   }
   
   /* Reduce header section height */
@@ -781,12 +829,6 @@ footer {
     font-size: 14px !important;
     font-style: normal !important;
     color: #000 !important;
-  }
-  
-  /* Keep tables on the same page */
-  .table-section {
-    page-break-inside: avoid !important;
-    margin-bottom: 0.2rem !important; /* Slightly more margin for separation */
   }
   
   /* Remove any animations */
