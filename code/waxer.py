@@ -11,6 +11,7 @@ Processes Spelling Bee puzzles:
 
 import os
 import sys
+import traceback
 from datetime import date, timedelta, datetime
 import xml.etree.ElementTree as ET
 from uuid import uuid4
@@ -18,14 +19,15 @@ import random
 from collections import Counter
 import pytz  # Added for timezone support
 
-# Constants for file paths
-WORDS_XML = "xml/words.xml"
-PUZZLES_XML = "xml/puzzles.xml"
-LOG_DIR = "log"
+# Constants for file paths - use absolute paths for GitHub Actions
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+WORDS_XML = os.path.join(SCRIPT_DIR, "xml/words.xml")
+PUZZLES_XML = os.path.join(SCRIPT_DIR, "xml/puzzles.xml")
+LOG_DIR = os.path.join(SCRIPT_DIR, "log")
 LOG_FILE = os.path.join(LOG_DIR, "log.txt")
 
 # Create necessary directories if they don't exist
-os.makedirs("xml", exist_ok=True)
+os.makedirs(os.path.join(SCRIPT_DIR, "xml"), exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -47,17 +49,24 @@ def log_simple(message, status="INFO"):
     """
     timestamp = get_timestamp()
     
-    # Check if the log file exists
-    file_exists = os.path.exists(LOG_FILE)
-    
-    # Open in append mode, but if the file doesn't exist, we'll add headers first
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        # Write headers if creating a new file
-        if not file_exists:
-            f.write("TIMESTAMP,STATUS,MESSAGE\n")
+    try:
+        # Check if the log file exists
+        file_exists = os.path.exists(LOG_FILE)
         
-        # Append the log entry
-        f.write(f"{timestamp},{status},\"{message}\"\n")
+        # Open in append mode, but if the file doesn't exist, we'll add headers first
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            # Write headers if creating a new file
+            if not file_exists:
+                f.write("TIMESTAMP,STATUS,MESSAGE\n")
+            
+            # Append the log entry
+            f.write(f"{timestamp},{status},\"{message}\"\n")
+            
+        # Also print to stdout for GitHub Actions logs
+        print(f"{timestamp} [{status}] {message}")
+    except Exception as e:
+        # If logging fails, print to stderr
+        print(f"ERROR: Failed to write to log file: {e}", file=sys.stderr)
 
 # ───────────────────────────────────────────────────────────────────────────────
 # ─── XML PROCESSING FUNCTIONS ────────────────────────────────────────────────
@@ -326,25 +335,60 @@ def wax():
     """
     log_simple("Waxer process started", "START")
     
+    # Check environment
+    log_simple(f"Running in directory: {os.getcwd()}", "INFO")
+    log_simple(f"Script directory: {SCRIPT_DIR}", "INFO")
+    log_simple(f"Looking for words.xml at: {WORDS_XML}", "INFO")
+    
+    # List files in xml directory to debug
+    try:
+        xml_dir = os.path.join(SCRIPT_DIR, "xml")
+        if os.path.exists(xml_dir):
+            files = os.listdir(xml_dir)
+            log_simple(f"Files in xml directory: {', '.join(files)}", "INFO")
+        else:
+            log_simple("xml directory does not exist yet", "INFO")
+    except Exception as e:
+        log_simple(f"Error listing xml directory: {str(e)}", "INFO")
+    
     # Check if words.xml exists
-    if not os.path.exists("xml/words.xml"):
-        log_simple("Waxer process failed - words.xml not found", "FAILURE")
+    if not os.path.exists(WORDS_XML):
+        log_simple(f"Waxer process failed - words.xml not found at {WORDS_XML}", "FAILURE")
         return False
     
     # Parse words.xml
     try:
-        words_root = ET.parse("xml/words.xml").getroot()
+        # Check if file is readable and not empty
+        if os.path.getsize(WORDS_XML) == 0:
+            log_simple("Waxer process failed - words.xml is empty", "FAILURE")
+            return False
+            
+        log_simple("Parsing words.xml file", "INFO")
+        words_root = ET.parse(WORDS_XML).getroot()
+        
+        # Count puzzles for debugging
+        puzzle_count = len(words_root.findall("puzzle"))
+        log_simple(f"Found {puzzle_count} puzzles in words.xml", "INFO")
+        
+        if puzzle_count == 0:
+            log_simple("No puzzles found in words.xml", "FAILURE")
+            return False
         
         # Get the newest 5 puzzles, sorted by date
         puzzles = sorted(words_root.findall("puzzle"), 
                         key=lambda p: p.attrib.get("date", ""), 
                         reverse=True)[:5]
         
+        log_simple(f"Selected {len(puzzles)} newest puzzles for processing", "INFO")
+        
         # Load or create puzzles.xml
-        if os.path.exists("xml/puzzles.xml"):
-            puzzles_tree = ET.parse("xml/puzzles.xml")
+        if os.path.exists(PUZZLES_XML):
+            log_simple(f"Loading existing puzzles.xml at {PUZZLES_XML}", "INFO")
+            puzzles_tree = ET.parse(PUZZLES_XML)
             puzzles_root = puzzles_tree.getroot()
+            log_simple(f"Found {len(puzzles_root.findall('puzzle'))} existing puzzles", "INFO")
         else:
+            log_simple("Creating new puzzles.xml file", "INFO")
             puzzles_root = ET.Element("puzzles")
             puzzles_tree = ET.ElementTree(puzzles_root)
         
@@ -353,10 +397,14 @@ def wax():
         existing_puzzles = {p.attrib.get("date"): p for p in puzzles_root.findall("puzzle")}
         
         # Process each of the 5 newest puzzles
+        updated_count = 0
         for puzzle in puzzles:
             date_str = puzzle.attrib.get("date")
             if not date_str:
+                log_simple(f"Skipping puzzle with no date attribute", "INFO")
                 continue
+            
+            log_simple(f"Processing puzzle for date: {date_str}", "INFO")
             
             # Check if puzzle already exists for this date
             existing = existing_puzzles.get(date_str)
@@ -365,30 +413,47 @@ def wax():
                 is_placeholder = not any(child.tag == "word" for child in existing)
                 
                 if is_placeholder:
+                    log_simple(f"Filling placeholder for date: {date_str}", "INFO")
                     # Fill the placeholder with real data
                     preserved_id = existing.attrib.get("id")
                     existing.attrib.clear()
                     existing.attrib.update(puzzle.attrib)
-                    existing.set("id", preserved_id)  # Keep original ID
+                    if preserved_id:
+                        existing.set("id", preserved_id)  # Keep original ID
                     existing[:] = []  # Clear all children
                     
                     # Add words
+                    word_count = 0
                     for word_el in puzzle.findall("word"):
                         new_word = ET.Element("word")
                         new_word.text = word_el.text.strip().upper()
                         existing.append(new_word)
+                        word_count += 1
+                    
+                    log_simple(f"Added {word_count} words to puzzle for date: {date_str}", "INFO")
+                    updated_count += 1
+                else:
+                    log_simple(f"Puzzle for date {date_str} already exists and has words - skipping", "INFO")
             else:
+                log_simple(f"Creating new puzzle for date: {date_str}", "INFO")
                 # Create a new puzzle element
                 new_puzzle = ET.Element("puzzle", attrib=dict(puzzle.attrib))
                 
                 # Add words to the new puzzle
+                word_count = 0
                 for word_el in puzzle.findall("word"):
                     new_word = ET.Element("word")
                     new_word.text = word_el.text.strip().upper()
                     new_puzzle.append(new_word)
+                    word_count += 1
+                
+                log_simple(f"Added {word_count} words to new puzzle for date: {date_str}", "INFO")
                 
                 # Add to puzzles root
                 puzzles_root.append(new_puzzle)
+                updated_count += 1
+        
+        log_simple(f"Updated {updated_count} puzzles with new data", "INFO")
         
         # Get dates of all existing puzzles
         existing_dates = get_puzzle_dates(puzzles_root)
@@ -398,12 +463,14 @@ def wax():
         end_date = date(today.year, 12, 31) + timedelta(days=3)  # Through Jan 3 of next year
         
         # Add placeholders for missing dates
+        placeholder_count = 0
         for delta in range((end_date - today).days + 1):
             target_date = today + timedelta(days=delta)
             target_str = target_date.isoformat()
             
             # Only add if date doesn't exist yet
             if target_str not in existing_dates:
+                log_simple(f"Adding placeholder for future date: {target_str}", "INFO")
                 new_puzzle = ET.Element("puzzle", attrib={"date": target_str})
                 new_id = generate_id(target_str, existing_ids)
                 new_puzzle.set("id", new_id)
@@ -411,34 +478,63 @@ def wax():
                 
                 puzzles_root.append(new_puzzle)
                 existing_dates.add(target_str)
+                placeholder_count += 1
+        
+        log_simple(f"Added {placeholder_count} placeholders for future dates", "INFO")
         
         # Update metadata for all puzzles
+        metadata_count = 0
         for puzzle in puzzles_root.findall("puzzle"):
             # Skip placeholders with IDs (they don't need metadata updates)
             if not puzzle.findall("word") and "id" in puzzle.attrib:
                 continue
             
+            date_str = puzzle.attrib.get("date", "unknown")
+            log_simple(f"Updating metadata for puzzle date: {date_str}", "INFO")
             update_puzzle_metadata(puzzle, existing_ids)
+            metadata_count += 1
+        
+        log_simple(f"Updated metadata for {metadata_count} puzzles", "INFO")
         
         # Apply proper indentation
         indent(puzzles_root)
         
+        # Ensure the xml directory exists
+        os.makedirs(os.path.dirname(PUZZLES_XML), exist_ok=True)
+        
         # Write updated XML to file
-        puzzles_tree.write("xml/puzzles.xml", encoding="utf-8", xml_declaration=True)
+        log_simple(f"Writing updated puzzles to {PUZZLES_XML}", "INFO")
+        puzzles_tree.write(PUZZLES_XML, encoding="utf-8", xml_declaration=True)
+        
+        # Verify file was written successfully
+        if os.path.exists(PUZZLES_XML) and os.path.getsize(PUZZLES_XML) > 0:
+            log_simple(f"Successfully wrote {os.path.getsize(PUZZLES_XML)} bytes to {PUZZLES_XML}", "INFO")
+        else:
+            log_simple(f"File write verification failed for {PUZZLES_XML}", "FAILURE")
+            return False
         
         log_simple("Waxer process completed successfully", "SUCCESS")
         return True
         
     except Exception as e:
-        log_simple(f"Waxer process failed - {str(e)}", "FAILURE")
+        # Get full traceback
+        tb = traceback.format_exc()
+        log_simple(f"Waxer process failed - {str(e)}\n{tb}", "FAILURE")
         return False
 
 if __name__ == "__main__":
     try:
+        # Print environment info for debugging
+        log_simple(f"Python version: {sys.version}", "INFO")
+        log_simple(f"Current directory: {os.getcwd()}", "INFO")
+        log_simple(f"Script path: {os.path.abspath(__file__)}", "INFO")
+        
         # Run the main function
         success = wax()
         if not success:
+            log_simple("Exiting with code 1 due to processing failure", "FAILURE")
             sys.exit(1)
     except Exception as e:
-        log_simple(f"Waxer process failed - unhandled exception", "FAILURE")
+        tb = traceback.format_exc()
+        log_simple(f"Waxer process failed - unhandled exception: {str(e)}\n{tb}", "FAILURE")
         sys.exit(1)
