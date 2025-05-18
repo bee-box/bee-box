@@ -853,3 +853,35 @@ footer {
     margin: 0.5cm !important;
   }
 }
+
+/* Allow sections to break across pages if necessary */
+.section-box {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Let sections break if content is long */
+#header,
+#contentSection,
+.content-container,
+.tables-container,
+.table-section {
+  page-break-inside: auto !important;
+  break-inside: auto !important;
+  page-break-after: auto !important;
+}
+
+/* Allow more flexible column word breaks */
+.word-box {
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Use full width and height for printing */
+body {
+  max-height: unset !important;
+  overflow: visible !important;
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+}
