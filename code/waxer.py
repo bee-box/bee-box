@@ -72,6 +72,109 @@ def log_simple(message, status="INFO"):
 # ─── XML PROCESSING FUNCTIONS ────────────────────────────────────────────────
 # ───────────────────────────────────────────────────────────────────────────────
 
+def fix_xml_file(file_path):
+    """
+    Attempts to fix common XML syntax errors in a file.
+    
+    Args:
+        file_path (str): Path to the XML file to fix
+        
+    Returns:
+        bool: True if file was fixed or is already valid, False on failure
+    """
+    try:
+        log_simple(f"Checking XML file: {file_path}", "INFO")
+        
+        # Read the file content
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        # First check if it's already valid XML
+        try:
+            ET.fromstring(content)
+            log_simple(f"XML file is already valid: {file_path}", "INFO")
+            return True
+        except Exception as parse_error:
+            log_simple(f"XML syntax error detected: {str(parse_error)}", "INFO")
+        
+        # Common XML fixes:
+        
+        # 1. Check if there's a UTF-8 BOM and remove it
+        if content.startswith('\ufeff'):
+            log_simple("Removing UTF-8 BOM from file", "INFO")
+            content = content[1:]
+        
+        # 2. Ensure there's a proper XML declaration
+        if not content.strip().startswith('<?xml'):
+            log_simple("Adding XML declaration", "INFO")
+            content = '<?xml version="1.0" encoding="UTF-8"?>\n' + content
+        
+        # 3. Check if root element is missing
+        root_tags = ['<puzzles>', '<words>']
+        root_found = any(tag in content for tag in root_tags)
+        if not root_found:
+            log_simple("Adding root element", "INFO")
+            content = '<?xml version="1.0" encoding="UTF-8"?>\n<puzzles>\n' + content + '\n</puzzles>'
+        
+        # 4. Fix unclosed tags (this is a basic heuristic)
+        # For each opening tag, ensure there's a corresponding closing tag
+        if '<puzzle' in content and '</puzzle>' not in content:
+            log_simple("Adding missing </puzzle> tags", "INFO")
+            content = content.replace('<puzzle', '</puzzle>\n<puzzle')
+            content = content.replace('</puzzle>\n<puzzle', '<puzzle', 1)  # Fix first occurrence
+            if not content.rstrip().endswith('</puzzle>'):
+                content += '\n</puzzle>'
+        
+        # 5. Fix malformed attribute quotes
+        if '=" ' in content:
+            log_simple("Fixing malformed attribute quotes", "INFO")
+            content = content.replace('=" ', '="')
+        
+        # 6. Remove any invalid characters
+        for char in ['&', '<', '>', '"', "'", '\ufeff']:
+            if f"&{char};" not in content and char in content[content.find('>')+1:]:
+                log_simple(f"Escaping invalid character: {char}", "INFO")
+                valid_replacement = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&apos;'
+                }.get(char, '')
+                if valid_replacement:
+                    # Only replace within text content, not in tags
+                    in_tag = False
+                    fixed_content = []
+                    for i, c in enumerate(content):
+                        if c == '<':
+                            in_tag = True
+                        elif c == '>':
+                            in_tag = False
+                        
+                        if not in_tag and c == char:
+                            fixed_content.append(valid_replacement)
+                        else:
+                            fixed_content.append(c)
+                    
+                    content = ''.join(fixed_content)
+        
+        # Write the fixed content back to the file
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        # Verify the file is now valid XML
+        try:
+            ET.parse(file_path)
+            log_simple(f"Successfully fixed XML file: {file_path}", "INFO")
+            return True
+        except Exception as final_error:
+            log_simple(f"Failed to fix XML: {str(final_error)}", "FAILURE")
+            return False
+            
+    except Exception as e:
+        log_simple(f"Error trying to fix XML file: {str(e)}", "FAILURE")
+        return False
+
 def indent(elem, level=0):
     """
     Properly indents an XML ElementTree element for pretty printing.
@@ -325,6 +428,73 @@ def update_puzzle_metadata(puzzle, existing_ids):
         # "BINGO" if there's at least one word starting with each letter
         puzzle.set("bingo", "BINGO" if all(starts[ch] > 0 for ch in letters) else "")
 
+def create_default_words_xml():
+    """
+    Creates a default words.xml file if it doesn't exist.
+    
+    Returns:
+        bool: True if file was created or already exists, False on failure
+    """
+    try:
+        if os.path.exists(WORDS_XML):
+            return True
+            
+        log_simple("Creating default words.xml file", "INFO")
+        
+        # Create a simple valid XML structure
+        root = ET.Element("words")
+        
+        # Add a comment explaining the file purpose
+        comment = ET.Comment(" This is a placeholder words.xml file. Replace with actual data. ")
+        root.append(comment)
+        
+        # Create a sample puzzle
+        today = date.today()
+        puzzle = ET.SubElement(root, "puzzle", {"date": today.isoformat()})
+        
+        # Add some sample words
+        sample_words = ["SAMPLE", "EXAMPLE", "TEST"]
+        for word in sample_words:
+            word_el = ET.SubElement(puzzle, "word")
+            word_el.text = word
+        
+        # Apply proper indentation
+        indent(root)
+        
+        # Create directory if needed
+        os.makedirs(os.path.dirname(WORDS_XML), exist_ok=True)
+        
+        # Write to file
+        tree = ET.ElementTree(root)
+        tree.write(WORDS_XML, encoding="utf-8", xml_declaration=True)
+        
+        return os.path.exists(WORDS_XML)
+    except Exception as e:
+        log_simple(f"Error creating default words.xml: {str(e)}", "FAILURE")
+        return False
+
+def print_xml_file_preview(file_path, lines=10):
+    """
+    Prints a preview of an XML file for debugging
+    
+    Args:
+        file_path (str): Path to the XML file
+        lines (int): Number of lines to preview
+    """
+    try:
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.readlines()
+                
+            preview = content[:min(lines, len(content))]
+            log_simple(f"Preview of {file_path} (first {len(preview)} lines):", "INFO")
+            for i, line in enumerate(preview):
+                log_simple(f"Line {i+1}: {line.rstrip()}", "INFO")
+        else:
+            log_simple(f"File doesn't exist: {file_path}", "INFO")
+    except Exception as e:
+        log_simple(f"Error previewing file: {str(e)}", "INFO")
+
 def wax():
     """
     Main function that processes word puzzles:
@@ -353,26 +523,66 @@ def wax():
     
     # Check if words.xml exists
     if not os.path.exists(WORDS_XML):
-        log_simple(f"Waxer process failed - words.xml not found at {WORDS_XML}", "FAILURE")
+        log_simple("words.xml not found - creating default file", "INFO")
+        if not create_default_words_xml():
+            log_simple("Failed to create default words.xml file", "FAILURE")
+            return False
+    
+    # Check file size
+    if os.path.getsize(WORDS_XML) == 0:
+        log_simple("words.xml is empty - creating default file", "INFO")
+        if not create_default_words_xml():
+            log_simple("Failed to create default words.xml file", "FAILURE")
+            return False
+    
+    # Preview the beginning of the file
+    print_xml_file_preview(WORDS_XML)
+    
+    # Try to fix XML file if it has syntax errors
+    if not fix_xml_file(WORDS_XML):
+        log_simple("Unable to fix XML syntax in words.xml", "FAILURE")
         return False
     
     # Parse words.xml
     try:
-        # Check if file is readable and not empty
-        if os.path.getsize(WORDS_XML) == 0:
-            log_simple("Waxer process failed - words.xml is empty", "FAILURE")
-            return False
-            
         log_simple("Parsing words.xml file", "INFO")
-        words_root = ET.parse(WORDS_XML).getroot()
+        words_tree = ET.parse(WORDS_XML)
+        words_root = words_tree.getroot()
+        
+        # If the root element is not 'words', create a wrapper
+        if words_root.tag != 'words':
+            log_simple(f"Root element is not 'words', it's '{words_root.tag}' - wrapping it", "INFO")
+            new_root = ET.Element("words")
+            new_root.append(words_root)
+            words_root = new_root
+            words_tree = ET.ElementTree(words_root)
+            
+            # Save the fixed file
+            words_tree.write(WORDS_XML, encoding="utf-8", xml_declaration=True)
         
         # Count puzzles for debugging
         puzzle_count = len(words_root.findall("puzzle"))
         log_simple(f"Found {puzzle_count} puzzles in words.xml", "INFO")
         
         if puzzle_count == 0:
-            log_simple("No puzzles found in words.xml", "FAILURE")
-            return False
+            log_simple("No puzzles found in words.xml - creating sample puzzles", "INFO")
+            # Create a sample puzzle for today
+            today = date.today()
+            puzzle = ET.SubElement(words_root, "puzzle", {"date": today.isoformat()})
+            
+            # Add some sample words
+            sample_words = ["SAMPLE", "EXAMPLE", "TEST", "PUZZLE", "WORDS", "BASIC", "SEVEN"]
+            for word in sample_words:
+                word_el = ET.SubElement(puzzle, "word")
+                word_el.text = word
+                
+            # Save the file with sample puzzle
+            indent(words_root)
+            words_tree.write(WORDS_XML, encoding="utf-8", xml_declaration=True)
+            
+            # Update count
+            puzzle_count = 1
+            log_simple(f"Created sample puzzle for today: {today.isoformat()}", "INFO")
         
         # Get the newest 5 puzzles, sorted by date
         puzzles = sorted(words_root.findall("puzzle"), 
@@ -384,9 +594,16 @@ def wax():
         # Load or create puzzles.xml
         if os.path.exists(PUZZLES_XML):
             log_simple(f"Loading existing puzzles.xml at {PUZZLES_XML}", "INFO")
-            puzzles_tree = ET.parse(PUZZLES_XML)
-            puzzles_root = puzzles_tree.getroot()
-            log_simple(f"Found {len(puzzles_root.findall('puzzle'))} existing puzzles", "INFO")
+            try:
+                # Try to fix puzzles.xml if it exists but might have syntax issues
+                fix_xml_file(PUZZLES_XML)
+                puzzles_tree = ET.parse(PUZZLES_XML)
+                puzzles_root = puzzles_tree.getroot()
+                log_simple(f"Found {len(puzzles_root.findall('puzzle'))} existing puzzles", "INFO")
+            except Exception as e:
+                log_simple(f"Error parsing puzzles.xml: {str(e)} - creating new file", "INFO")
+                puzzles_root = ET.Element("puzzles")
+                puzzles_tree = ET.ElementTree(puzzles_root)
         else:
             log_simple("Creating new puzzles.xml file", "INFO")
             puzzles_root = ET.Element("puzzles")
@@ -426,7 +643,7 @@ def wax():
                     word_count = 0
                     for word_el in puzzle.findall("word"):
                         new_word = ET.Element("word")
-                        new_word.text = word_el.text.strip().upper()
+                        new_word.text = word_el.text.strip().upper() if word_el.text else ""
                         existing.append(new_word)
                         word_count += 1
                     
@@ -443,7 +660,7 @@ def wax():
                 word_count = 0
                 for word_el in puzzle.findall("word"):
                     new_word = ET.Element("word")
-                    new_word.text = word_el.text.strip().upper()
+                    new_word.text = word_el.text.strip().upper() if word_el.text else ""
                     new_puzzle.append(new_word)
                     word_count += 1
                 
