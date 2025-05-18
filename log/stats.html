@@ -64,16 +64,16 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            margin-right: 5px;
         }
         button:hover {
             background-color: #2980b9;
         }
         #logContent {
             background-color: #fff;
-            padding: 20px;
+            padding: 15px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            white-space: pre-wrap;
             font-size: 14px;
             overflow-x: auto;
         }
@@ -82,21 +82,44 @@
             font-style: italic;
             color: #7f8c8d;
         }
-        .status-start {
-            color: #27ae60;
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .log-entry:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .timestamp {
+            color: #8e44ad;
+            font-weight: bold;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+            padding: 2px 5px;
+            margin: 0 10px;
+            border-radius: 3px;
             font-weight: bold;
         }
-        .status-success {
-            color: #27ae60;
-            font-weight: bold;
+        .status-START {
+            background-color: #27ae60;
+            color: white;
         }
-        .status-failure {
-            color: #e74c3c;
-            font-weight: bold;
+        .status-SUCCESS {
+            background-color: #27ae60;
+            color: white;
         }
-        .separator-line {
-            color: #e74c3c;
-            margin: 10px 0;
+        .status-FAILURE {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .message {
+            flex-grow: 1;
         }
         .error-message {
             color: #e74c3c;
@@ -105,30 +128,35 @@
             border-left: 4px solid #e74c3c;
             background-color: #fdedeb;
         }
-        .timestamp {
-            color: #8e44ad;
-            font-weight: bold;
-        }
         input[type="text"] {
             padding: 8px;
-            width: 250px;
-            margin-right: 10px;
+            width: 200px;
+            margin-right: 5px;
         }
         .filter-controls {
             margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
         }
         #dateFilter {
             padding: 8px;
-            margin-right: 10px;
+            width: 180px;
         }
-        .log-line {
-            margin-bottom: 2px;
-            padding: 3px 0;
-        }
-        .log-group {
-            border-bottom: 1px dashed #ccc;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -151,10 +179,10 @@
         <div class="filter-controls">
             <input type="text" id="filterInput" placeholder="Filter logs...">
             <input type="text" id="dateFilter" placeholder="Filter by date (YYYY-MM-DD)">
-            <button id="clearFilterBtn">Clear Filters</button>
+            <button id="clearFilterBtn">Clear</button>
+            <button id="refreshBtn">Refresh</button>
+            <button id="autoRefreshBtn">Auto-Refresh</button>
         </div>
-        <button id="refreshBtn">Refresh Logs</button>
-        <button id="autoRefreshBtn">Enable Auto-Refresh</button>
         <div class="status" id="statusMessage">Ready</div>
     </div>
     
@@ -220,15 +248,12 @@
             const filterText = filterInput.value.toLowerCase();
             const dateText = dateFilter.value;
             
-            // Split logs into lines and apply highlighting/filtering
+            // Split logs into lines and prepare for display
             const lines = rawLogData.split('\n');
-            
-            // Group logs by run (every 2-3 entries with a separator)
-            const logGroups = [];
-            let currentGroup = [];
+            const logEntries = [];
             
             // Skip header line
-            let skipFirst = true;
+            let isHeaderLine = true;
             
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -237,94 +262,57 @@
                 if (!line) continue;
                 
                 // Skip header line
-                if (skipFirst) {
-                    skipFirst = false;
+                if (isHeaderLine) {
+                    isHeaderLine = false;
                     continue;
                 }
                 
-                // If we find a separator, start a new group (but don't add the separator)
-                if (line.includes('─────────')) {
-                    if (currentGroup.length > 0) {
-                        logGroups.push(currentGroup);
-                        currentGroup = [];
-                    }
-                    continue;
-                }
-                
-                // Add the line to the current group
-                currentGroup.push(line);
-            }
-            
-            // Add the last group if not empty
-            if (currentGroup.length > 0) {
-                logGroups.push(currentGroup);
-            }
-            
-            // Filter and format groups
-            const filteredGroups = [];
-            
-            for (const group of logGroups) {
-                // Check if any line in the group matches the filters
-                const groupMatches = group.some(line => {
-                    return (!filterText || line.toLowerCase().includes(filterText)) &&
-                           (!dateText || line.includes(dateText));
-                });
-                
-                if (!groupMatches) continue;
-                
-                // Format the group
-                const formattedGroup = [];
-                
-                for (const line of group) {
-                    // Parse CSV line: TIMESTAMP,STATUS,MESSAGE
-                    const parts = line.split(',');
+                // Check if line matches filters
+                if ((!filterText || line.toLowerCase().includes(filterText)) &&
+                    (!dateText || line.includes(dateText))) {
                     
-                    if (parts.length >= 3) {
-                        const timestamp = parts[0];
-                        const status = parts[1];
-                        // Join remaining parts in case the message contains commas
-                        let message = parts.slice(2).join(',');
-                        
-                        // Remove quotes if present
-                        if (message.startsWith('"') && message.endsWith('"')) {
-                            message = message.substring(1, message.length - 1);
-                        }
-                        
-                        // Determine status class
-                        let statusClass = '';
-                        if (status === 'START') {
-                            statusClass = 'status-start';
-                        } else if (status === 'SUCCESS') {
-                            statusClass = 'status-success';
-                        } else if (status === 'FAILURE') {
-                            statusClass = 'status-failure';
-                        }
-                        
-                        const formattedLine = `
-                            <div class="log-line">
-                                <span class="timestamp">${timestamp}</span> - 
-                                <span class="${statusClass}">${status}</span>: ${message}
-                            </div>
-                        `;
-                        
-                        formattedGroup.push(formattedLine);
-                    } else {
-                        // Fallback for non-standard format
-                        formattedGroup.push(`<div class="log-line">${line}</div>`);
+                    // Parse CSV line: TIMESTAMP,STATUS,MESSAGE
+                    const commaIndex = line.indexOf(',');
+                    if (commaIndex === -1) {
+                        // Malformed line
+                        logEntries.push(`<div class="log-entry">${line}</div>`);
+                        continue;
                     }
-                }
-                
-                if (formattedGroup.length > 0) {
-                    filteredGroups.push(`<div class="log-group">${formattedGroup.join('')}</div>`);
+                    
+                    const timestamp = line.substring(0, commaIndex);
+                    
+                    const restOfLine = line.substring(commaIndex + 1);
+                    const secondCommaIndex = restOfLine.indexOf(',');
+                    if (secondCommaIndex === -1) {
+                        // Malformed line
+                        logEntries.push(`<div class="log-entry">${line}</div>`);
+                        continue;
+                    }
+                    
+                    const status = restOfLine.substring(0, secondCommaIndex);
+                    let message = restOfLine.substring(secondCommaIndex + 1);
+                    
+                    // Remove quotes if present
+                    if (message.startsWith('"') && message.endsWith('"')) {
+                        message = message.substring(1, message.length - 1);
+                    }
+                    
+                    logEntries.push(`
+                        <div class="log-entry">
+                            <span class="timestamp">${timestamp}</span>
+                            <span class="status-indicator status-${status}">${status}</span>
+                            <span class="message">${message}</span>
+                        </div>
+                    `);
                 }
             }
             
-            // Reverse groups to show newest first
-            filteredGroups.reverse();
+            // Reverse entries to show newest first
+            logEntries.reverse();
             
             // Show results or no matches message
-            if (filteredGroups.length > 0) {
-                logContent.innerHTML = filteredGroups.join('');
+            if (logEntries.length > 0) {
+                logContent.innerHTML = logEntries.join('');
             } else {
                 logContent.innerHTML = `<div class="error-message">No log entries match your filters.</div>`;
             }
@@ -335,12 +323,12 @@
             autoRefreshEnabled = !autoRefreshEnabled;
             
             if (autoRefreshEnabled) {
-                autoRefreshBtn.textContent = 'Disable Auto-Refresh';
+                autoRefreshBtn.textContent = 'Stop Auto-Refresh';
                 autoRefreshBtn.style.backgroundColor = '#e74c3c';
                 autoRefreshTimer = setInterval(loadLogs, refreshInterval);
                 statusMessage.textContent = `Auto-refresh enabled (every ${refreshInterval/1000} seconds)`;
             } else {
-                autoRefreshBtn.textContent = 'Enable Auto-Refresh';
+                autoRefreshBtn.textContent = 'Auto-Refresh';
                 autoRefreshBtn.style.backgroundColor = '#3498db';
                 clearInterval(autoRefreshTimer);
                 statusMessage.textContent = 'Auto-refresh disabled';

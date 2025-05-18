@@ -7,9 +7,7 @@ This script:
 - Saves it to xml/words.xml if the date isn't already present
 - Always backs up words.xml to xml/backups/words.xml.bak
 - Uses lxml for fast and clean XML handling
-- Logs all activity to log/log.txt with timestamps in New Orleans, LA time (Central Time Zone)
-- Handles Daylight Saving Time shifts automatically
-- Provides detailed progress annotations and error reporting
+- Logs minimal information: start time, success/failure, end time
 
 Author: Kevin Kolb
 Last updated: May 13, 2025
@@ -50,73 +48,32 @@ os.makedirs(BACKUP_DIR, exist_ok=True)   # Create backup directory
 os.makedirs(LOG_DIR, exist_ok=True)      # Create log directory
 
 # ───────────────────────────────────────────────────────────────────────────────
-# ─── LOGGING FUNCTIONS ──────────────────────────────────────────────────────────
+# ─── SIMPLE LOGGING ────────────────────────────────────────────────────────────
 # ───────────────────────────────────────────────────────────────────────────────
 
-def get_nola_time():
-    """
-    Get the current time in New Orleans (Central Time Zone) with DST handling.
-    
-    Returns:
-        str: A formatted timestamp string in New Orleans local time
-    """
-    utc_now = datetime.now(pytz.utc)                   # Get current UTC time
-    nola_now = utc_now.astimezone(NOLA_TIMEZONE)       # Convert to New Orleans time
-    
-    # Format with timezone info to show CDT/CST as appropriate
-    return nola_now.strftime('%Y-%m-%d %H:%M:%S %Z')
+def get_timestamp():
+    """Get current timestamp in New Orleans timezone with 12-hour format"""
+    utc_now = datetime.now(pytz.utc)
+    nola_now = utc_now.astimezone(NOLA_TIMEZONE)
+    return nola_now.strftime('%Y-%m-%d %I:%M:%S %p %Z')  # 12-hour format with AM/PM
 
-def log(message, level="INFO"):
+def log_simple(message, status="INFO"):
     """
-    Log a message with New Orleans timestamp to screen and log file.
-    
-    Args:
-        message (str): The message to log
-        level (str): The logging level (INFO, WARNING, ERROR, etc.)
+    Write a simple log entry with timestamp
     """
-    timestamp = get_nola_time()
-    full_msg = f"[{timestamp}] [{level}] {message}"
-    print(full_msg)
+    timestamp = get_timestamp()
     
+    # Check if the log file exists
+    file_exists = os.path.exists(LOG_FILE)
+    
+    # Open in append mode, but if the file doesn't exist, we'll add headers first
     with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(full_msg + "\n")
-
-def log_separator():
-    """
-    Adds a divider line to the end of the log entry.
-    """
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write("─" * 60 + "\n\n")
-
-def log_operation_start(operation):
-    """
-    Log the start of a specific operation with a distinctive marker.
-    
-    Args:
-        operation (str): Name of the operation being started
-    """
-    log(f"▶️ Starting operation: {operation}")
-
-def log_operation_end(operation, status="completed"):
-    """
-    Log the end of a specific operation with a distinctive marker.
-    
-    Args:
-        operation (str): Name of the operation being completed
-        status (str): Status of completion (completed, failed, etc.)
-    """
-    log(f"⏹️ Operation {status}: {operation}")
-
-def log_error(message, exception=None):
-    """
-    Log an error with exception details if available.
-    
-    Args:
-        message (str): Error description
-        exception (Exception, optional): The exception object if available
-    """
-    error_details = f": {str(exception)}" if exception else ""
-    log(f"❌ ERROR: {message}{error_details}", level="ERROR")
+        # Write headers if creating a new file
+        if not file_exists:
+            f.write("TIMESTAMP,STATUS,MESSAGE\n")
+        
+        # Append the log entry
+        f.write(f"{timestamp},{status},\"{message}\"\n")
 
 # ───────────────────────────────────────────────────────────────────────────────
 # ─── XML DATA HANDLING ──────────────────────────────────────────────────────────
@@ -129,23 +86,15 @@ def load_existing_dates():
     Returns:
         set: A set of date strings for puzzles already in the XML file
     """
-    log_operation_start("Loading existing dates from XML")
-    
     if not os.path.exists(XML_FILE):
-        log("XML file does not exist yet - no existing dates")
-        log_operation_end("Loading existing dates")
         return set()
     
     try:
         tree = ET.parse(XML_FILE)
         root = tree.getroot()
         dates = {p.get("date") for p in root.findall("puzzle")}
-        log(f"Found {len(dates)} existing puzzle dates in XML")
-        log_operation_end("Loading existing dates")
         return dates
-    except Exception as e:
-        log_error("Failed to parse existing XML file", e)
-        log_operation_end("Loading existing dates", "failed")
+    except Exception:
         return set()
 
 def load_latest_words():
@@ -155,11 +104,7 @@ def load_latest_words():
     Returns:
         list: Sorted list of words from the most recent puzzle
     """
-    log_operation_start("Loading latest word list")
-    
     if not os.path.exists(XML_FILE):
-        log("XML file does not exist yet - no latest words")
-        log_operation_end("Loading latest word list")
         return []
     
     try:
@@ -168,20 +113,12 @@ def load_latest_words():
         puzzles = root.findall("puzzle")
         
         if not puzzles:
-            log("No puzzles found in XML file")
-            log_operation_end("Loading latest word list")
             return []
         
         latest = puzzles[-1]
-        latest_date = latest.get("date", "unknown")
         words = sorted([w.text.strip().upper() for w in latest.findall("word") if w.text])
-        
-        log(f"Loaded {len(words)} words from latest puzzle ({latest_date})")
-        log_operation_end("Loading latest word list")
         return words
-    except Exception as e:
-        log_error("Failed to load latest words", e)
-        log_operation_end("Loading latest word list", "failed")
+    except Exception:
         return []
 
 def backup_xml_file():
@@ -191,21 +128,13 @@ def backup_xml_file():
     Returns:
         bool: True if backup was successful, False otherwise
     """
-    log_operation_start("Backing up XML file")
-    
     if os.path.exists(XML_FILE):
         try:
             shutil.copyfile(XML_FILE, BACKUP_FILE)
-            log(f"Backup created: {BACKUP_FILE}")
-            log_operation_end("Backing up XML file")
             return True
-        except Exception as e:
-            log_error("Failed to create backup", e)
-            log_operation_end("Backing up XML file", "failed")
+        except Exception:
             return False
     else:
-        log("No existing XML file to back up")
-        log_operation_end("Backing up XML file", "skipped")
         return True
 
 def append_puzzle(date_str, words):
@@ -219,28 +148,20 @@ def append_puzzle(date_str, words):
     Returns:
         bool: True if the puzzle was successfully added, False otherwise
     """
-    log_operation_start(f"Adding puzzle for {date_str} to XML")
-    
     try:
         # If file exists, parse it; otherwise create new root
         if os.path.exists(XML_FILE):
-            log("Parsing existing XML file")
             tree = ET.parse(XML_FILE)
             root = tree.getroot()
         else:
-            log("Creating new XML structure")
             root = ET.Element("words")
             tree = ET.ElementTree(root)
 
         # Create new puzzle element
-        log(f"Creating puzzle element with {len(words)} words")
         puzzle = ET.SubElement(root, "puzzle", date=date_str)
         for word in words:
             ET.SubElement(puzzle, "word").text = word
 
-        # Write to file with pretty formatting
-        log("Writing updated XML to file")
-        
         # Generate XML string with pretty print
         xml_str = ET.tostring(root, encoding="utf-8", xml_declaration=True, pretty_print=True)
         
@@ -251,12 +172,8 @@ def append_puzzle(date_str, words):
         with open(XML_FILE, 'wb') as f:
             f.write(xml_str)
             
-        log(f"✅ Puzzle for {date_str} successfully added to words.xml")
-        log_operation_end(f"Adding puzzle for {date_str} to XML")
         return True
-    except Exception as e:
-        log_error(f"Failed to add puzzle for {date_str} to XML", e)
-        log_operation_end(f"Adding puzzle for {date_str} to XML", "failed")
+    except Exception:
         return False
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -270,30 +187,23 @@ def fetch_puzzle():
     Returns:
         tuple: (date_str, words_list) containing the puzzle date and words
     """
-    log_operation_start("Fetching puzzle from NYT")
-    
     max_retries = 3
     delay = 5  # seconds between retries
 
     for attempt in range(1, max_retries + 1):
         try:
-            log(f"Attempt {attempt} of {max_retries}...")
-            
             # Make the request with a user agent to avoid being blocked
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml",
                 "Accept-Language": "en-US,en;q=0.9"
             }
-            log("Sending HTTP request to NYT")
             response = requests.get(NYT_URL, headers=headers, timeout=30)
             response.raise_for_status()
             
-            log("Parsing HTML response")
             soup = BeautifulSoup(response.text, "html.parser")
 
             # Find the script containing the game data
-            log("Searching for game data in page source")
             script = next((s.string for s in soup.find_all("script") 
                           if s.string and "window.gameData" in s.string), None)
                           
@@ -301,7 +211,6 @@ def fetch_puzzle():
                 raise RuntimeError("Game data not found in page source.")
 
             # Extract the JSON data from the script
-            log("Extracting JSON data from script")
             start = script.find("{")
             brace_count = 0
             for i in range(start, len(script)):
@@ -314,7 +223,6 @@ def fetch_puzzle():
                     break
 
             # Parse the JSON data
-            log("Parsing JSON data")
             data = json.loads(json_str)
             today_data = data.get("today", {})
             
@@ -323,31 +231,21 @@ def fetch_puzzle():
             date_str = raw_date.replace("/", "-") if raw_date else date.today().isoformat()
             answers = today_data.get("answers", [])
 
-            # Success!
-            log(f"📅 Successfully fetched puzzle for {date_str} with {len(answers)} words")
-            log_operation_end("Fetching puzzle from NYT")
             return date_str, [w.upper() for w in answers]
 
-        except Exception as e:
-            log_error(f"Error in fetch attempt {attempt}", e)
-            
-            # If this is the last attempt, try to send email notification and exit
+        except Exception:
+            # If this is the last attempt, exit
             if attempt == max_retries:
-                log("Maximum retry attempts reached")
                 try:
                     from archive.emailer import send_email_notification
-                    log("Sending error notification email")
                     send_email_notification("❌ Spelling Bee Harvest Error", 
-                                          f"Failed to fetch puzzle: {str(e)}")
-                    log("Error notification email sent")
-                except Exception as mail_err:
-                    log_error("Failed to send email alert", mail_err)
+                                          f"Failed to fetch puzzle")
+                except Exception:
+                    pass
                 
-                log_operation_end("Fetching puzzle from NYT", "failed")
-                sys.exit(1)
+                return None, []
                 
             # Otherwise, wait and retry
-            log(f"🔁 Waiting {delay} seconds before retry...")
             time.sleep(delay)
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -364,9 +262,9 @@ def main():
     4. Validate the puzzle data
     5. Add puzzle to XML file
     """
-    log("🟡 START HARVEST RUN", level="START")
-    log(f"Running on system: {os.name}, Python: {sys.version.split()[0]}")
-
+    # Log start
+    log_simple("Harvest process started", "START")
+    
     # Always back up words.xml before doing anything
     backup_xml_file()
 
@@ -375,65 +273,53 @@ def main():
     today_str = date.today().isoformat()
 
     if today_str in existing_dates:
-        log(f"ℹ️ Puzzle for {today_str} already exists in XML", level="INFO")
-        log("🔚 END HARVEST RUN - No action needed", level="END")
-        log_separator()
-        return
+        log_simple("Harvest process completed - puzzle already exists", "SUCCESS")
+        return True
 
     # Fetch the puzzle from NYT
     date_str, words = fetch_puzzle()
+    
+    # Check if fetch failed
+    if date_str is None:
+        log_simple("Harvest process failed - could not fetch puzzle", "FAILURE")
+        return False
 
     # Double-check if the fetched date is already in our XML
     if date_str in existing_dates:
-        log(f"ℹ️ Puzzle for {date_str} already exists in XML", level="INFO")
-        log("🔚 END HARVEST RUN - No action needed", level="END")
-        log_separator()
-        return
+        log_simple("Harvest process completed - puzzle already exists", "SUCCESS")
+        return True
 
     # Validate that we have words to save
     if not words:
-        log_error(f"No words found for {date_str}")
-        log("🔚 END HARVEST RUN - Failed: no words found", level="END")
-        log_separator()
-        return
+        log_simple("Harvest process failed - no words found", "FAILURE")
+        return False
 
     # Check if the puzzle is identical to the previous one
     latest_words = load_latest_words()
     if sorted(words) == latest_words:
-        log("ℹ️ Puzzle is identical to the previous one - potential error", level="WARNING")
-        log(f"Latest: {len(latest_words)} words, New: {len(words)} words - same content")
-        log("🔚 END HARVEST RUN - Skipped: duplicate puzzle", level="END")
-        log_separator()
-        return
+        log_simple("Harvest process completed with warnings - duplicate puzzle", "SUCCESS")
+        return True
 
     # Add the new puzzle to the XML
     success = append_puzzle(date_str, words)
     
     if success:
-        log("✅ Harvest completed successfully", level="SUCCESS")
+        log_simple("Harvest process completed successfully", "SUCCESS")
+        return True
     else:
-        log("❌ Harvest completed with errors", level="ERROR")
-        
-    log("🔚 END HARVEST RUN", level="END")
-    log_separator()
+        log_simple("Harvest process failed - could not save puzzle", "FAILURE")
+        return False
 
 # ───────────────────────────────────────────────────────────────────────────────
 # ─── SCRIPT ENTRY POINT ─────────────────────────────────────────────────────────
 # ───────────────────────────────────────────────────────────────────────────────
 
-if __name__ == "__main__":
-    # Record script start time
-    start_time = time.time()
-    
+if __name__ == "__main__":    
     try:
         # Run the main program
-        main()
+        success = main()
+        if not success:
+            sys.exit(1)
     except Exception as e:
-        # Catch any unhandled exceptions
-        log_error("Unhandled exception in main program", e)
-        log_separator()
+        log_simple(f"Harvest process failed - unhandled exception", "FAILURE")
         sys.exit(1)
-        
-    # Calculate and log execution time
-    execution_time = time.time() - start_time
-    log(f"Total execution time: {execution_time:.2f} seconds", level="INFO")
