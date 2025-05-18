@@ -19,15 +19,18 @@ import random
 from collections import Counter
 import pytz  # Added for timezone support
 
-# Constants for file paths - use absolute paths for GitHub Actions
+# Base directories - use absolute paths for GitHub Actions
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-WORDS_XML = os.path.join(SCRIPT_DIR, "xml/words.xml")
-PUZZLES_XML = os.path.join(SCRIPT_DIR, "xml/puzzles.xml")
+XML_DIR = os.path.join(SCRIPT_DIR, "xml")
 LOG_DIR = os.path.join(SCRIPT_DIR, "log")
+
+# Specific files
+WORDS_XML = os.path.join(XML_DIR, "words.xml")
+PUZZLES_XML = os.path.join(XML_DIR, "puzzles.xml")
 LOG_FILE = os.path.join(LOG_DIR, "log.txt")
 
 # Create necessary directories if they don't exist
-os.makedirs(os.path.join(SCRIPT_DIR, "xml"), exist_ok=True)
+os.makedirs(XML_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -461,9 +464,6 @@ def create_default_words_xml():
         # Apply proper indentation
         indent(root)
         
-        # Create directory if needed
-        os.makedirs(os.path.dirname(WORDS_XML), exist_ok=True)
-        
         # Write to file
         tree = ET.ElementTree(root)
         tree.write(WORDS_XML, encoding="utf-8", xml_declaration=True)
@@ -512,9 +512,8 @@ def wax():
     
     # List files in xml directory to debug
     try:
-        xml_dir = os.path.join(SCRIPT_DIR, "xml")
-        if os.path.exists(xml_dir):
-            files = os.listdir(xml_dir)
+        if os.path.exists(XML_DIR):
+            files = os.listdir(XML_DIR)
             log_simple(f"Files in xml directory: {', '.join(files)}", "INFO")
         else:
             log_simple("xml directory does not exist yet", "INFO")
@@ -716,9 +715,6 @@ def wax():
         # Apply proper indentation
         indent(puzzles_root)
         
-        # Ensure the xml directory exists
-        os.makedirs(os.path.dirname(PUZZLES_XML), exist_ok=True)
-        
         # Write updated XML to file
         log_simple(f"Writing updated puzzles to {PUZZLES_XML}", "INFO")
         puzzles_tree.write(PUZZLES_XML, encoding="utf-8", xml_declaration=True)
@@ -736,7 +732,8 @@ def wax():
     except Exception as e:
         # Get full traceback
         tb = traceback.format_exc()
-        log_simple(f"Waxer process failed - {str(e)}\n{tb}", "FAILURE")
+        log_simple(f"Waxer process failed - unhandled exception: {str(e)}\n{tb}", "FAILURE")
+        sys.exit(1) process failed - {str(e)}\n{tb}", "FAILURE")
         return False
 
 if __name__ == "__main__":
@@ -753,5 +750,4 @@ if __name__ == "__main__":
             sys.exit(1)
     except Exception as e:
         tb = traceback.format_exc()
-        log_simple(f"Waxer process failed - unhandled exception: {str(e)}\n{tb}", "FAILURE")
-        sys.exit(1)
+        log_simple(f"Waxer

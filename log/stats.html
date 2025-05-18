@@ -321,14 +321,14 @@
             text-transform: uppercase;
         }
         
-        .status-START {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
+        .status-INFO {
+            color: #52ff52;
+            border-color: #52ff52;
         }
         
-        .status-SUCCESS {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
+        .status-START {
+            color: #ffcc00;
+            border-color: #ffcc00;
         }
         
         .status-FAILURE {
@@ -465,7 +465,7 @@
     <div class="container">
         <div class="logo animate__animated animate__fadeIn">W.O.P.<span>R</span></div>
         
-        <h1 class="animate__animated animate__fadeInDown">System Log Terminal</h1>
+        <h1 class="animate__animated animate__fadeInDown">Harvester Log Terminal</h1>
         
         <div class="top-bar animate__animated animate__fadeInUp">
             <a href="https://beebox.ghost.io/" target="_blank" class="banner-button toolbox-button">
@@ -495,7 +495,55 @@
         <div id="logContent" class="animate__animated animate__fadeIn">INITIALIZING LOG DATABASE...</div>
     </div>
 
-RefreshBtn.addEventListener('click', loadLogs);
+    <script>
+        // Define DOM elements
+        const refreshBtn = document.getElementById('refreshBtn');
+        const autoRefreshBtn = document.getElementById('autoRefreshBtn');
+        const filterInput = document.getElementById('filterInput');
+        const dateFilter = document.getElementById('dateFilter');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const logContent = document.getElementById('logContent');
+        
+        // Configuration
+        const logFilePath = 'logs.txt'; // Replace with actual path to your log file
+        let refreshInterval = 30000; // 30 seconds
+        let autoRefreshEnabled = false;
+        let autoRefreshTimer;
+        let rawLogData = '';
+        
+// Function to parse CSV log format
+function parseLogFile(rawLogText) {
+    const logs = [];
+    const lines = rawLogText.trim().split('\n');
+    
+    for (const line of lines) {
+        // CSV parsing with regex to handle quoted fields
+        const match = line.match(/^([^,]+),([^,]+),"(.+)"$/);
+        if (match) {
+            logs.push({
+                timestamp: match[1],
+                status: match[2],
+                message: match[3]
+            });
+        }
+    }
+    
+    return logs;
+}
+
+// Sample raw log text (from logs.txt)
+const rawLogText = `2025-05-18 01:11:55 AM CDT,START,"Harvest process started"
+2025-05-18 01:11:55 AM CDT,INFO,"Skipping backup - current file (2090075 bytes) is not larger than backup (2090075 bytes)"
+2025-05-18 01:11:55 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-05-18 01:11:55 AM CDT,INFO,"Successfully fetched puzzle for 2025-05-17 with 65 words"
+2025-05-18 01:11:55 AM CDT,SUCCESS,"Harvest process completed - puzzle already exists"`;
+
+// Parse the raw log text into structured log objects
+const sampleLogs = parseLogFile(rawLogText);
+        
+        // Event listeners
+        refreshBtn.addEventListener('click', loadLogs);
         autoRefreshBtn.addEventListener('click', toggleAutoRefresh);
         
         filterInput.addEventListener('input', displayFilteredLogs);
@@ -516,6 +564,73 @@ RefreshBtn.addEventListener('click', loadLogs);
                 this.style.opacity = '1';
             });
         });
+        
+        // Function to display filtered logs
+        function displayFilteredLogs() {
+            const filterText = filterInput.value.toLowerCase();
+            const dateText = dateFilter.value;
+            
+            let filteredLogs = sampleLogs;
+            
+            // Apply filters if they exist
+            if (filterText || dateText) {
+                filteredLogs = sampleLogs.filter(log => {
+                    const matchesFilter = filterText ? 
+                        (log.message.toLowerCase().includes(filterText) || 
+                         log.status.toLowerCase().includes(filterText) ||
+                         log.timestamp.toLowerCase().includes(filterText)) : true;
+                    
+                    const matchesDate = dateText ? 
+                        log.timestamp.includes(dateText) : true;
+                    
+                    return matchesFilter && matchesDate;
+                });
+            }
+            
+            // Render logs
+            if (filteredLogs.length === 0) {
+                logContent.innerHTML = `<div class="error-message">
+                    <p>** NO MATCHING LOGS FOUND **</p>
+                    <p>TRY ADJUSTING YOUR FILTER CRITERIA.</p>
+                </div>`;
+            } else {
+                logContent.innerHTML = '';
+                filteredLogs.forEach(log => {
+                    const logEntry = document.createElement('div');
+                    logEntry.classList.add('log-entry');
+                    
+                    const logHeader = document.createElement('div');
+                    logHeader.classList.add('log-entry-header');
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.classList.add('timestamp');
+                    timestamp.textContent = log.timestamp;
+                    
+                    const statusIndicator = document.createElement('div');
+                    statusIndicator.classList.add('status-indicator', `status-${log.status}`);
+                    statusIndicator.textContent = log.status;
+                    
+                    const message = document.createElement('div');
+                    message.classList.add('message');
+                    message.textContent = log.message;
+                    
+                    logHeader.appendChild(timestamp);
+                    logHeader.appendChild(statusIndicator);
+                    logEntry.appendChild(logHeader);
+                    logEntry.appendChild(message);
+                    
+                    logContent.appendChild(logEntry);
+                });
+            }
+            
+            // Update status
+            const filterActive = filterText || dateText;
+            if (filterActive) {
+                typeWriter(statusMessage, `FILTERED: ${filteredLogs.length} RESULTS`);
+            } else {
+                typeWriter(statusMessage, `DISPLAYING ${filteredLogs.length} LOG ENTRIES`);
+            }
+        }
         
         // Typewriter effect for status messages
         function typeWriter(element, text, speed = 50) {
@@ -541,18 +656,72 @@ RefreshBtn.addEventListener('click', loadLogs);
             
             if (autoRefreshEnabled) {
                 autoRefreshBtn.textContent = 'STOP AUTO-REFRESH';
-                autoRefreshBtn.style.borderColor = var(--danger-color);
-                autoRefreshBtn.style.color = var(--danger-color);
+                autoRefreshBtn.style.color = '#ff0000';
+                autoRefreshBtn.style.borderColor = '#ff0000';
                 autoRefreshTimer = setInterval(loadLogs, refreshInterval);
                 typeWriter(statusMessage, `AUTO-REFRESH ACTIVE (${refreshInterval/1000}s)`);
             } else {
                 autoRefreshBtn.textContent = 'AUTO-REFRESH';
-                autoRefreshBtn.style.borderColor = '';
                 autoRefreshBtn.style.color = '';
+                autoRefreshBtn.style.borderColor = '';
                 clearInterval(autoRefreshTimer);
                 typeWriter(statusMessage, 'AUTO-REFRESH DISABLED');
             }
         }
+        
+        // Add functionality to read log files from the user's system
+        function readLogFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = (error) => reject(error);
+                reader.readAsText(file);
+            });
+        }
+        
+        // Create a file input element for uploading logs
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.txt,.log,.csv';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+        
+        // Create a button to trigger the file picker
+        const uploadButton = document.createElement('button');
+        uploadButton.textContent = 'UPLOAD LOG';
+        uploadButton.addEventListener('click', () => fileInput.click());
+        
+        // Add the upload button to the action buttons
+        const actionButtons = document.querySelector('.action-buttons');
+        actionButtons.appendChild(uploadButton);
+        
+        // Process uploaded log file
+        fileInput.addEventListener('change', async (event) => {
+            if (event.target.files.length > 0) {
+                try {
+                    typeWriter(statusMessage, 'READING LOG FILE...');
+                    const file = event.target.files[0];
+                    const content = await readLogFromFile(file);
+                    const parsedLogs = parseLogFile(content);
+                    
+                    if (parsedLogs.length > 0) {
+                        // Replace our sample logs with the uploaded ones
+                        while (sampleLogs.length > 0) {
+                            sampleLogs.pop();
+                        }
+                        parsedLogs.forEach(log => sampleLogs.push(log));
+                        
+                        displayFilteredLogs();
+                        typeWriter(statusMessage, `LOADED ${parsedLogs.length} LOG ENTRIES FROM ${file.name}`);
+                    } else {
+                        typeWriter(statusMessage, 'ERROR: NO VALID LOG ENTRIES FOUND');
+                    }
+                } catch (error) {
+                    console.error('Error processing log file:', error);
+                    typeWriter(statusMessage, 'ERROR PROCESSING LOG FILE');
+                }
+            }
+        });
         
         // Load and display logs with retro terminal effects
         async function loadLogs() {
@@ -563,25 +732,36 @@ RefreshBtn.addEventListener('click', loadLogs);
                 // Simulate slight delay for retro terminal feel
                 await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const response = await fetch(logFilePath + '?t=' + new Date().getTime());
-                
-                if (!response.ok) {
-                    throw new Error(`FAILED: CODE ${response.status} ${response.statusText}`);
-                }
-                
-                // Show loading animation
+                // In a real application, you would fetch actual log data from a file
+                // For this demo, we could simulate parsing a log file:
                 logContent.innerHTML = '<div class="loading-text">DOWNLOADING LOG DATA...</div>';
                 await new Promise(resolve => setTimeout(resolve, 600));
                 logContent.innerHTML = '<div class="loading-text">DECRYPTING CONTENTS...</div>';
                 await new Promise(resolve => setTimeout(resolve, 400));
                 
-                rawLogData = await response.text();
+                // Add a new log entry with current timestamp for demonstration
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    hour12: true
+                };
+                const formattedTime = now.toLocaleString('en-US', options).replace(',', '');
+                sampleLogs.push({
+                    timestamp: formattedTime,
+                    status: 'INFO',
+                    message: `Log file refreshed at ${formattedTime}`
+                });
                 
                 // Display logs with current filters
                 displayFilteredLogs();
                 
-                const now = new Date().toLocaleString();
-                typeWriter(statusMessage, `LAST UPDATE: ${now}`);
+                const nowString = now.toLocaleString();
+                typeWriter(statusMessage, `LAST UPDATE: ${nowString}`);
                 refreshBtn.disabled = false;
                 
             } catch (error) {
