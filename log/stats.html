@@ -3,340 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Log Viewer</title>
+    <title>WOPR Log Terminal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
+        :root {
+            --primary-color: #33ff00;
+            --primary-dim: #1a8000;
+            --terminal-bg: #000000;
+            --terminal-border: #33ff00;
+            --dark-terminal: #001000;
+            --light-terminal: #002800;
+            --warning-color: #ff8c00;
+            --danger-color: #ff0000;
+            --glow: 0 0 10px rgba(51, 255, 0, 0.7), 0 0 5px rgba(51, 255, 0, 0.4);
+            --soft-glow: 0 0 5px rgba(51, 255, 0, 0.5);
+            --border-radius: 0;
+            --spacing-sm: 5px;
+            --spacing-md: 10px;
+            --spacing-lg: 15px;
+            --spacing-xl: 20px;
+        }
+        
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100%);
+            }
+        }
+        
+        @keyframes blink {
+            0%, 49% {
+                opacity: 1;
+            }
+            50%, 100% {
+                opacity: 0;
+            }
+        }
+        
+        @keyframes textflicker {
+            0%, 100% { text-shadow: var(--glow); }
+            50% { text-shadow: var(--soft-glow); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: var(--glow); }
+            50% { box-shadow: var(--soft-glow); }
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: monospace;
+            font-family: 'VT323', monospace;
             line-height: 1.5;
-            margin: 20px;
-            background-color: #f5f5f5;
+            margin: 0;
+            background-color: var(--terminal-bg);
+            color: var(--primary-color);
+            font-size: 16px;
+            overflow-x: hidden;
+            text-shadow: var(--soft-glow);
+            padding: var(--spacing-md);
         }
+        
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(to bottom, 
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 50, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+        
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(18, 16, 16, 0.1);
+            opacity: 0.5;
+            z-index: 3;
+            pointer-events: none;
+        }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(
+                to bottom,
+                rgba(51, 255, 0, 0) 0%,
+                rgba(51, 255, 0, 0.1) 50%,
+                rgba(51, 255, 0, 0) 100%
+            );
+            z-index: 998;
+            opacity: 0.6;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+        
         h1 {
-            color: #2c3e50;
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+            letter-spacing: 2px;
+            animation: textflicker 3s linear infinite;
+            text-transform: uppercase;
         }
+        
+        h1::before {
+            content: "// ";
+        }
+        
+        h1::after {
+            content: " //";
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+            border: 2px solid var(--terminal-border);
+            background-color: rgba(0, 10, 0, 0.7);
+            box-shadow: var(--glow);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
         .top-bar {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
         }
+        
         .banner-button {
-            color: white;
-            padding: 15px;
+            color: var(--primary-color);
+            padding: var(--spacing-lg);
             text-align: center;
-            font-size: 18px;
+            font-size: 1rem;
             font-weight: bold;
-            border-radius: 5px;
+            border: 1px solid var(--primary-color);
             text-decoration: none;
-            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: var(--dark-terminal);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
-        .toolbox-button {
-            background-color: #7B68EE;
+        
+        .banner-button:hover {
+            background-color: var(--light-terminal);
+            box-shadow: var(--glow);
         }
-        .toolbox-button:hover {
-            background-color: #6A5ACD;
-        }
-        .analytics-button {
-            background-color: #4285F4;
-        }
-        .analytics-button:hover {
-            background-color: #3367D6;
-        }
-        .actions-button {
-            background-color: #2EA44F;
-        }
-        .actions-button:hover {
-            background-color: #22863A;
-        }
+        
         .button-icon {
-            margin-right: 10px;
+            margin-right: var(--spacing-md);
         }
+        
         .controls {
-            margin-bottom: 20px;
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid var(--primary-color);
+            padding: var(--spacing-md);
+            background-color: var(--dark-terminal);
         }
+        
         button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            background-color: var(--dark-terminal);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 8px var(--spacing-lg);
             cursor: pointer;
-            font-size: 14px;
-            margin-right: 5px;
+            font-size: 16px;
+            margin-right: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            min-height: 40px;
+            width: 100%;
+            font-family: 'VT323', monospace;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
         }
+        
         button:hover {
-            background-color: #2980b9;
+            background-color: var(--primary-color);
+            color: var(--terminal-bg);
         }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         #logContent {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            font-size: 14px;
+            background-color: var(--dark-terminal);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--primary-color);
+            font-size: 16px;
             overflow-x: auto;
+            height: calc(100vh - 300px);
+            min-height: 250px;
+            position: relative;
         }
+        
+        #logContent::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--primary-dim) 0%, transparent 100%);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+        
+        #logContent::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to top, var(--primary-dim) 0%, transparent 100%);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+        
         .status {
-            margin-top: 10px;
+            margin-top: var(--spacing-md);
             font-style: italic;
-            color: #7f8c8d;
+            color: var(--primary-dim);
+            font-size: 1rem;
         }
+        
+        .status::before {
+            content: "[ ";
+        }
+        
+        .status::after {
+            content: " ]";
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: var(--primary-color);
+            animation: blink 1s step-start infinite;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
         .log-entry {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid rgba(51, 255, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .log-entry:hover {
+            background-color: rgba(51, 255, 0, 0.05);
+        }
+        
+        .log-entry-header {
             display: flex;
             align-items: center;
+            margin-bottom: var(--spacing-sm);
         }
-        .log-entry:nth-child(odd) {
-            background-color: #f9f9f9;
-        }
+        
         .timestamp {
-            color: #8e44ad;
+            color: #52ff52;
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: var(--spacing-md);
             white-space: nowrap;
+            font-size: 1rem;
         }
+        
+        .timestamp::before {
+            content: "[";
+        }
+        
+        .timestamp::after {
+            content: "]";
+        }
+        
         .status-indicator {
             display: inline-block;
-            width: 80px;
+            min-width: 80px;
             text-align: center;
-            padding: 2px 5px;
-            margin: 0 10px;
-            border-radius: 3px;
+            padding: 2px 8px;
             font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid;
+            text-transform: uppercase;
         }
+        
         .status-START {
-            background-color: #27ae60;
-            color: white;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
         }
+        
         .status-SUCCESS {
-            background-color: #27ae60;
-            color: white;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
         }
+        
         .status-FAILURE {
-            background-color: #e74c3c;
-            color: white;
+            color: var(--danger-color);
+            border-color: var(--danger-color);
         }
+        
         .message {
-            flex-grow: 1;
+            width: 100%;
+            word-break: break-word;
+            padding-left: 20px;
         }
+        
+        .message::before {
+            content: "> ";
+            color: var(--primary-dim);
+        }
+        
         .error-message {
-            color: #e74c3c;
-            margin: 20px 0;
-            padding: 10px;
-            border-left: 4px solid #e74c3c;
-            background-color: #fdedeb;
+            color: var(--danger-color);
+            margin: var(--spacing-xl) 0;
+            padding: var(--spacing-md);
+            border: 1px solid var(--danger-color);
+            background-color: rgba(255, 0, 0, 0.1);
         }
+        
         input[type="text"] {
-            padding: 8px;
-            width: 200px;
-            margin-right: 5px;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--primary-color);
+            background-color: var(--dark-terminal);
+            color: var(--primary-color);
+            font-size: 16px;
+            min-height: 40px;
+            font-family: 'VT323', monospace;
         }
+        
+        input[type="text"]::placeholder {
+            color: rgba(51, 255, 0, 0.5);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: var(--soft-glow);
+        }
+        
         .filter-controls {
-            margin-bottom: 10px;
+            margin-bottom: var(--spacing-md);
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 5px;
+            flex-direction: column;
         }
-        #dateFilter {
-            padding: 8px;
-            width: 180px;
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
         }
-        @media (max-width: 768px) {
+        
+        .logo {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            font-size: 2.5rem;
+            letter-spacing: 3px;
+            text-shadow: var(--glow);
+        }
+        
+        .logo span {
+            color: var(--danger-color);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+        
+        /* Media queries for larger screens */
+        @media (min-width: 768px) {            
             .top-bar {
-                flex-direction: column;
-                gap: 5px;
+                flex-direction: row;
+                gap: var(--spacing-lg);
             }
+            
+            .banner-button {
+                flex: 1;
+                font-size: 18px;
+            }
+            
             .filter-controls {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--spacing-sm);
             }
+            
             input[type="text"] {
-                width: 100%;
-                margin-bottom: 5px;
+                margin-right: var(--spacing-sm);
+                margin-bottom: 0;
+                width: auto;
+            }
+            
+            #filterInput {
+                width: 200px;
+            }
+            
+            #dateFilter {
+                width: 180px;
+            }
+            
+            button {
+                width: auto;
+                margin-bottom: 0;
+            }
+            
+            .action-buttons {
+                display: inline-block;
+            }
+            
+            .log-entry {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .log-entry-header {
+                margin-bottom: 0;
+                width: auto;
+            }
+            
+            .message {
+                padding-left: 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <a href="https://beebox.ghost.io/" target="_blank" class="banner-button toolbox-button">
-            <span class="button-icon">🧰</span> Toolbox
-        </a>
-        <a href="https://analytics.google.com/analytics/web/#/p403067039/reports/intelligenthome" target="_blank" class="banner-button analytics-button">
-            <span class="button-icon">📊</span> Analytics
-        </a>
-        <a href="https://github.com/bee-box/bee-box/actions/workflows/run_harvest.yaml" target="_blank" class="banner-button actions-button">
-            <span class="button-icon">🚀</span> Run Actions
-        </a>
-    </div>
+    <div class="scanline"></div>
     
-    <h1>Simple Log Viewer</h1>
-    
-    <div class="controls">
-        <div class="filter-controls">
-            <input type="text" id="filterInput" placeholder="Filter logs...">
-            <input type="text" id="dateFilter" placeholder="Filter by date (YYYY-MM-DD)">
-            <button id="clearFilterBtn">Clear</button>
-            <button id="refreshBtn">Refresh</button>
-            <button id="autoRefreshBtn">Auto-Refresh</button>
+    <div class="container">
+        <div class="logo animate__animated animate__fadeIn">W.O.P.<span>R</span></div>
+        
+        <h1 class="animate__animated animate__fadeInDown">System Log Terminal</h1>
+        
+        <div class="top-bar animate__animated animate__fadeInUp">
+            <a href="https://beebox.ghost.io/" target="_blank" class="banner-button toolbox-button">
+                <span class="button-icon">⚙️</span> TOOLBOX
+            </a>
+            <a href="https://analytics.google.com/analytics/web/#/p403067039/reports/intelligenthome" target="_blank" class="banner-button analytics-button">
+                <span class="button-icon">📈</span> ANALYTICS
+            </a>
+            <a href="https://github.com/bee-box/bee-box/actions/workflows/run_harvest.yaml" target="_blank" class="banner-button actions-button">
+                <span class="button-icon">🔄</span> EXECUTE
+            </a>
         </div>
-        <div class="status" id="statusMessage">Ready</div>
+        
+        <div class="controls animate__animated animate__fadeIn">
+            <div class="filter-controls">
+                <input type="text" id="filterInput" placeholder="SEARCH QUERY...">
+                <input type="text" id="dateFilter" placeholder="DATE (YYYY-MM-DD)">
+                <div class="action-buttons">
+                    <button id="clearFilterBtn">CLEAR</button>
+                    <button id="refreshBtn">REFRESH</button>
+                    <button id="autoRefreshBtn">AUTO-REFRESH</button>
+                </div>
+            </div>
+            <div class="status" id="statusMessage">SYSTEM READY<span class="cursor"></span></div>
+        </div>
+        
+        <div id="logContent" class="animate__animated animate__fadeIn">INITIALIZING LOG DATABASE...</div>
     </div>
-    
-    <div id="logContent">Loading logs...</div>
 
-    <script>
-        // Configuration
-        const logFilePath = 'log.txt';
-        const refreshInterval = 30000; // 30 seconds
-        
-        // State variables
-        let autoRefreshEnabled = false;
-        let autoRefreshTimer = null;
-        let rawLogData = '';
-        
-        // DOM elements
-        const logContent = document.getElementById('logContent');
-        const statusMessage = document.getElementById('statusMessage');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const autoRefreshBtn = document.getElementById('autoRefreshBtn');
-        const filterInput = document.getElementById('filterInput');
-        const dateFilter = document.getElementById('dateFilter');
-        const clearFilterBtn = document.getElementById('clearFilterBtn');
-        
-        // Load and display logs
-        async function loadLogs() {
-            try {
-                statusMessage.textContent = 'Loading logs...';
-                refreshBtn.disabled = true;
-                
-                const response = await fetch(logFilePath + '?t=' + new Date().getTime());
-                
-                if (!response.ok) {
-                    throw new Error(`Failed to load log file: ${response.status} ${response.statusText}`);
-                }
-                
-                rawLogData = await response.text();
-                
-                // Display logs with current filters
-                displayFilteredLogs();
-                
-                statusMessage.textContent = `Last updated: ${new Date().toLocaleString()}`;
-                refreshBtn.disabled = false;
-                
-            } catch (error) {
-                console.error('Error loading logs:', error);
-                logContent.innerHTML = `<div class="error-message">
-                    <p>Error loading log file: ${error.message}</p>
-                    <p>Make sure log.txt exists in the same folder as this HTML file.</p>
-                </div>`;
-                statusMessage.textContent = `Error: ${error.message}`;
-                refreshBtn.disabled = false;
-            }
-        }
-        
-        // Display logs with filtering
-        function displayFilteredLogs() {
-            if (!rawLogData) {
-                logContent.textContent = 'No log data available.';
-                return;
-            }
-            
-            const filterText = filterInput.value.toLowerCase();
-            const dateText = dateFilter.value;
-            
-            // Split logs into lines and prepare for display
-            const lines = rawLogData.split('\n');
-            const logEntries = [];
-            
-            // Skip header line
-            let isHeaderLine = true;
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                
-                // Skip empty lines
-                if (!line) continue;
-                
-                // Skip header line
-                if (isHeaderLine) {
-                    isHeaderLine = false;
-                    continue;
-                }
-                
-                // Check if line matches filters
-                if ((!filterText || line.toLowerCase().includes(filterText)) &&
-                    (!dateText || line.includes(dateText))) {
-                    
-                    // Parse CSV line: TIMESTAMP,STATUS,MESSAGE
-                    const commaIndex = line.indexOf(',');
-                    if (commaIndex === -1) {
-                        // Malformed line
-                        logEntries.push(`<div class="log-entry">${line}</div>`);
-                        continue;
-                    }
-                    
-                    const timestamp = line.substring(0, commaIndex);
-                    
-                    const restOfLine = line.substring(commaIndex + 1);
-                    const secondCommaIndex = restOfLine.indexOf(',');
-                    if (secondCommaIndex === -1) {
-                        // Malformed line
-                        logEntries.push(`<div class="log-entry">${line}</div>`);
-                        continue;
-                    }
-                    
-                    const status = restOfLine.substring(0, secondCommaIndex);
-                    let message = restOfLine.substring(secondCommaIndex + 1);
-                    
-                    // Remove quotes if present
-                    if (message.startsWith('"') && message.endsWith('"')) {
-                        message = message.substring(1, message.length - 1);
-                    }
-                    
-                    logEntries.push(`
-                        <div class="log-entry">
-                            <span class="timestamp">${timestamp}</span>
-                            <span class="status-indicator status-${status}">${status}</span>
-                            <span class="message">${message}</span>
-                        </div>
-                    `);
-                }
-            }
-            
-            // Reverse entries to show newest first
-            logEntries.reverse();
-            
-            // Show results or no matches message
-            if (logEntries.length > 0) {
-                logContent.innerHTML = logEntries.join('');
-            } else {
-                logContent.innerHTML = `<div class="error-message">No log entries match your filters.</div>`;
-            }
-        }
-        
-        // Toggle auto-refresh
-        function toggleAutoRefresh() {
-            autoRefreshEnabled = !autoRefreshEnabled;
-            
-            if (autoRefreshEnabled) {
-                autoRefreshBtn.textContent = 'Stop Auto-Refresh';
-                autoRefreshBtn.style.backgroundColor = '#e74c3c';
-                autoRefreshTimer = setInterval(loadLogs, refreshInterval);
-                statusMessage.textContent = `Auto-refresh enabled (every ${refreshInterval/1000} seconds)`;
-            } else {
-                autoRefreshBtn.textContent = 'Auto-Refresh';
-                autoRefreshBtn.style.backgroundColor = '#3498db';
-                clearInterval(autoRefreshTimer);
-                statusMessage.textContent = 'Auto-refresh disabled';
-            }
-        }
-        
-        // Event listeners
-        refreshBtn.addEventListener('click', loadLogs);
+RefreshBtn.addEventListener('click', loadLogs);
         autoRefreshBtn.addEventListener('click', toggleAutoRefresh);
         
         filterInput.addEventListener('input', displayFilteredLogs);
@@ -347,8 +506,126 @@
             displayFilteredLogs();
         });
         
-        // Initialize
-        loadLogs();
+        // Add touch event listeners for better mobile experience
+        document.querySelectorAll('button, .banner-button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.style.opacity = '0.7';
+            });
+            
+            button.addEventListener('touchend', function() {
+                this.style.opacity = '1';
+            });
+        });
+        
+        // Typewriter effect for status messages
+        function typeWriter(element, text, speed = 50) {
+            element.innerHTML = "";
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.innerHTML += '<span class="cursor"></span>';
+                }
+            }
+            
+            type();
+        }
+        
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            
+            if (autoRefreshEnabled) {
+                autoRefreshBtn.textContent = 'STOP AUTO-REFRESH';
+                autoRefreshBtn.style.borderColor = var(--danger-color);
+                autoRefreshBtn.style.color = var(--danger-color);
+                autoRefreshTimer = setInterval(loadLogs, refreshInterval);
+                typeWriter(statusMessage, `AUTO-REFRESH ACTIVE (${refreshInterval/1000}s)`);
+            } else {
+                autoRefreshBtn.textContent = 'AUTO-REFRESH';
+                autoRefreshBtn.style.borderColor = '';
+                autoRefreshBtn.style.color = '';
+                clearInterval(autoRefreshTimer);
+                typeWriter(statusMessage, 'AUTO-REFRESH DISABLED');
+            }
+        }
+        
+        // Load and display logs with retro terminal effects
+        async function loadLogs() {
+            try {
+                typeWriter(statusMessage, 'ACCESSING LOG DATABASE...');
+                refreshBtn.disabled = true;
+                
+                // Simulate slight delay for retro terminal feel
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const response = await fetch(logFilePath + '?t=' + new Date().getTime());
+                
+                if (!response.ok) {
+                    throw new Error(`FAILED: CODE ${response.status} ${response.statusText}`);
+                }
+                
+                // Show loading animation
+                logContent.innerHTML = '<div class="loading-text">DOWNLOADING LOG DATA...</div>';
+                await new Promise(resolve => setTimeout(resolve, 600));
+                logContent.innerHTML = '<div class="loading-text">DECRYPTING CONTENTS...</div>';
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                rawLogData = await response.text();
+                
+                // Display logs with current filters
+                displayFilteredLogs();
+                
+                const now = new Date().toLocaleString();
+                typeWriter(statusMessage, `LAST UPDATE: ${now}`);
+                refreshBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                logContent.innerHTML = `<div class="error-message">
+                    <p>** ACCESS DENIED **</p>
+                    <p>ERROR: ${error.message}</p>
+                    <p>VERIFY LOG DATABASE EXISTS AND IS ACCESSIBLE.</p>
+                </div>`;
+                typeWriter(statusMessage, `SYSTEM ERROR`);
+                refreshBtn.disabled = false;
+            }
+        }
+        
+        // Add retro terminal boot sequence
+        function simulateBootSequence() {
+            const bootMessages = [
+                "INITIALIZING WOPR TERMINAL...",
+                "ESTABLISHING CONNECTION...",
+                "SECURITY CLEARANCE: VERIFIED",
+                "LOADING LOG DATABASE...",
+                "WELCOME TO WOPR LOG TERMINAL"
+            ];
+            
+            logContent.innerHTML = "";
+            typeWriter(statusMessage, "BOOTING SYSTEM");
+            
+            bootMessages.forEach((message, index) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.classList.add('log-entry');
+                    div.innerHTML = `<span class="message">${message}</span>`;
+                    logContent.appendChild(div);
+                    
+                    // After last boot message, load the actual logs
+                    if (index === bootMessages.length - 1) {
+                        setTimeout(loadLogs, 800);
+                    }
+                }, index * 600);
+            });
+        }
+        
+        // Initialize with boot sequence
+        simulateBootSequence();
     </script>
 </body>
 </html>
