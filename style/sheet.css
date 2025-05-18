@@ -620,28 +620,33 @@ footer {
     overflow: hidden !important;
   }
   
-  /* Prevent page breaks for ALL important elements */
+  
+/* Firefox-specific fixes */
+@-moz-document url-prefix() {
+  body {
+    height: 100%;
+    overflow: visible;
+  }
+
   .section-box,
-  .bee-table,
-  .bee-table tr,
-  .bee-table td,
   .tables-container,
   .content-container,
-  .table-section,
-  .word-box,
-  .header-flex,
-  .header-text,
-  #header,
-  #content,
-  .accordion-item,
-  .accordion-content,
-  .wcol,
-  .combined-container {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+  .table-section {
+    display: inline-block !important;
+    width: 100%;
   }
-  
-  /* Firefox-specific fixes */
+}
+
+/* Allow page breaks in general, but keep critical elements together */
+@media print {
+  .table-section {
+    page-break-inside: avoid;
+  }
+  .word-box {
+    break-inside: avoid;
+  }
+}
+
   @-moz-document url-prefix() {
     body {
       height: 100%;
