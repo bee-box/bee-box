@@ -13,10 +13,11 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Loading...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Cache prevention meta tags -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <!-- Enhanced cache prevention meta tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <meta http-equiv="Expires" content="-1" />
+  <meta http-equiv="Last-Modified" content="0" />
   <link rel="stylesheet" href="style/grid.css">
   <link rel="icon" href="style/bee.ico" type="image/x-icon" />
 </head>
@@ -106,6 +107,8 @@ function setupEventListeners() {
       const u = new URL(window.location);
       u.searchParams.set('date', d);
       u.searchParams.delete('puzzleid');
+      // Add cache busting to URL changes too
+      u.searchParams.set('_cb', Date.now());
       window.location.href = u.toString();
     }
   });
@@ -113,6 +116,12 @@ function setupEventListeners() {
   document.getElementById('printButton').addEventListener('click', () => {
     window.print();
   });
+}
+
+// Enhanced cache busting function
+function generateCacheBuster() {
+  // Combine timestamp with random number for extra uniqueness
+  return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 async function loadPuzzleData() {
@@ -125,18 +134,44 @@ async function loadPuzzleData() {
   });
 
   try {
-    // Add cache busting parameter to prevent caching
-    const timestamp = new Date().getTime();
-    const puzzlesUrl = `xml/puzzles.xml?_=${timestamp}`;
+    // Enhanced cache busting with multiple techniques
+    const cacheBuster = generateCacheBuster();
+    const puzzlesUrl = `xml/puzzles.xml?_cb=${cacheBuster}&t=${Date.now()}&r=${Math.random()}`;
+    
     const res = await fetch(puzzlesUrl, {
-      cache: 'no-store',  // Tell fetch to bypass cache
+      method: 'GET',
+      cache: 'no-store',  // Force bypass of HTTP cache
       headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
-        'Cache-Control': 'no-cache'
-      }
+        'Expires': '0',
+        'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT', // Force server to treat as new request
+        'If-None-Match': '*' // Prevent ETag matching
+      },
+      // Add credentials if your server requires it
+      credentials: 'same-origin'
     });
+
+    // Additional check - if response is not ok, throw error
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
     const xmlText = await res.text();
+    
+    // Validate that we actually got XML content
+    if (!xmlText.trim().startsWith('<?xml') && !xmlText.trim().startsWith('<')) {
+      throw new Error('Invalid XML response received');
+    }
+    
     const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+    
+    // Check for XML parsing errors
+    const parseError = xml.querySelector('parsererror');
+    if (parseError) {
+      throw new Error('XML parsing error: ' + parseError.textContent);
+    }
+    
     const puzzles = [...xml.querySelectorAll('puzzle')].filter(p => p.getElementsByTagName('word').length);
     const sorted = puzzles.sort((a, b) => new Date(a.getAttribute('date')) - new Date(b.getAttribute('date')));
     const mostRecent = sorted[sorted.length - 1];
@@ -160,12 +195,21 @@ async function loadPuzzleData() {
     if (!selected) throw new Error("No puzzle selected.");
     populateDateSelector(sorted, selected?.getAttribute('date'));
     displayPuzzle(selected);
+    
+    // Log successful load with timestamp for debugging
+    console.log(`Puzzle data loaded successfully at ${new Date().toISOString()}`);
+    
   } catch (err) {
     [headerContent, toolContent].forEach(el => {
       el.className = 'error';
       el.textContent = 'Unable to load data.';
     });
     console.error("Puzzle load error:", err);
+    
+    // Optional: Show more detailed error to user in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      headerContent.textContent = `Debug Error: ${err.message}`;
+    }
   }
 }
 
@@ -373,13 +417,38 @@ function displayGrid(puzzle, allLetters) {
   document.getElementById('twoLetterList').innerHTML = twos;
 }
 
-// Add cache busting to page refresh
-window.addEventListener('beforeunload', function() {
-  // This is a backup method - it won't always work but can help in some cases
-  const timestamp = new Date().getTime();
-  const currentUrl = new URL(window.location.href);
-  currentUrl.searchParams.set('_', timestamp);
-  window.location.href = currentUrl.toString();
+// Enhanced page refresh with cache clearing
+function forceRefresh() {
+  // Clear various caches before refresh
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => {
+        caches.delete(name);
+      });
+    });
+  }
+  
+  // Force a hard refresh
+  window.location.reload(true);
+}
+
+// Optional: Add a manual refresh button for testing
+window.addEventListener('keydown', function(e) {
+  // Ctrl+Shift+R or Cmd+Shift+R for force refresh
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+    e.preventDefault();
+    forceRefresh();
+  }
+});
+
+// Remove the problematic beforeunload cache busting as it can cause issues
+// Instead, ensure fresh data on focus/visibility change
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    // Page became visible again - optionally reload data
+    // Uncomment the next line if you want to reload data when user returns to tab
+    // loadPuzzleData();
+  }
 });
 </script>
 </body>
