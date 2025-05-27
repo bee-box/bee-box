@@ -562,7 +562,8 @@
       const monthName = monthNames[parseInt(mm) - 1];
       const dayNum = parseInt(dd);
       
-      const prompt = `Identify the National Day celebrated on ${monthName} ${dayNum}, then generate a bee-themed image that reflects that observance. Be sure to include both the date ${monthName} ${dayNum} and the name of the National Day in the design.`;
+      // Updated prompt to create the image directly
+      const prompt = `Create a bee-themed image for ${monthName} ${dayNum}. Research what National Day is celebrated on this date and incorporate that theme into a vibrant, professional image featuring bees and honeycomb elements. Include the text "${monthName} ${dayNum}" prominently in the design.`;
       
       return `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
     }
