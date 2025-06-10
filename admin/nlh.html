@@ -3,927 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manual Newsletter Builder - Admin</title>
+  <title>Newsletter Helper</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: #333;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
+      font-family: monospace;
+      background: #fff;
+      color: #222;
+      margin: 0;
       padding: 2rem;
     }
-
-    .header {
-      text-align: center;
-      margin-bottom: 3rem;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-    }
-
-    .header h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.5rem;
-    }
-
-    .header p {
-      font-size: 1.1rem;
-      color: #666;
-      font-weight: 300;
-    }
-
-    .admin-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-      color: white;
-      padding: 0.3rem 1rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .content-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-    }
-
-    .controls-panel {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-    }
-
-    .controls-header {
+    .record-row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      align-items: flex-start;
       margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      gap: 1rem;
     }
-
-    .controls-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #333;
+    .image-container {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-    }
-
-    .controls-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      align-items: end;
-    }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .control-label {
-      font-weight: 600;
-      color: #555;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .control-input, .control-select {
-      padding: 0.8rem 1rem;
-      border: 2px solid #e9ecef;
-      border-radius: 12px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      background: white;
-    }
-
-    .control-input:focus, .control-select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .filter-buttons {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 0.6rem 1.2rem;
-      border: 2px solid #e9ecef;
-      border-radius: 25px;
-      background: white;
-      color: #666;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .filter-btn:hover {
-      border-color: #667eea;
-      color: #667eea;
-    }
-
-    .filter-btn.active {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border-color: transparent;
-    }
-
-    .clear-filters {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .clear-filters:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
-    }
-
-    .results-summary {
-      background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-weight: 600;
-      color: #2e7d32;
-      display: none;
-    }
-
-    .missing-count {
-      background: linear-gradient(135deg, #ffecd2, #fcb69f);
-      padding: 1rem;
-      border-radius: 12px;
-      margin-bottom: 2rem;
-      text-align: center;
-      font-weight: 600;
-      color: #8b4513;
-    }
-
-    .no-results {
-      text-align: center;
-      padding: 3rem;
-      color: #666;
-      font-size: 1.1rem;
-      background: rgba(248, 249, 250, 0.8);
-      border-radius: 12px;
-      display: none;
-    }
-
-    .puzzle-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .puzzle-item {
-      display: flex;
-      align-items: center;
-      background: white;
-      padding: 1.5rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-    }
-
-    .puzzle-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-      border-color: #667eea;
-    }
-
-    .date-badge {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      padding: 0.8rem 1.2rem;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 1rem;
-      min-width: 120px;
-      text-align: center;
       margin-right: 1.5rem;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
-
-    .thumb-container {
-      margin-right: 1.5rem;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
+    .chatgpt-link {
+      margin-left: 0.5rem;
+      font-size: 10pt;
+      color: #007acc;
+      text-decoration: none;
+      padding: 2px 4px;
+      border: 1px solid #007acc;
+      border-radius: 4px;
+      background: #f8f9fa;
     }
-
+    .chatgpt-link:hover {
+      background: #007acc;
+      color: white;
+    }
     .thumb {
-      width: 60px;
-      height: 60px;
+      width: 20pt;
+      height: 20pt;
       object-fit: cover;
-      border-radius: 12px;
-      border: 3px solid #e9ecef;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .thumb:hover {
-      transform: scale(1.1);
-      border-color: #667eea;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .chatgpt-btn {
-      background: linear-gradient(135deg, #10a37f, #1a7f64);
-      color: white !important;
-      text-decoration: none;
-      padding: 0.4rem 0.7rem;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      transition: all 0.3s ease;
-      box-shadow: 0 3px 10px rgba(16, 163, 127, 0.3);
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-      text-align: center;
+      margin-right: 1.5rem;
+      background: #eee;
+      border: 1px solid #ccc;
     }
-
-    .chatgpt-btn:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .chatgpt-btn:hover:before {
-      left: 100%;
-    }
-
-    .chatgpt-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 163, 127, 0.4);
-    }
-
-    .links-container {
+    .thumb-placeholder {
+      width: 20pt;
+      height: 20pt;
+      border-radius: 8px;
+      margin-right: 1.5rem;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
       display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      font-size: 12pt;
+      color: #888;
+      text-align: center;
+      line-height: 1;
+    }
+    .xml-text {
+      white-space: pre-wrap;
+      font-size: 1rem;
+      background: #f4f4f4;
+      padding: 1rem;
+      border-radius: 8px;
       flex: 1;
-    }
-
-    .puzzle-link {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white !important;
-      text-decoration: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .puzzle-link:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .puzzle-link:hover:before {
-      left: 100%;
-    }
-
-    .puzzle-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-
-    .puzzle-link.beesheet {
-      background: linear-gradient(135deg, #74b9ff, #0984e3);
-    }
-
-    .puzzle-link.beejumble {
-      background: linear-gradient(135deg, #fd79a8, #e84393);
-    }
-
-    .puzzle-link.beepeek {
-      background: linear-gradient(135deg, #fdcb6e, #e17055);
-    }
-
-    .loading {
-      text-align: center;
-      padding: 3rem;
-      color: #666;
-      font-size: 1.1rem;
-    }
-
-    .loading::after {
-      content: "...";
-      animation: loading 1.5s infinite;
-    }
-
-    @keyframes loading {
-      0%, 20% { opacity: 0; }
-      50% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    .error {
-      background: linear-gradient(135deg, #ff7675, #d63031);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    @media (max-width: 768px) {
-      .puzzle-item {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-      }
-
-      .date-badge, .thumb-container {
-        margin-right: 0;
-        margin-bottom: 1rem;
-      }
-
-      .links-container {
-        justify-content: center;
-      }
-
-      .header h1 {
-        font-size: 2rem;
-      }
-
-      .controls-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .controls-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      overflow-x: auto;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="admin-badge">Admin Panel</div>
-      <h1>Manual Newsletter Builder</h1>
-      <p>Build and manage newsletter content with advanced sorting and filtering</p>
-    </div>
-
-    <div class="content-card">
-      <!-- Controls Panel -->
-      <div class="controls-panel">
-        <div class="controls-header">
-          <div class="controls-title">
-            ⚙️ Sort & Filter Controls
-          </div>
-          <button class="clear-filters" onclick="clearAllFilters()">Clear All Filters</button>
-        </div>
-        
-        <div class="controls-grid">
-          <!-- Sort Options -->
-          <div class="control-group">
-            <label class="control-label">Sort By</label>
-            <select class="control-select" id="sortSelect" onchange="applySortAndFilter()">
-              <option value="today-forward">Today Forward (Default)</option>
-              <option value="date-newest">Date (Newest First)</option>
-              <option value="date-oldest">Date (Oldest First)</option>
-              <option value="date-asc">Date (A-Z)</option>
-              <option value="date-desc">Date (Z-A)</option>
-            </select>
-          </div>
-
-          <!-- Date Range Filter -->
-          <div class="control-group">
-            <label class="control-label">Date Range</label>
-            <div style="display: flex; gap: 0.5rem;">
-              <input type="date" class="control-input" id="dateFrom" onchange="applySortAndFilter()" style="flex: 1;">
-              <input type="date" class="control-input" id="dateTo" onchange="applySortAndFilter()" style="flex: 1;">
-            </div>
-          </div>
-
-          <!-- Pagination Control -->
-          <div class="control-group">
-            <label class="control-label">Items Per Page</label>
-            <select class="control-select" id="itemsPerPage" onchange="applySortAndFilter()">
-              <option value="10">10 items</option>
-              <option value="25" selected>25 items</option>
-              <option value="50">50 items</option>
-              <option value="100">100 items</option>
-              <option value="all">Show All</option>
-            </select>
-          </div>
-
-          <!-- Image Status Filter -->
-          <div class="control-group">
-            <label class="control-label">Image Status</label>
-            <div class="filter-buttons">
-              <button class="filter-btn active" data-filter="all" onclick="setImageFilter('all')">All</button>
-              <button class="filter-btn" data-filter="working" onclick="setImageFilter('working')">Working Images</button>
-              <button class="filter-btn" data-filter="broken" onclick="setImageFilter('broken')">Broken Images</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Yesterday & Earlier Box -->
-      <div class="controls-panel" id="yesterday-panel" style="display: none;">
-        <div class="controls-header">
-          <div class="controls-title">
-            📅 Yesterday & Earlier
-          </div>
-          <button class="clear-filters" onclick="toggleYesterdayView()" id="yesterday-toggle">Hide Yesterday View</button>
-        </div>
-        <div class="puzzle-grid" id="yesterday-grid">
-          <!-- Yesterday puzzles will be injected here -->
-        </div>
-      </div>
-
-      <!-- Show Yesterday Button -->
-      <div style="text-align: center; margin-bottom: 2rem;">
-        <button class="clear-filters" onclick="toggleYesterdayView()" id="show-yesterday" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">
-          📅 Show Yesterday & Earlier
-        </button>
-      </div>
-
-      <!-- Results Summary -->
-      <div class="results-summary" id="results-summary">
-        <span id="results-text"></span>
-      </div>
-      
-      <div class="missing-count" id="missing-count" style="display: none;">
-        <span id="count-text"></span>
-      </div>
-      
-      <div class="loading" id="loading">Loading puzzle data</div>
-      <div class="error" id="error" style="display: none;">
-        Failed to load puzzle data. Please check the XML file path.
-      </div>
-      
-      <div class="no-results" id="no-results">
-        <h3>No puzzles match your current filters</h3>
-        <p>Try adjusting your sort and filter options above.</p>
-      </div>
-      
-      <div class="puzzle-grid" id="puzzle-grid">
-        <!-- Puzzle items will be injected here -->
-      </div>
-    </div>
-  </div>
-
+  <h2>Puzzle XML Records (Today + Next 10 Days)</h2>
+  <div id="xml-records">Loading...</div>
   <script>
-    const loading = document.getElementById('loading');
-    const error = document.getElementById('error');
-    const puzzleGrid = document.getElementById('puzzle-grid');
-    const missingCount = document.getElementById('missing-count');
-    const countText = document.getElementById('count-text');
-    const resultsSummary = document.getElementById('results-summary');
-    const resultsText = document.getElementById('results-text');
-    const noResults = document.getElementById('no-results');
-    
-    let allPuzzles = [];
-    let filteredPuzzles = [];
-    let currentImageFilter = 'all';
-    let yesterdayPuzzles = [];
-    let todayForwardPuzzles = [];
-    let currentPage = 1;
-    let itemsPerPage = 25;
-
-    function getTodayString() {
-      const today = new Date();
-      return today.toISOString().split('T')[0]; // YYYY-MM-DD format
-    }
-
-    function createChatGPTLink(date) {
-      const [yyyy, mm, dd] = date.split("-");
-      const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"];
-      const monthName = monthNames[parseInt(mm) - 1];
-      const dayNum = parseInt(dd);
-      
-      // Updated prompt to create the image directly
-      const prompt = `Create a bee-themed image for ${monthName} ${dayNum}. Research what National Day is celebrated on this date and incorporate that theme into a vibrant, professional image featuring bees and honeycomb elements. Include the text "${monthName} ${dayNum}" prominently in the design.`;
-      
-      return `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
-    }
-
-    function toggleYesterdayView() {
-      const panel = document.getElementById('yesterday-panel');
-      const showBtn = document.getElementById('show-yesterday');
-      const toggleBtn = document.getElementById('yesterday-toggle');
-      
-      if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        showBtn.style.display = 'none';
-        renderYesterdayPuzzles();
-      } else {
-        panel.style.display = 'none';
-        showBtn.style.display = 'block';
-      }
-    }
-
-    function setImageFilter(filter) {
-      currentImageFilter = filter;
-      
-      // Update button states
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
-      
-      applySortAndFilter();
-    }
-
-    function clearAllFilters() {
-      document.getElementById('sortSelect').value = 'today-forward';
-      document.getElementById('dateFrom').value = '';
-      document.getElementById('dateTo').value = '';
-      document.getElementById('itemsPerPage').value = '25';
-      setImageFilter('all');
-      currentPage = 1;
-      applySortAndFilter();
-    }
-
-    function applySortAndFilter() {
-      const sortBy = document.getElementById('sortSelect').value;
-      const dateFrom = document.getElementById('dateFrom').value;
-      const dateTo = document.getElementById('dateTo').value;
-      itemsPerPage = document.getElementById('itemsPerPage').value;
-      
-      const today = getTodayString();
-      
-      // Separate puzzles into today/forward and yesterday/earlier
-      if (sortBy === 'today-forward') {
-        todayForwardPuzzles = allPuzzles.filter(puzzle => puzzle.date >= today);
-        yesterdayPuzzles = allPuzzles.filter(puzzle => puzzle.date < today);
-        
-        // Sort today/forward: today first, then ascending
-        todayForwardPuzzles.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        // Sort yesterday/earlier: yesterday first, then descending
-        yesterdayPuzzles.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        filteredPuzzles = [...todayForwardPuzzles];
-      } else {
-        // For other sort options, use all puzzles
-        filteredPuzzles = [...allPuzzles];
-        todayForwardPuzzles = [];
-        yesterdayPuzzles = [];
-      }
-      
-      // Apply date range filter
-      if (dateFrom || dateTo) {
-        filteredPuzzles = filteredPuzzles.filter(puzzle => {
-          const puzzleDate = puzzle.date;
-          const fromMatch = !dateFrom || puzzleDate >= dateFrom;
-          const toMatch = !dateTo || puzzleDate <= dateTo;
-          return fromMatch && toMatch;
-        });
-      }
-      
-      // Apply image status filter
-      if (currentImageFilter !== 'all') {
-        filteredPuzzles = filteredPuzzles.filter(puzzle => {
-          if (currentImageFilter === 'working') return puzzle.hasWorkingImage;
-          if (currentImageFilter === 'broken') return !puzzle.hasWorkingImage;
-          return true;
-        });
-        
-        // Also filter yesterday puzzles if in today-forward mode
-        if (sortBy === 'today-forward') {
-          yesterdayPuzzles = yesterdayPuzzles.filter(puzzle => {
-            if (currentImageFilter === 'working') return puzzle.hasWorkingImage;
-            if (currentImageFilter === 'broken') return !puzzle.hasWorkingImage;
-            return true;
-          });
-        }
-      }
-      
-      // Apply sorting for non-today-forward modes
-      if (sortBy !== 'today-forward') {
-        filteredPuzzles.sort((a, b) => {
-          switch (sortBy) {
-            case 'date-newest':
-              return new Date(b.date) - new Date(a.date);
-            case 'date-oldest':
-              return new Date(a.date) - new Date(b.date);
-            case 'date-asc':
-              return a.date.localeCompare(b.date);
-            case 'date-desc':
-              return b.date.localeCompare(a.date);
-            default:
-              return 0;
-          }
-        });
-      }
-      
-      renderPuzzles();
-      updateResultsSummary();
-      
-      // Show/hide yesterday section based on sort mode
-      const showYesterdayBtn = document.getElementById('show-yesterday');
-      if (sortBy === 'today-forward' && yesterdayPuzzles.length > 0) {
-        showYesterdayBtn.style.display = 'block';
-      } else {
-        showYesterdayBtn.style.display = 'none';
-        document.getElementById('yesterday-panel').style.display = 'none';
-      }
-    }
-
-    function updateResultsSummary() {
-      const total = allPuzzles.length;
-      const filtered = filteredPuzzles.length;
-      const workingImages = filteredPuzzles.filter(p => p.hasWorkingImage).length;
-      const brokenImages = filteredPuzzles.filter(p => !p.hasWorkingImage).length;
-      const today = getTodayString();
-      const sortBy = document.getElementById('sortSelect').value;
-      
-      if (filtered === 0) {
-        resultsSummary.style.display = 'none';
-        noResults.style.display = 'block';
-        puzzleGrid.style.display = 'none';
-      } else {
-        noResults.style.display = 'none';
-        puzzleGrid.style.display = 'grid';
-        resultsSummary.style.display = 'block';
-        
-        let summaryText = `Showing <strong>${Math.min(filtered, itemsPerPage === 'all' ? filtered : itemsPerPage)}</strong> of <strong>${filtered}</strong> puzzles`;
-        
-        if (sortBy === 'today-forward') {
-          const todayCount = filteredPuzzles.filter(p => p.date === today).length;
-          const futureCount = filteredPuzzles.filter(p => p.date > today).length;
-          summaryText += ` | 📅 <strong>${todayCount}</strong> today, <strong>${futureCount}</strong> future`;
-          if (yesterdayPuzzles.length > 0) {
-            summaryText += ` | <span style="color: #666;">${yesterdayPuzzles.length} in yesterday view</span>`;
-          }
-        }
-        
-        summaryText += ` | <span style="color: #28a745;">${workingImages} working images</span> | <span style="color: #dc3545;">${brokenImages} broken images</span>`;
-        
-        resultsText.innerHTML = summaryText;
-      }
-    }
-
-    function renderPuzzles() {
-      puzzleGrid.innerHTML = '';
-      
-      // Apply pagination
-      const puzzlesToShow = itemsPerPage === 'all' ? filteredPuzzles : filteredPuzzles.slice(0, parseInt(itemsPerPage));
-      
-      puzzlesToShow.forEach(puzzle => {
-        const puzzleItem = createPuzzleElement(puzzle);
-        puzzleGrid.appendChild(puzzleItem);
-      });
-    }
-
-    function renderYesterdayPuzzles() {
-      const yesterdayGrid = document.getElementById('yesterday-grid');
-      yesterdayGrid.innerHTML = '';
-      
-      // Show first 25 yesterday puzzles
-      const puzzlesToShow = yesterdayPuzzles.slice(0, 25);
-      
-      puzzlesToShow.forEach(puzzle => {
-        const puzzleItem = createPuzzleElement(puzzle);
-        yesterdayGrid.appendChild(puzzleItem);
-      });
-    }
-
-    function createPuzzleElement(puzzle) {
-      const puzzleItem = document.createElement("div");
-      puzzleItem.className = "puzzle-item";
-
-      const dateBadge = document.createElement("div");
-      dateBadge.className = "date-badge";
-      
-      // Add special styling for today
-      const today = getTodayString();
-      if (puzzle.date === today) {
-        dateBadge.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
-        dateBadge.innerHTML = `${puzzle.date}<br><small>TODAY</small>`;
-      } else if (puzzle.date > today) {
-        dateBadge.style.background = 'linear-gradient(135deg, #17a2b8, #007bff)';
-        dateBadge.textContent = puzzle.date;
-      } else {
-        dateBadge.style.background = 'linear-gradient(135deg, #6c757d, #495057)';
-        dateBadge.textContent = puzzle.date;
-      }
-
-      const thumbContainer = document.createElement("div");
-      thumbContainer.className = "thumb-container";
-
-      const thumbLink = document.createElement("a");
-      thumbLink.href = puzzle.imgSrc;
-      thumbLink.target = "_blank";
-      thumbLink.rel = "noopener";
-
-      if (puzzle.hasWorkingImage) {
-        const img = document.createElement("img");
-        img.className = "thumb";
-        img.src = puzzle.imgSrc;
-        img.alt = `Puzzle ${puzzle.displayDate}`;
-        thumbLink.appendChild(img);
-      } else {
-        const placeholder = document.createElement("div");
-        placeholder.style.cssText = `
-          width: 60px; 
-          height: 60px; 
-          background: #ff6b6b; 
-          border-radius: 12px; 
-          display: flex; 
-          align-items: center; 
-          justify-content: center; 
-          color: white; 
-          font-size: 10px; 
-          font-weight: bold; 
-          text-align: center;
-          border: 2px solid #dc3545;
-        `;
-        placeholder.innerHTML = '❌<br>BROKEN';
-        thumbLink.appendChild(placeholder);
-      }
-
-      thumbContainer.appendChild(thumbLink);
-
-      // Add ChatGPT button below the image
-      const chatGPTLink = document.createElement("a");
-      chatGPTLink.href = createChatGPTLink(puzzle.date);
-      chatGPTLink.className = "chatgpt-btn";
-      chatGPTLink.textContent = "🤖 GPT";
-      chatGPTLink.target = "_blank";
-      chatGPTLink.rel = "noopener";
-      chatGPTLink.title = "Generate National Day bee image in ChatGPT";
-      thumbContainer.appendChild(chatGPTLink);
-
-      const linksContainer = document.createElement("div");
-      linksContainer.className = "links-container";
-
-      const sheetLink = document.createElement("a");
-      sheetLink.href = puzzle.sheetURL;
-      sheetLink.className = "puzzle-link beesheet";
-      sheetLink.textContent = "BeeSheet";
-      sheetLink.target = "_blank";
-
-      const jumbleLink = document.createElement("a");
-      jumbleLink.href = puzzle.jumbleURL;
-      jumbleLink.className = "puzzle-link beejumble";
-      jumbleLink.textContent = "BeeJumble";
-      jumbleLink.target = "_blank";
-
-      const peekLink = document.createElement("a");
-      peekLink.href = puzzle.peekURL;
-      peekLink.className = "puzzle-link beepeek";
-      peekLink.textContent = "BeePeek";
-      peekLink.target = "_blank";
-
-      linksContainer.appendChild(sheetLink);
-      linksContainer.appendChild(jumbleLink);
-      linksContainer.appendChild(peekLink);
-
-      puzzleItem.appendChild(dateBadge);
-      puzzleItem.appendChild(thumbContainer);
-      puzzleItem.appendChild(linksContainer);
-      
-      return puzzleItem;
-    }
-
-    async function checkImageExists(url) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-        img.src = url;
-      });
-    }
-
-    fetch("../xml/puzzles.xml")
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.text();
-      })
-      .then(async xmlText => {
-        loading.style.display = 'none';
-        
+    async function init() {
+      try {
+        const response = await fetch("../xml/puzzles.xml");
+        const xmlText = await response.text();
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, "application/xml");
-        const puzzles = xml.querySelectorAll("puzzle");
-        let missingPuzzles = 0;
-
-        // Process puzzles and check images
-        const puzzlePromises = Array.from(puzzles).map(async puzzle => {
-          const words = puzzle.querySelectorAll("word");
-          if (words.length === 0) {
-            missingPuzzles++;
-            const id = puzzle.getAttribute("id");
-            const date = puzzle.getAttribute("date");
-            
-            if (id && date) {
-              const [yyyy, mm, dd] = date.split("-");
-              const sheetURL = `https://bee-box.github.io/bee-box/sheet.html?puzzleid=${id}`;
-              const jumbleURL = `https://bee-box.github.io/bee-box/jumble.html?puzzleid=${id}`;
-              const peekURL = `https://bee-box.github.io/bee-box/peek.html?puzzleid=${id}`;
-              const imgSrc = `../images/${mm}-${dd}.png`;
-
-              // Check if image exists
-              const hasWorkingImage = await checkImageExists(imgSrc);
-
-              return {
-                id,
-                date,
-                displayDate: `${mm}-${dd}`,
-                sheetURL,
-                jumbleURL,
-                peekURL,
-                imgSrc,
-                hasWorkingImage
-              };
-            }
-          }
-          return null;
+        const puzzles = [...xml.getElementsByTagName("puzzle")];
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const endStr = getDateString(10);
+        const relevant = puzzles.filter(p => {
+          const d = p.getAttribute("date");
+          return d >= todayStr && d <= endStr;
         });
-
-        const results = await Promise.all(puzzlePromises);
-        allPuzzles = results.filter(puzzle => puzzle !== null);
-        
-        if (missingPuzzles > 0) {
-          countText.textContent = `Found ${missingPuzzles} puzzle${missingPuzzles === 1 ? '' : 's'} missing word data`;
-          missingCount.style.display = 'block';
+        const container = document.getElementById("xml-records");
+        container.innerHTML = '';
+        relevant.forEach(p => {
+          const date = p.getAttribute("date");
+          const [yyyy, mm, dd] = date.split('-');
+          const imgUrl = `https://bee-box.github.io/bee-box/images/${mm}-${dd}.png`;
           
-          // Initial render
-          applySortAndFilter();
-        } else {
-          puzzleGrid.innerHTML = '<div style="text-align: center; padding: 3rem; color: #28a745; font-size: 1.2rem; font-weight: 600;">🎉 All puzzles have complete word data!</div>';
-        }
-      })
-      .catch(err => {
-        console.error("Failed to load or parse puzzles.xml:", err);
-        loading.style.display = 'none';
-        error.style.display = 'block';
-        error.innerHTML = `<strong>Error:</strong> ${err.message}<br><small>Check console for details</small>`;
-      });
+          // Convert month and day to spelled out format
+          const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+          const monthName = monthNames[parseInt(mm) - 1];
+          const dayNum = parseInt(dd);
+          const dayWithSuffix = getDayWithSuffix(dayNum);
+          
+          const row = document.createElement('div');
+          row.className = 'record-row';
+          
+          const imageContainer = document.createElement('div');
+          imageContainer.className = 'image-container';
+          
+          const img = document.createElement('img');
+          img.className = 'thumb';
+          img.src = imgUrl;
+          img.alt = `${mm}-${dd}`;
+          
+          const placeholder = document.createElement('div');
+          placeholder.className = 'thumb-placeholder';
+          placeholder.innerHTML = '🖼️';
+          placeholder.style.display = 'none';
+          
+          img.onerror = function() { 
+            this.style.display = 'none';
+            placeholder.style.display = 'flex';
+          };
+          
+          // Create ChatGPT link with pre-filled prompt for immediate image generation
+          const chatgptLink = document.createElement('a');
+          chatgptLink.className = 'chatgpt-link';
+          chatgptLink.textContent = 'AI';
+          chatgptLink.target = '_blank';
+          const prompt = encodeURIComponent(`Create a 1500x600 pixel newsletter banner image. Show a cute cartoon bee enjoying the National Day celebration for ${monthName} ${dayWithSuffix}. First look up what National Day is celebrated on ${monthName} ${dayWithSuffix} on https://www.nationaldaycalendar.com then show the bee participating in that specific celebration. Include bold text overlay: "${monthName} ${dayWithSuffix}" and the National Day name. Use bright, cheerful colors perfect for a newsletter header.`);
+          chatgptLink.href = `https://chat.openai.com/?q=${prompt}`;
+          
+          const pre = document.createElement('div');
+          pre.className = 'xml-text';
+          pre.textContent = p.outerHTML;
+          
+          imageContainer.appendChild(img);
+          imageContainer.appendChild(placeholder);
+          imageContainer.appendChild(chatgptLink);
+          row.appendChild(imageContainer);
+          row.appendChild(pre);
+          container.appendChild(row);
+        });
+      } catch (e) {
+        document.getElementById("xml-records").textContent = "Error loading XML: " + e;
+      }
+    }
+    function getDayWithSuffix(day) {
+      if (day >= 11 && day <= 13) {
+        return day + "th";
+      }
+      switch (day % 10) {
+        case 1: return day + "st";
+        case 2: return day + "nd";
+        case 3: return day + "rd";
+        default: return day + "th";
+      }
+    }
+    function getDateString(daysAhead) {
+      const date = new Date();
+      date.setDate(date.getDate() + daysAhead);
+      return date.toISOString().split('T')[0];
+    }
+    init();
   </script>
 </body>
 </html>
