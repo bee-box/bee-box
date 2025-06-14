@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter HTML Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .controls {
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="date"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 200px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output-section {
+            margin-top: 30px;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .copy-button {
+            margin-top: 10px;
+            background-color: #2196F3;
+        }
+        .copy-button:hover {
+            background-color: #0b7dda;
+        }
+        .preview-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .puzzle-info {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .word-item {
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .pangram {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Newsletter HTML Generator</h1>
+        
+        <div class="controls">
+            <label for="puzzleDate">Select Puzzle Date:</label>
+            <input type="date" id="puzzleDate">
+            <button onclick="generateHTML()">Generate HTML</button>
+            <button onclick="reloadData()" style="margin-left: 10px; background-color: #9e9e9e;">Reload Data</button>
+        </div>
+
+        <div id="errorMessage"></div>
+
+        <div class="output-section" id="outputSection" style="display: none;">
+            <h2>Generated HTML (Ghost Compatible)</h2>
+            <textarea id="htmlOutput" readonly></textarea>
+            <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
+
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h2>Preview</h2>
+            <div id="preview"></div>
+        </div>
+    </div>
+
+    <script>
+        let puzzleData = null;
+
+        // Load XML data automatically
+        async function loadPuzzleData() {
+            try {
+                // Fetch the XML file from the relative path
+                const response = await fetch('../xml/puzzles.xml');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                puzzleData = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Check for parsing errors
+                const parserError = puzzleData.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('XML parsing error');
+                }
+                
+                const puzzleCount = puzzleData.getElementsByTagName('puzzle').length;
+                if (puzzleCount > 0) {
+                    document.getElementById('errorMessage').innerHTML = 
+                        '<div style="color: #4CAF50; padding: 10px; background-color: #e8f5e9; border-radius: 4px;">Puzzle data loaded! Found ' + 
+                        puzzleCount + ' puzzles.</div>';
+                    
+                    // Clear success message after 3 seconds
+                    setTimeout(() => {
+                        document.getElementById('errorMessage').innerHTML = '';
+                    }, 3000);
+                } else {
+                    throw new Error('No puzzles found in XML file');
+                }
+            } catch (error) {
+                console.error('Error loading puzzle data:', error);
+                document.getElementById('errorMessage').innerHTML = 
+                    '<div class="error">Error loading puzzle data: ' + error.message + 
+                    '<br>Make sure to serve this file through a web server (not file://) for automatic loading.</div>';
+            }
+        }
+
+        // Reload data function
+        function reloadData() {
+            document.getElementById('errorMessage').innerHTML = '<div style="padding: 10px;">Reloading puzzle data...</div>';
+            loadPuzzleData();
+        }
+
+        // Load data when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPuzzleData();
+            
+            // Set date picker to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowString = tomorrow.toISOString().split('T')[0];
+            document.getElementById('puzzleDate').value = tomorrowString;
+            
+            // Auto-generate HTML for tomorrow after data loads
+            setTimeout(() => {
+                if (puzzleData) {
+                    generateHTML();
+                }
+            }, 500);
+        });
+
+        function generateHTML() {
+            const selectedDate = document.getElementById('puzzleDate').value;
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = '';
+
+            if (!puzzleData) {
+                errorDiv.innerHTML = '<div class="error">Puzzle data not loaded yet. Please try again.</div>';
+                return;
+            }
+
+            // Find puzzle for selected date
+            const puzzles = puzzleData.getElementsByTagName('puzzle');
+            let selectedPuzzle = null;
+
+            for (let puzzle of puzzles) {
+                if (puzzle.getAttribute('date') === selectedDate) {
+                    selectedPuzzle = puzzle;
+                    break;
+                }
+            }
+
+            if (!selectedPuzzle) {
+                errorDiv.innerHTML = `<div class="error">No puzzle found for date: ${selectedDate}</div>`;
+                document.getElementById('outputSection').style.display = 'none';
+                document.getElementById('previewSection').style.display = 'none';
+                return;
+            }
+
+            // Extract puzzle information
+            const letters = selectedPuzzle.getAttribute('letters');
+            const count = selectedPuzzle.getAttribute('count');
+            const pangrams = selectedPuzzle.getAttribute('pangrams');
+            const queenbee = selectedPuzzle.getAttribute('queenbee');
+            
+            // Get all words
+            const words = selectedPuzzle.getElementsByTagName('word');
+            const wordList = [];
+            let pangramWords = [];
+
+            for (let word of words) {
+                const text = word.textContent;
+                const isPangram = word.getAttribute('pangram') === 'yes';
+                const points = word.getAttribute('points');
+                
+                wordList.push({
+                    text: text,
+                    points: points,
+                    isPangram: isPangram
+                });
+
+                if (isPangram) {
+                    pangramWords.push(text);
+                }
+            }
+
+            // Sort words alphabetically
+            wordList.sort((a, b) => a.text.localeCompare(b.text));
+
+            // Extract month and day from the selected puzzle's date attribute
+            const puzzleDate = selectedPuzzle.getAttribute('date'); // format: YYYY-MM-DD
+            const [year, month, day] = puzzleDate.split('-');
+            const imageUrl = `https://bee-box.github.io/bee-box/images/${month}-${day}.png`;
+            
+            // Generate Ghost-compatible HTML
+            const html = `<div style="width: 100%; margin: 30px 0;">
+    <img src="${imageUrl}" style="width: 100%; height: auto; display: block; border-radius: 12px; margin-bottom: 20px;">
+    <div style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+                border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; padding: 24px;
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <h3 style="margin: 0; color: #000; font-size: 20px; font-weight: 600;">TODAY'S SUBSCRIBER ONLY LINKS</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=${selectedPuzzle.getAttribute('id')}" 
+                   style="display: inline-block; background-color: #ffd700; color: #000; padding: 10px 20px; 
+                          text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;
+                          box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3); transition: all 0.3s ease;
+                          border: 1px solid rgba(255, 215, 0, 0.3);">
+                    BEE SHEET
+                </a>
+                <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=${selectedPuzzle.getAttribute('id')}" 
+                   style="display: inline-block; background-color: #9333ea; color: #000; padding: 10px 20px; 
+                          text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;
+                          box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3); transition: all 0.3s ease;
+                          border: 1px solid rgba(147, 51, 234, 0.3);">
+                    BEE JUMBLE
+                </a>
+                <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=${selectedPuzzle.getAttribute('id')}" 
+                   style="display: inline-block; background-color: #10b981; color: #000; padding: 10px 20px; 
+                          text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;
+                          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: all 0.3s ease;
+                          border: 1px solid rgba(16, 185, 129, 0.3);">
+                    BEE PEEK
+                </a>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+            // Display the HTML
+            document.getElementById('htmlOutput').value = html.trim();
+            document.getElementById('outputSection').style.display = 'block';
+            
+            // Show preview
+            document.getElementById('preview').innerHTML = html;
+            document.getElementById('previewSection').style.display = 'block';
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('htmlOutput');
+            textarea.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.style.backgroundColor = '#4CAF50';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.backgroundColor = '#2196F3';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
