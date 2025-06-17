@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscriber's Only - Spelling Bee Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            gap: 40px;
+        }
+
+        .left-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            max-width: 500px;
+        }
+
+        .right-section {
+            flex: 1;
+            max-width: 700px;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .main-title {
+            text-align: center;
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 0;
+        }
+
+        .card-content {
+            display: flex;
+        }
+
+        .date-panel {
+            background: #f7da21;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 200px;
+        }
+
+        .date-info {
+            text-align: center;
+            color: #333;
+        }
+
+        .weekday {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .month-name {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .day-num {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .year-num {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .content-panel {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .action-btn {
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 18px 28px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .sheet-btn {
+            background: #FFDC00;
+            color: #333;
+        }
+
+        .sheet-btn:hover {
+            background: #e6c600;
+        }
+
+        .jumble-btn {
+            background: #8A2BE2;
+            color: white;
+        }
+
+        .jumble-btn:hover {
+            background: #7b27cc;
+        }
+
+        .peek-btn {
+            background: #00B050;
+            color: white;
+        }
+
+        .peek-btn:hover {
+            background: #009e48;
+        }
+
+        .picker-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+            text-align: center;
+        }
+
+        .picker-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .picker-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .date-input {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            min-width: 200px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #FFDC00;
+            box-shadow: 0 0 0 3px rgba(255, 220, 0, 0.2);
+        }
+
+        .generate-btn {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            background: #2d3748;
+        }
+
+        .generate-btn.success {
+            background: #00B050;
+        }
+
+        .code-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .code-header {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s ease;
+            width: 100%;
+        }
+
+        .copy-btn:hover {
+            background: #2d3748;
+        }
+
+        .copy-btn.success {
+            background: #00B050;
+        }
+
+        @media (max-width: 1200px) {
+            body {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            
+            .left-section {
+                width: 100%;
+                max-width: 500px;
+            }
+            
+            .right-section {
+                width: 100%;
+                max-width: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .card-content {
+                flex-direction: column;
+            }
+            
+            .date-panel {
+                flex: none;
+                padding: 30px;
+            }
+
+            .content-panel {
+                padding: 30px;
+            }
+            
+            .main-title {
+                font-size: 16px;
+                padding: 15px;
+            }
+            
+            .action-btn {
+                padding: 16px 24px;
+                font-size: 15px;
+            }
+
+            .picker-container,
+            .code-container {
+                padding: 20px;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="left-section">
+        <div class="main-card">
+            <div class="main-title">Subscriber's Only</div>
+            <div class="card-content">
+                <div class="date-panel">
+                    <div class="date-info">
+                        <div class="weekday" id="displayWeekday">MONDAY</div>
+                        <div class="month-name" id="displayMonth">JUNE</div>
+                        <div class="day-num" id="displayDay">17</div>
+                        <div class="year-num" id="displayYear">2025</div>
+                    </div>
+                </div>
+                <div class="content-panel">
+                    <div class="btn-group">
+                        <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=idgoeshere" class="action-btn sheet-btn" id="sheetLink">
+                            Today's Bee Sheet
+                        </a>
+                        <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=idgoeshere" class="action-btn jumble-btn" id="jumbleLink">
+                            Today's Bee Jumble
+                        </a>
+                        <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=idgoeshere" class="action-btn peek-btn" id="peekLink">
+                            Today's Bee Peek
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="picker-container">
+            <h3 class="picker-title">Date Selector</h3>
+            <label for="datePicker" class="picker-label">Select Date:</label>
+            <input type="date" id="datePicker" class="date-input">
+            <button class="generate-btn" id="generateBtn">
+                Generate Code
+            </button>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <div class="code-container">
+            <h2 class="code-header">Ghost.org HTML Code</h2>
+            
+            <div class="code-block" id="codeOutput">
+                Loading code snippet...
+            </div>
+            
+            <button class="copy-btn" id="copyBtn">
+                Copy to Clipboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let puzzleDatabase = {};
+        
+        async function loadPuzzleDatabase() {
+            try {
+                const response = await fetch('../../xml/puzzles.xml');
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                const puzzleElements = xmlDoc.getElementsByTagName('puzzle');
+                for (let puzzle of puzzleElements) {
+                    const date = puzzle.getAttribute('date');
+                    const id = puzzle.getAttribute('id');
+                    if (date && id) {
+                        puzzleDatabase[date] = id;
+                    }
+                }
+                
+                initializeDatePicker();
+            } catch (error) {
+                console.error('Error loading puzzle database:', error);
+                initializeDatePicker();
+            }
+        }
+        
+        function initializeDatePicker() {
+            const picker = document.getElementById('datePicker');
+            const availableDates = Object.keys(puzzleDatabase).sort();
+            
+            if (availableDates.length > 0) {
+                picker.min = availableDates[0];
+                picker.max = availableDates[availableDates.length - 1];
+            }
+            
+            // Always default to today's date
+            const today = new Date();
+            const todayString = today.getFullYear() + '-' + 
+                String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(today.getDate()).padStart(2, '0');
+            
+            picker.value = todayString;
+            refreshDateDisplay(todayString);
+            
+            // Use today's puzzle ID if it exists, otherwise use fallback
+            const puzzleId = puzzleDatabase[todayString] || 'idgoeshere';
+            generateCode(puzzleId);
+        }
+
+        function refreshDateDisplay(dateString) {
+            const dateObj = new Date(dateString + 'T00:00:00');
+            
+            const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+            const month = dateObj.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+            const day = dateObj.getDate();
+            const year = dateObj.getFullYear();
+            
+            document.getElementById('displayWeekday').textContent = weekday;
+            document.getElementById('displayMonth').textContent = month;
+            document.getElementById('displayDay').textContent = day;
+            document.getElementById('displayYear').textContent = year;
+        }
+        
+        function generateCode(puzzleId = 'idgoeshere') {
+            // Get the current selected date for the HTML snippet
+            const selectedDate = document.getElementById('datePicker').value;
+            let weekday = 'MONDAY', month = 'JUNE', day = '17', year = '2025';
+            
+            if (selectedDate) {
+                const dateObj = new Date(selectedDate + 'T00:00:00');
+                weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+                month = dateObj.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+                day = dateObj.getDate();
+                year = dateObj.getFullYear();
+            }
+            
+            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);max-width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="display:flex"><div style="background:#f7da21;padding:50px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 200px"><div style="text-align:center;color:#333"><div style="font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">' + weekday + '</div><div style="font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">' + month + '</div><div style="font-size:52px;font-weight:900;line-height:1;margin-bottom:8px">' + day + '</div><div style="font-size:20px;font-weight:600">' + year + '</div></div></div><div style="flex:1;padding:50px 40px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;flex-direction:column;gap:18px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:#333;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px" onmouseover="this.style.background=\'#e6c600\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'#FFDC00\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px" onmouseover="this.style.background=\'#7b27cc\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'#8A2BE2\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px" onmouseover="this.style.background=\'#009e48\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'#00B050\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">Today\'s Bee Peek</a></div></div></div></div>';
+            
+            document.getElementById('codeOutput').textContent = htmlCode;
+            
+            // Update preview button URLs
+            document.getElementById('sheetLink').href = `https://bee-box.github.io/bee-box/sheet.html?puzzleid=${puzzleId}`;
+            document.getElementById('jumbleLink').href = `https://bee-box.github.io/bee-box/jumble.html?puzzleid=${puzzleId}`;
+            document.getElementById('peekLink').href = `https://bee-box.github.io/bee-box/peek.html?puzzleid=${puzzleId}`;
+        }
+        
+        function copyToClipboard() {
+            const codeContent = document.getElementById('codeOutput');
+            const copyButton = document.getElementById('copyBtn');
+            
+            navigator.clipboard.writeText(codeContent.textContent).then(() => {
+                copyButton.textContent = 'Copied!';
+                copyButton.classList.add('success');
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy to Clipboard';
+                    copyButton.classList.remove('success');
+                }, 2000);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = codeContent.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                copyButton.textContent = 'Copied!';
+                copyButton.classList.add('success');
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy to Clipboard';
+                    copyButton.classList.remove('success');
+                }, 2000);
+            });
+        }
+
+        function generateCodeManually() {
+            const selectedDate = document.getElementById('datePicker').value;
+            const selectedId = puzzleDatabase[selectedDate] || 'idgoeshere';
+            refreshDateDisplay(selectedDate);
+            generateCode(selectedId);
+            
+            const generateButton = document.getElementById('generateBtn');
+            generateButton.textContent = 'Generated!';
+            generateButton.classList.add('success');
+            setTimeout(() => {
+                generateButton.textContent = 'Generate Code';
+                generateButton.classList.remove('success');
+            }, 2000);
+        }
+        
+        // Event listeners
+        document.getElementById('datePicker').addEventListener('change', function() {
+            const selectedDate = this.value;
+            const selectedId = puzzleDatabase[selectedDate] || 'idgoeshere';
+            refreshDateDisplay(selectedDate);
+            generateCode(selectedId);
+        });
+
+        document.getElementById('generateBtn').addEventListener('click', generateCodeManually);
+        document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+        
+        // Initialize on page load
+        loadPuzzleDatabase();
+    </script>
+</body>
+</html>
