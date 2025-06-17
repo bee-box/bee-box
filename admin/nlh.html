@@ -129,7 +129,7 @@
           chatgptLink.className = 'chatgpt-link';
           chatgptLink.textContent = 'AI';
           chatgptLink.target = '_blank';
-          const prompt = encodeURIComponent(`Create a 1500x600 pixel newsletter banner image. Show a cute cartoon bee enjoying the National Day celebration for ${monthName} ${dayWithSuffix}. First look up what National Day is celebrated on ${monthName} ${dayWithSuffix} on https://www.nationaldaycalendar.com then show the bee participating in that specific celebration. Include bold text overlay: "${monthName} ${dayWithSuffix}" and the National Day name. Use bright, cheerful colors perfect for a newsletter header.`);
+          const prompt = encodeURIComponent(`Create an image. Show a bumble bee enjoying the National Day celebration for ${monthName} ${dayWithSuffix}. First look up what National Day is celebrated on ${monthName} ${dayWithSuffix} on https://www.nationaldaycalendar.com then show the bee participating in that specific celebration. Include bold text overlay: "${monthName} ${dayWithSuffix}" and the National Day name. Use bright, cheerful colors perfect for a newsletter header.`);
           chatgptLink.href = `https://chat.openai.com/?q=${prompt}`;
           
           const pre = document.createElement('div');
