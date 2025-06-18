@@ -131,11 +131,22 @@
             transition: all 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            /* Mobile-friendly touch targets */
+            min-height: 56px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Active state for better mobile feedback */
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .sheet-btn {
@@ -147,6 +158,10 @@
             background: #e6c600;
         }
 
+        .sheet-btn:active {
+            background: #d4b800;
+        }
+
         .jumble-btn {
             background: #8A2BE2;
             color: white;
@@ -156,6 +171,10 @@
             background: #7b27cc;
         }
 
+        .jumble-btn:active {
+            background: #6b22b3;
+        }
+
         .peek-btn {
             background: #00B050;
             color: white;
@@ -163,6 +182,10 @@
 
         .peek-btn:hover {
             background: #009e48;
+        }
+
+        .peek-btn:active {
+            background: #008a3e;
         }
 
         .picker-container {
@@ -189,13 +212,16 @@
         }
 
         .date-input {
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 8px;
             border: 2px solid #ddd;
             font-size: 16px;
             min-width: 200px;
             background: white;
             cursor: pointer;
+            /* Mobile-friendly touch targets */
+            min-height: 48px;
+            touch-action: manipulation;
         }
 
         .date-input:focus {
@@ -208,17 +234,27 @@
             background: #4a5568;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
             margin-top: 20px;
+            /* Mobile-friendly touch targets */
+            min-height: 48px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .generate-btn:hover {
             background: #2d3748;
+        }
+
+        .generate-btn:active {
+            background: #1a202c;
+            transform: scale(0.98);
         }
 
         .generate-btn.success {
@@ -260,17 +296,27 @@
             background: #4a5568;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 14px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
             width: 100%;
+            /* Mobile-friendly touch targets */
+            min-height: 48px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .copy-btn:hover {
             background: #2d3748;
+        }
+
+        .copy-btn:active {
+            background: #1a202c;
+            transform: scale(0.98);
         }
 
         .copy-btn.success {
@@ -298,6 +344,7 @@
         @media (max-width: 768px) {
             body {
                 padding: 15px;
+                gap: 20px;
             }
             
             .card-content {
@@ -319,8 +366,10 @@
             }
             
             .action-btn {
-                padding: 16px 24px;
-                font-size: 15px;
+                padding: 20px 24px;
+                font-size: 16px;
+                min-height: 60px;
+                border-radius: 16px;
             }
 
             .picker-container,
@@ -331,6 +380,83 @@
             .code-block {
                 font-size: 12px;
                 padding: 15px;
+            }
+
+            .date-input {
+                min-width: 100%;
+                width: 100%;
+                font-size: 16px;
+            }
+
+            .generate-btn,
+            .copy-btn {
+                font-size: 16px;
+                padding: 16px 24px;
+                min-height: 56px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-card {
+                border-radius: 16px;
+            }
+
+            .date-panel {
+                padding: 20px;
+            }
+
+            .content-panel {
+                padding: 20px;
+            }
+
+            .action-btn {
+                padding: 18px 20px;
+                font-size: 15px;
+                min-height: 56px;
+                gap: 16px;
+            }
+
+            .btn-group {
+                gap: 16px;
+            }
+
+            .picker-container,
+            .code-container {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .day-num {
+                font-size: 44px;
+            }
+
+            .month-name {
+                font-size: 18px;
+            }
+
+            .weekday {
+                font-size: 14px;
+            }
+
+            .year-num {
+                font-size: 18px;
+            }
+        }
+
+        /* Improved touch feedback for iOS */
+        @media (hover: none) and (pointer: coarse) {
+            .action-btn:hover {
+                transform: none;
+                box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            }
+            
+            .generate-btn:hover,
+            .copy-btn:hover {
+                background: #4a5568;
             }
         }
     </style>
@@ -464,7 +590,8 @@
                 year = dateObj.getFullYear();
             }
             
-            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);max-width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="display:flex"><div style="background:#f7da21;padding:50px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 200px"><div style="text-align:center;color:#333"><div style="font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">' + weekday + '</div><div style="font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">' + month + '</div><div style="font-size:52px;font-weight:900;line-height:1;margin-bottom:8px">' + day + '</div><div style="font-size:20px;font-weight:600">' + year + '</div></div></div><div style="flex:1;padding:50px 40px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;flex-direction:column;gap:18px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:#333;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px" onmouseover="this.style.background=\'#e6c600\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'#FFDC00\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px" onmouseover="this.style.background=\'#7b27cc\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'#8A2BE2\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px" onmouseover="this.style.background=\'#009e48\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'#00B050\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">Today\'s Bee Peek</a></div></div></div></div>';
+            // Updated HTML code with mobile-friendly button styles
+            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);max-width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="display:flex;flex-direction:column"><div style="background:#f7da21;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="text-align:center;color:#333"><div style="font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">' + weekday + '</div><div style="font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">' + month + '</div><div style="font-size:52px;font-weight:900;line-height:1;margin-bottom:8px">' + day + '</div><div style="font-size:20px;font-weight:600">' + year + '</div></div></div><div style="padding:30px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;flex-direction:column;gap:16px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:16px;padding:20px 24px;font-family:inherit;font-size:16px;font-weight:700;color:#333;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:60px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;display:flex;align-items:center;justify-content:center" ontouchstart="this.style.background=\'#e6c600\'" ontouchend="this.style.background=\'#FFDC00\'" onmousedown="this.style.background=\'#d4b800\'" onmouseup="this.style.background=\'#FFDC00\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:16px;padding:20px 24px;font-family:inherit;font-size:16px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:60px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;display:flex;align-items:center;justify-content:center" ontouchstart="this.style.background=\'#7b27cc\'" ontouchend="this.style.background=\'#8A2BE2\'" onmousedown="this.style.background=\'#6b22b3\'" onmouseup="this.style.background=\'#8A2BE2\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:16px;padding:20px 24px;font-family:inherit;font-size:16px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:60px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;display:flex;align-items:center;justify-content:center" ontouchstart="this.style.background=\'#009e48\'" ontouchend="this.style.background=\'#00B050\'" onmousedown="this.style.background=\'#008a3e\'" onmouseup="this.style.background=\'#00B050\'">Today\'s Bee Peek</a></div></div></div></div>';
             
             document.getElementById('codeOutput').textContent = htmlCode;
             
