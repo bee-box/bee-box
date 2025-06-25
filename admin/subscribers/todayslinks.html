@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscriber's Only - Spelling Bee Tools</title>
+    
     <style>
         * {
             margin: 0;
@@ -58,16 +59,16 @@
 
         .card-content {
             display: flex;
+            flex-direction: column;
         }
 
         .date-panel {
             background: #f7da21;
-            padding: 50px 40px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 0 0 200px;
         }
 
         .date-info {
@@ -104,8 +105,7 @@
         }
 
         .content-panel {
-            flex: 1;
-            padding: 50px 40px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -131,7 +131,6 @@
             transition: all 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            /* Mobile-friendly touch targets */
             min-height: 56px;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
@@ -143,7 +142,6 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
-        /* Active state for better mobile feedback */
         .action-btn:active {
             transform: translateY(0);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -188,6 +186,19 @@
             background: #008a3e;
         }
 
+        .grid-btn {
+            background: #0023FF;
+            color: white;
+        }
+
+        .grid-btn:hover {
+            background: #001fe6;
+        }
+
+        .grid-btn:active {
+            background: #001acc;
+        }
+
         .picker-container {
             background: #f8f9fa;
             border-radius: 15px;
@@ -219,7 +230,6 @@
             min-width: 200px;
             background: white;
             cursor: pointer;
-            /* Mobile-friendly touch targets */
             min-height: 48px;
             touch-action: manipulation;
         }
@@ -230,34 +240,34 @@
             box-shadow: 0 0 0 3px rgba(255, 220, 0, 0.2);
         }
 
-        .generate-btn {
+        .copy-btn {
             background: #4a5568;
             color: white;
             border: none;
-            padding: 14px 24px;
+            padding: 14px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
             transition: all 0.2s ease;
-            margin-top: 20px;
-            /* Mobile-friendly touch targets */
+            width: 100%;
             min-height: 48px;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            margin-top: 20px;
         }
 
-        .generate-btn:hover {
+        .copy-btn:hover {
             background: #2d3748;
         }
 
-        .generate-btn:active {
+        .copy-btn:active {
             background: #1a202c;
             transform: scale(0.98);
         }
 
-        .generate-btn.success {
+        .copy-btn.success {
             background: #00B050;
         }
 
@@ -280,47 +290,16 @@
         .code-block {
             background: #2d3748;
             color: #e2e8f0;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 8px;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 12px;
+            line-height: 1.4;
             margin-bottom: 15px;
-            max-height: 400px;
+            max-height: 200px;
             overflow-y: auto;
             word-break: break-all;
             white-space: pre-wrap;
-        }
-
-        .copy-btn {
-            background: #4a5568;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            width: 100%;
-            /* Mobile-friendly touch targets */
-            min-height: 48px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        .copy-btn:hover {
-            background: #2d3748;
-        }
-
-        .copy-btn:active {
-            background: #1a202c;
-            transform: scale(0.98);
-        }
-
-        .copy-btn.success {
-            background: #00B050;
         }
 
         @media (max-width: 1200px) {
@@ -347,12 +326,7 @@
                 gap: 20px;
             }
             
-            .card-content {
-                flex-direction: column;
-            }
-            
             .date-panel {
-                flex: none;
                 padding: 30px;
             }
 
@@ -388,7 +362,6 @@
                 font-size: 16px;
             }
 
-            .generate-btn,
             .copy-btn {
                 font-size: 16px;
                 padding: 16px 24px;
@@ -447,14 +420,12 @@
             }
         }
 
-        /* Improved touch feedback for iOS */
         @media (hover: none) and (pointer: coarse) {
             .action-btn:hover {
                 transform: none;
                 box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
             }
             
-            .generate-btn:hover,
             .copy-btn:hover {
                 background: #4a5568;
             }
@@ -463,54 +434,28 @@
 </head>
 <body>
     <div class="left-section">
-        <div class="main-card">
-            <div class="main-title">Subscriber's Only</div>
-            <div class="card-content">
-                <div class="date-panel">
-                    <div class="date-info">
-                        <div class="weekday" id="displayWeekday">MONDAY</div>
-                        <div class="month-name" id="displayMonth">JUNE</div>
-                        <div class="day-num" id="displayDay">17</div>
-                        <div class="year-num" id="displayYear">2025</div>
-                    </div>
-                </div>
-                <div class="content-panel">
-                    <div class="btn-group">
-                        <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=idgoeshere" class="action-btn sheet-btn" id="sheetLink">
-                            Today's Bee Sheet
-                        </a>
-                        <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=idgoeshere" class="action-btn jumble-btn" id="jumbleLink">
-                            Today's Bee Jumble
-                        </a>
-                        <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=idgoeshere" class="action-btn peek-btn" id="peekLink">
-                            Today's Bee Peek
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="picker-container">
-            <h3 class="picker-title">Date Selector</h3>
-            <label for="datePicker" class="picker-label">Select Date:</label>
-            <input type="date" id="datePicker" class="date-input">
-            <button class="generate-btn" id="generateBtn">
-                Generate Code
-            </button>
+        <!-- PREVIEW CONTAINER: This will be populated by the generated HTML -->
+        <div id="previewContainer">
+            <!-- The generated HTML will be inserted here -->
         </div>
     </div>
 
     <div class="right-section">
+        <div class="picker-container">
+            <h3 class="picker-title">Date Selector</h3>
+            <label for="datePicker" class="picker-label">Select Date:</label>
+            <input type="date" id="datePicker" class="date-input">
+            <button class="copy-btn" id="copyBtn">
+                Copy to Clipboard
+            </button>
+        </div>
+        
         <div class="code-container">
             <h2 class="code-header">Ghost.org HTML Code</h2>
             
             <div class="code-block" id="codeOutput">
                 Loading code snippet...
             </div>
-            
-            <button class="copy-btn" id="copyBtn">
-                Copy to Clipboard
-            </button>
         </div>
     </div>
 
@@ -519,6 +464,7 @@
         
         async function loadPuzzleDatabase() {
             try {
+                console.log('Loading puzzle database...');
                 const response = await fetch('../../xml/puzzles.xml');
                 const xmlText = await response.text();
                 const parser = new DOMParser();
@@ -533,6 +479,7 @@
                     }
                 }
                 
+                console.log(`Loaded ${Object.keys(puzzleDatabase).length} puzzles`);
                 initializeDatePicker();
             } catch (error) {
                 console.error('Error loading puzzle database:', error);
@@ -549,56 +496,40 @@
                 picker.max = availableDates[availableDates.length - 1];
             }
             
-            // Always default to today's date
-            const today = new Date();
-            const todayString = today.getFullYear() + '-' + 
-                String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                String(today.getDate()).padStart(2, '0');
+            const now = new Date();
+            const centralTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
+            const tomorrow = new Date(centralTime);
+            tomorrow.setDate(tomorrow.getDate() + 1);
             
-            picker.value = todayString;
-            refreshDateDisplay(todayString);
+            const tomorrowString = tomorrow.getFullYear() + '-' + 
+                String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(tomorrow.getDate()).padStart(2, '0');
             
-            // Use today's puzzle ID if it exists, otherwise use fallback
-            const puzzleId = puzzleDatabase[todayString] || 'idgoeshere';
-            generateCode(puzzleId);
+            picker.value = tomorrowString;
+            
+            const puzzleId = puzzleDatabase[tomorrowString] || 'idgoeshere';
+            updatePreviewAndCode(tomorrowString, puzzleId);
         }
 
-        function refreshDateDisplay(dateString) {
-            const dateObj = new Date(dateString + 'T00:00:00');
-            
-            const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-            const month = dateObj.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
-            const day = dateObj.getDate();
-            const year = dateObj.getFullYear();
-            
-            document.getElementById('displayWeekday').textContent = weekday;
-            document.getElementById('displayMonth').textContent = month;
-            document.getElementById('displayDay').textContent = day;
-            document.getElementById('displayYear').textContent = year;
-        }
-        
-        function generateCode(puzzleId = 'idgoeshere') {
-            // Get the current selected date for the HTML snippet
-            const selectedDate = document.getElementById('datePicker').value;
+        function updatePreviewAndCode(dateString, puzzleId = 'idgoeshere') {
             let weekday = 'MONDAY', month = 'JUNE', day = '17', year = '2025';
             
-            if (selectedDate) {
-                const dateObj = new Date(selectedDate + 'T00:00:00');
+            if (dateString) {
+                const dateObj = new Date(dateString + 'T00:00:00');
                 weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
                 month = dateObj.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
                 day = dateObj.getDate();
                 year = dateObj.getFullYear();
             }
             
-            // Updated HTML code with mobile-friendly button styles
-            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);max-width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="display:flex;flex-direction:column"><div style="background:#f7da21;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="text-align:center;color:#333"><div style="font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">' + weekday + '</div><div style="font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">' + month + '</div><div style="font-size:52px;font-weight:900;line-height:1;margin-bottom:8px">' + day + '</div><div style="font-size:20px;font-weight:600">' + year + '</div></div></div><div style="padding:30px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;flex-direction:column;gap:16px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:16px;padding:20px 24px;font-family:inherit;font-size:16px;font-weight:700;color:#333;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:60px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;display:flex;align-items:center;justify-content:center" ontouchstart="this.style.background=\'#e6c600\'" ontouchend="this.style.background=\'#FFDC00\'" onmousedown="this.style.background=\'#d4b800\'" onmouseup="this.style.background=\'#FFDC00\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:16px;padding:20px 24px;font-family:inherit;font-size:16px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:60px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;display:flex;align-items:center;justify-content:center" ontouchstart="this.style.background=\'#7b27cc\'" ontouchend="this.style.background=\'#8A2BE2\'" onmousedown="this.style.background=\'#6b22b3\'" onmouseup="this.style.background=\'#8A2BE2\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:16px;padding:20px 24px;font-family:inherit;font-size:16px;font-weight:700;color:white;text-decoration:none;display:block;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:60px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;display:flex;align-items:center;justify-content:center" ontouchstart="this.style.background=\'#009e48\'" ontouchend="this.style.background=\'#00B050\'" onmousedown="this.style.background=\'#008a3e\'" onmouseup="this.style.background=\'#00B050\'">Today\'s Bee Peek</a></div></div></div></div>';
+            // Generate the HTML code
+            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="padding:40px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:#333;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#e6c600\'" ontouchend="this.style.background=\'#FFDC00\'" onmousedown="this.style.background=\'#d4b800\'" onmouseup="this.style.background=\'#FFDC00\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#7b27cc\'" ontouchend="this.style.background=\'#8A2BE2\'" onmousedown="this.style.background=\'#6b22b3\'" onmouseup="this.style.background=\'#8A2BE2\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#009e48\'" ontouchend="this.style.background=\'#00B050\'" onmousedown="this.style.background=\'#008a3e\'" onmouseup="this.style.background=\'#00B050\'">Today\'s Bee Peek</a><a href="https://bee-box.github.io/bee-box/grid.html?puzzleid=' + puzzleId + '" style="background:#0023FF;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none" ontouchstart="this.style.background=\'#001fe6\'" ontouchend="this.style.background=\'#0023FF\'" onmousedown="this.style.background=\'#001acc\'" onmouseup="this.style.background=\'#0023FF\'">Today\'s Bee Grid</a></div></div>';
             
+            // Update the code output
             document.getElementById('codeOutput').textContent = htmlCode;
             
-            // Update preview button URLs
-            document.getElementById('sheetLink').href = `https://bee-box.github.io/bee-box/sheet.html?puzzleid=${puzzleId}`;
-            document.getElementById('jumbleLink').href = `https://bee-box.github.io/bee-box/jumble.html?puzzleid=${puzzleId}`;
-            document.getElementById('peekLink').href = `https://bee-box.github.io/bee-box/peek.html?puzzleid=${puzzleId}`;
+            // Update the preview by inserting the HTML directly
+            document.getElementById('previewContainer').innerHTML = htmlCode;
         }
         
         function copyToClipboard() {
@@ -606,12 +537,7 @@
             const copyButton = document.getElementById('copyBtn');
             
             navigator.clipboard.writeText(codeContent.textContent).then(() => {
-                copyButton.textContent = 'Copied!';
-                copyButton.classList.add('success');
-                setTimeout(() => {
-                    copyButton.textContent = 'Copy to Clipboard';
-                    copyButton.classList.remove('success');
-                }, 2000);
+                showCopySuccess(copyButton);
             }).catch(() => {
                 const textarea = document.createElement('textarea');
                 textarea.value = codeContent.textContent;
@@ -620,27 +546,16 @@
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
                 
-                copyButton.textContent = 'Copied!';
-                copyButton.classList.add('success');
-                setTimeout(() => {
-                    copyButton.textContent = 'Copy to Clipboard';
-                    copyButton.classList.remove('success');
-                }, 2000);
+                showCopySuccess(copyButton);
             });
         }
-
-        function generateCodeManually() {
-            const selectedDate = document.getElementById('datePicker').value;
-            const selectedId = puzzleDatabase[selectedDate] || 'idgoeshere';
-            refreshDateDisplay(selectedDate);
-            generateCode(selectedId);
-            
-            const generateButton = document.getElementById('generateBtn');
-            generateButton.textContent = 'Generated!';
-            generateButton.classList.add('success');
+        
+        function showCopySuccess(button) {
+            button.textContent = 'Copied!';
+            button.classList.add('success');
             setTimeout(() => {
-                generateButton.textContent = 'Generate Code';
-                generateButton.classList.remove('success');
+                button.textContent = 'Copy to Clipboard';
+                button.classList.remove('success');
             }, 2000);
         }
         
@@ -648,14 +563,12 @@
         document.getElementById('datePicker').addEventListener('change', function() {
             const selectedDate = this.value;
             const selectedId = puzzleDatabase[selectedDate] || 'idgoeshere';
-            refreshDateDisplay(selectedDate);
-            generateCode(selectedId);
+            updatePreviewAndCode(selectedDate, selectedId);
         });
 
-        document.getElementById('generateBtn').addEventListener('click', generateCodeManually);
         document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
         
-        // Initialize on page load
+        // Initialize the application
         loadPuzzleDatabase();
     </script>
 </body>
