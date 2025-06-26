@@ -3,619 +3,696 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newsletter Generator</title>
+    <title>Subscriber's Only - Spelling Bee Tools</title>
+    
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
             padding: 20px;
-            background-color: #f7f9fc;
+            gap: 40px;
+        }
+
+        .left-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            max-width: 500px;
+        }
+
+        .right-section {
+            flex: 1;
+            max-width: 700px;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .main-title {
+            text-align: center;
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 0;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-panel {
+            background: #f7da21;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .date-info {
+            text-align: center;
             color: #333;
         }
-        header {
-            text-align: center;
-            margin-bottom: 20px;
+
+        .weekday {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+
+        .month-name {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
-        .layout {
+
+        .day-num {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .year-num {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .content-panel {
+            padding: 40px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .sidebar {
-            flex: 1;
-            min-width: 200px;
-            max-width: 300px;
-        }
-        .main-content {
-            flex: 3;
-            min-width: 300px;
-        }
-        .date-selector {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .date-display {
-            font-size: 18px;
-            color: #7f8c8d;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-        .id-display {
-            font-size: 14px;
-            color: #95a5a6;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-        .links-container {
-            display: flex;
+            flex-direction: column;
             justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .action-btn {
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 18px 28px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-height: 56px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sheet-btn {
+            background: #FFDC00;
+            color: #333;
+        }
+
+        .sheet-btn:hover {
+            background: #e6c600;
+        }
+
+        .sheet-btn:active {
+            background: #d4b800;
+        }
+
+        .jumble-btn {
+            background: #8A2BE2;
+            color: white;
+        }
+
+        .jumble-btn:hover {
+            background: #7b27cc;
+        }
+
+        .jumble-btn:active {
+            background: #6b22b3;
+        }
+
+        .peek-btn {
+            background: #00B050;
+            color: white;
+        }
+
+        .peek-btn:hover {
+            background: #009e48;
+        }
+
+        .peek-btn:active {
+            background: #008a3e;
+        }
+
+        .grid-btn {
+            background: #0023FF;
+            color: white;
+        }
+
+        .grid-btn:hover {
+            background: #001fe6;
+        }
+
+        .grid-btn:active {
+            background: #001acc;
+        }
+
+        .picker-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+            text-align: center;
+        }
+
+        .picker-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
             margin-bottom: 20px;
         }
-        .links-container a {
-            text-decoration: none;
-            color: #3498db;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        .links-container a:hover {
-            background-color: #eaf2f8;
-        }
-        label {
-            font-weight: bold;
+
+        .picker-label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
         }
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-bottom: 10px;
+
+        .date-input {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            min-width: 200px;
+            background: white;
+            cursor: pointer;
+            min-height: 48px;
+            touch-action: manipulation;
         }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-bottom: 10px;
+
+        .date-input:focus {
+            outline: none;
+            border-color: #FFDC00;
+            box-shadow: 0 0 0 3px rgba(255, 220, 0, 0.2);
         }
-        button {
-            background-color: #3498db;
+
+        .copy-btn {
+            background: #4a5568;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 14px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
             width: 100%;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .newsletter-container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .puzzle-info {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .letters-display {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 24px;
-            letter-spacing: 5px;
-        }
-        .center-letter {
-            font-weight: bold;
-            color: #e74c3c;
-            font-size: 28px;
-        }
-        .error-message {
-            color: #e74c3c;
-            font-weight: bold;
-            text-align: center;
-            padding: 15px;
-            background-color: #fde2e2;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #7f8c8d;
-        }
-        .success-message {
-            color: #27ae60;
-            text-align: center;
-            padding: 15px;
-            background-color: #e8f8f5;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        .stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .stat-item {
-            background-color: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .words-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-            margin-top: 30px;
-        }
-        .word-item {
-            background-color: #f8f9fa;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .word-points {
-            font-weight: bold;
-            color: #27ae60;
-        }
-        .pangram {
-            background-color: #fef9e7;
-            border-left: 3px solid #f1c40f;
-        }
-        .words-by-letter {
-            margin-top: 30px;
-        }
-        .letter-section {
-            margin-bottom: 20px;
-        }
-        .letter-header {
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-        }
-        #xml-config {
+            min-height: 48px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
             margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
         }
-        #direct-xml-input {
+
+        .copy-btn:hover {
+            background: #2d3748;
+        }
+
+        .copy-btn:active {
+            background: #1a202c;
+            transform: scale(0.98);
+        }
+
+        .copy-btn.success {
+            background: #00B050;
+        }
+
+        .code-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
             width: 100%;
-            min-height: 100px;
-            font-family: monospace;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
         }
-        @media (max-width: 700px) {
-            .layout {
-                flex-direction: column;
-            }
-            .sidebar {
-                max-width: 100%;
-            }
-        }
-        .puzzle-image {
+
+        .code-header {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
             text-align: center;
-            margin: 20px 0;
         }
-        .puzzle-image img {
-            max-width: 100%;
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        /* Hive section styles */
+        .hive-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .hive-title {
+            text-align: center;
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 0;
+        }
+
+        .hive-display {
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.3);
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hive-display svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        .hive-loading {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 16px;
+        }
+
+        .hive-error {
+            color: #e74c3c;
+            font-size: 16px;
+        }
+
+        @media (max-width: 1200px) {
+            body {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            
+            .left-section {
+                width: 100%;
+                max-width: 500px;
+            }
+            
+            .right-section {
+                width: 100%;
+                max-width: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                gap: 20px;
+            }
+            
+            .date-panel {
+                padding: 30px;
+            }
+
+            .content-panel {
+                padding: 30px;
+            }
+            
+            .main-title {
+                font-size: 16px;
+                padding: 15px;
+            }
+            
+            .action-btn {
+                padding: 20px 24px;
+                font-size: 16px;
+                min-height: 60px;
+                border-radius: 16px;
+            }
+
+            .picker-container,
+            .code-container {
+                padding: 20px;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: 15px;
+            }
+
+            .date-input {
+                min-width: 100%;
+                width: 100%;
+                font-size: 16px;
+            }
+
+            .copy-btn {
+                font-size: 16px;
+                padding: 16px 24px;
+                min-height: 56px;
+            }
+
+            .hive-display {
+                padding: 30px;
+                min-height: 240px;
+            }
+
+            .hive-title {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-card {
+                border-radius: 16px;
+            }
+
+            .date-panel {
+                padding: 20px;
+            }
+
+            .content-panel {
+                padding: 20px;
+            }
+
+            .action-btn {
+                padding: 18px 20px;
+                font-size: 15px;
+                min-height: 56px;
+                gap: 16px;
+            }
+
+            .btn-group {
+                gap: 16px;
+            }
+
+            .picker-container,
+            .code-container {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .day-num {
+                font-size: 44px;
+            }
+
+            .month-name {
+                font-size: 18px;
+            }
+
+            .weekday {
+                font-size: 14px;
+            }
+
+            .year-num {
+                font-size: 18px;
+            }
+
+            .hive-display {
+                padding: 20px;
+                min-height: 200px;
+            }
+
+            .hive-container {
+                border-radius: 16px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .action-btn:hover {
+                transform: none;
+                box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            }
+            
+            .copy-btn:hover {
+                background: #4a5568;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Newsletter Generator</h1>
-    
-    <div class="date-selector">
-        <label for="dateSelector">Select Newsletter Date: </label>
-        <select id="dateSelector">
-            <option value="">Loading dates...</option>
-        </select>
+    <div class="left-section">
+        <!-- HIVE CONTAINER -->
+        <div class="hive-container">
+            <div class="hive-title">Today's Hive</div>
+            <div id="hiveDisplay" class="hive-display">
+                <div class="hive-loading">Select a date to load the hive...</div>
+            </div>
+        </div>
+
+        <!-- PREVIEW CONTAINER: This will be populated by the generated HTML -->
+        <div id="previewContainer">
+            <!-- The generated HTML will be inserted here -->
+        </div>
     </div>
-    
-    <div id="puzzleContent" class="puzzle-container">
-        <p class="loading">Select a date to load newsletter data...</p>
+
+    <div class="right-section">
+        <div class="picker-container">
+            <h3 class="picker-title">Date Selector</h3>
+            <label for="datePicker" class="picker-label">Select Date:</label>
+            <input type="date" id="datePicker" class="date-input">
+            <button class="copy-btn" id="copyBtn">
+                Copy to Clipboard
+            </button>
+        </div>
+        
+        <div class="code-container">
+            <h2 class="code-header">Ghost.org HTML Code</h2>
+            
+            <div class="code-block" id="codeOutput">
+                Loading code snippet...
+            </div>
+        </div>
     </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM elements
-            const dateSelect = document.getElementById('date-select');
-            const dateDisplay = document.getElementById('date-display');
-            const shortDateDisplay = document.getElementById('short-date-display');
-            const idDisplay = document.getElementById('id-display');
-            const linksContainer = document.getElementById('links-container');
-            const newsletterContainer = document.getElementById('newsletter-container');
-            const messageContainer = document.getElementById('message-container');
-            const xmlSourceSelect = document.getElementById('xml-source');
-            const fileInputContainer = document.getElementById('file-input-container');
-            const directInputContainer = document.getElementById('direct-input-container');
-            const xmlPathInput = document.getElementById('xml-path');
-            const directXmlInput = document.getElementById('direct-xml-input');
-            const loadXmlButton = document.getElementById('load-xml');
-            
-            // Initial variables
-            const urlParams = new URLSearchParams(window.location.search);
-            let selectedDate = urlParams.get('date');
-            const dateSelector = document.getElementById('dateSelector');
-            const puzzleContent = document.getElementById('puzzleContent');
-            
-            // Function to format date for display
-            function formatDate(dateStr) {
-                const dateObj = new Date(dateStr);
-                return dateObj.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
-            
-            // Function to get month and day from date string for image URL
-            function getMonthDayForImage(dateStr) {
-                const dateObj = new Date(dateStr);
-                // Format month and day with leading zeros
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                return { month, day };
-            }
-            
-            // Function to display puzzle content
-            function displayPuzzle(puzzle) {
-                if (!puzzle) {
-                    puzzleContent.innerHTML = `<div class="error-message">
-                        No newsletter found with the selected date.
-                    </div>`;
-                    return;
+        let puzzleDatabase = {};
+        
+        async function loadPuzzleDatabase() {
+            try {
+                console.log('Loading puzzle database...');
+                const response = await fetch('../../xml/puzzles.xml');
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                const puzzleElements = xmlDoc.getElementsByTagName('puzzle');
+                for (let puzzle of puzzleElements) {
+                    const date = puzzle.getAttribute('date');
+                    const id = puzzle.getAttribute('id');
+                    if (date && id) {
+                        puzzleDatabase[date] = id;
+                    }
                 }
                 
-                // Log puzzle for debugging
-                console.log("Displaying puzzle:", puzzle);
-                
-                const puzzleDate = puzzle.getAttribute('date');
-                const puzzleId = puzzle.getAttribute('id');
-                const formattedDate = formatDate(puzzleDate);
-                
-                // Get month and day for image URL
-                const { month, day } = getMonthDayForImage(puzzleDate);
-                const imageUrl = `https://bee-box.github.io/bee-box/images/${month}-${day}.png`;
-                
-                // Extract puzzle attributes
-                const countStr = puzzle.getAttribute('count') || '0';
-                
-                // Parse count as integer
-                let count = 0;
-                try {
-                    // Remove any non-numeric characters except decimal points
-                    const cleanCountStr = countStr.replace(/[^0-9.]/g, '');
-                    count = cleanCountStr ? parseInt(cleanCountStr) : 0;
-                } catch (e) {
-                    console.warn(`Error parsing count for puzzle ${puzzleId}: ${e}`);
-                    count = 0;
-                }
-                
-                const letters = puzzle.getAttribute('letters') || 'N/A';
-                const pangrams = puzzle.getAttribute('pangrams') || 'N/A';
-                const perfectPangrams = puzzle.getAttribute('perfectpangrams') || 'N/A';
-                const queenBee = puzzle.getAttribute('queenbee') || 'N/A';
-                
-                // A puzzle has words if count is 1 or greater
-                const hasWords = count >= 1;
-                
-                // Get all available words if they exist
-                const wordElements = puzzle.getElementsByTagName('word');
-                console.log("Word elements found:", wordElements.length);
-                
-                let wordsList = '';
-                if (wordElements.length > 0) {
-                    wordsList = '<div class="words-list"><h4>Words in this Puzzle:</h4><ul>';
-                    for (let i = 0; i < wordElements.length; i++) {
-                        const word = wordElements[i];
-                        const wordText = word.textContent;
-                        const points = word.getAttribute('points') || '-';
-                        const isPangram = word.getAttribute('pangram') === 'yes';
-                        
-                        const formattedDate = dateObj.toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                        dateDisplay.textContent = formattedDate;
-                    } catch (e) {
-                        console.error("Error formatting date:", e);
-                        dateDisplay.textContent = `Date: ${selectedDate}`;
-                    }
-                    wordsList += '</ul></div>';
-                } else if (hasWords) {
-                    wordsList = `<div class="words-list">
-                        <p>This puzzle has ${count} words:</p>
-                        <p><strong>Letters:</strong> ${letters}</p>
-                        <p><strong>Pangrams:</strong> ${pangrams}</p>
-                        <p>Note: Individual words are not listed in the data.</p>
-                    </div>`;
-                }
-                
-                puzzleContent.innerHTML = `
-                    <div class="puzzle-info">
-                        <div>
-                            <strong>Newsletter ID:</strong> ${puzzleId}
-                        </div>
-                        <div>
-                            <strong>Date:</strong> ${formattedDate}
-                        </div>
-                    </div>
-                    
-                    <div class="puzzle-image">
-                        <img src="${imageUrl}" alt="Puzzle image for ${month}-${day}" 
-                            onerror="this.onerror=null; this.src='https://bee-box.github.io/bee-box/images/placeholder.png'; this.alt='Image not available';">
-                    </div>
-                    
-                    <div class="puzzle-details">
-                        <h3>Puzzle Details</h3>
-                        <div class="details-grid">
-                            <div class="detail-item">
-                                <strong>Letters:</strong> ${letters}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Word Count:</strong> ${count}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Pangrams:</strong> ${pangrams}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Perfect Pangrams:</strong> ${perfectPangrams}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Queen Bee Score:</strong> ${queenBee}
-                            </div>
-                            <div class="detail-item">
-                                <strong>Has Words:</strong> 
-                                <span class="${hasWords ? 'yes-indicator' : 'no-indicator'}">
-                                    ${hasWords ? 'Yes' : 'No'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${wordsList}
-                `;
+                console.log(`Loaded ${Object.keys(puzzleDatabase).length} puzzles`);
+                initializeDatePicker();
+            } catch (error) {
+                console.error('Error loading puzzle database:', error);
+                initializeDatePicker();
+            }
+        }
+        
+        function initializeDatePicker() {
+            const picker = document.getElementById('datePicker');
+            const availableDates = Object.keys(puzzleDatabase).sort();
+            
+            if (availableDates.length > 0) {
+                picker.min = availableDates[0];
+                picker.max = availableDates[availableDates.length - 1];
             }
             
-            // Function to load XML data from selected source
-            async function loadXmlData() {
-                try {
-                    messageContainer.innerHTML = '';
-                    dateSelect.innerHTML = '<option value="">-- Select a date --</option>';
-                    newsletterContainer.innerHTML = '<div class="loading">Loading XML data...</div>';
-                    dateDisplay.textContent = '';
-                    shortDateDisplay.textContent = '';
-                    idDisplay.textContent = '';
-                    linksContainer.innerHTML = '';
-                    
-                    // Get XML content based on selected source
-                    if (xmlSource === 'file') {
-                        const xmlPath = xmlPathInput.value.trim();
-                        if (!xmlPath) {
-                            throw new Error('Please enter a valid XML file path');
+            const now = new Date();
+            const centralTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
+            const tomorrow = new Date(centralTime);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const tomorrowString = tomorrow.getFullYear() + '-' + 
+                String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(tomorrow.getDate()).padStart(2, '0');
+            
+            picker.value = tomorrowString;
+            
+            const puzzleId = puzzleDatabase[tomorrowString] || 'idgoeshere';
+            updatePreviewAndCode(tomorrowString, puzzleId);
+            loadHiveForDate(tomorrowString);
+        }
+
+        // Function to load hive SVG for selected date
+        function loadHiveForDate(selectedDate) {
+            const hiveDisplay = document.getElementById('hiveDisplay');
+            
+            if (!selectedDate) {
+                hiveDisplay.innerHTML = '<div class="hive-loading">Select a date to load the hive...</div>';
+                return;
+            }
+            
+            hiveDisplay.innerHTML = '<div class="hive-loading">Loading hive...</div>';
+            
+            // Try multiple possible paths for the SVG
+            const possiblePaths = [
+                `images/${selectedDate}.svg`,     // Same level as this file
+                `../images/${selectedDate}.svg`,  // One level up
+                `../../images/${selectedDate}.svg`, // Two levels up
+                `/images/${selectedDate}.svg`,    // Root level
+                `https://bee-box.github.io/bee-box/images/${selectedDate}.svg` // Full URL
+            ];
+            
+            async function tryLoadSVG() {
+                for (const svgPath of possiblePaths) {
+                    try {
+                        console.log(`Trying to load SVG from: ${svgPath}`);
+                        const response = await fetch(svgPath);
+                        if (response.ok) {
+                            const svgContent = await response.text();
+                            hiveDisplay.innerHTML = svgContent;
+                            console.log(`Successfully loaded SVG from: ${svgPath}`);
+                            return;
                         }
-                        
-                        const response = await fetch(xmlPath);
-                        if (!response.ok) {
-                            throw new Error(`Failed to load XML file. Status: ${response.status}`);
-                        }
-                        
-                        xmlContent = await response.text();
-                    } else {
-                        xmlContent = directXmlInput.value.trim();
-                        if (!xmlContent) {
-                            throw new Error('Please enter valid XML content');
-                        }
+                    } catch (error) {
+                        console.log(`Failed to load from ${svgPath}:`, error);
+                        continue;
                     }
-                    return response.text();
-                })
-                .then(xmlString => {
-                    console.log("XML loaded, parsing...");
-                    
-                    // Parse XML
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
-                    
-                    // Check for parsing errors
-                    const parseError = xmlDoc.getElementsByTagName('parsererror');
-                    if (parseError.length > 0) {
-                        throw new Error('XML parsing error: Invalid XML format');
-                    }
-                    
-                    // Get puzzles
-                    const puzzles = xmlDoc.getElementsByTagName('puzzle');
-                    
-                    if (puzzles.length === 0) {
-                        throw new Error('No puzzles found in the XML data');
-                    }
-                    
-                    showMessage(`Successfully loaded ${puzzles.length} puzzles`, 'success');
-                    
-                    // Extract and sort dates (newest first)
-                    const dates = [];
-                    for (let i = 0; i < puzzles.length; i++) {
-                        const puzzleDate = puzzles[i].getAttribute('date');
-                        if (puzzleDate) {
-                            dates.push(puzzleDate);
-                        }
-                    }
-                    
-                    // Sort dates in reverse order (newest first)
-                    dates.sort().reverse();
-                    
-                    // Populate date select
-                    for (const dateStr of dates) {
-                        const option = document.createElement('option');
-                        option.value = dateStr;
-                        option.textContent = dateStr;
-                        dateSelect.appendChild(option);
-                    }
-                    
-                    // Find today's date or closest date
-                    if (dates.length > 0) {
-                        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-                        
-                        // Check if date from URL param exists in our dates
-                        let selectedDate = date && dates.includes(date) ? date : null;
-                        
-                        // If no valid URL param, try to find today's date
-                        if (!selectedDate) {
-                            if (dates.includes(today)) {
-                                // Today's puzzle is available
-                                selectedDate = today;
-                            } else {
-                                // Find closest date (first future date or most recent past date)
-                                // Since dates are sorted newest first, we can find the first date that's <= today
-                                selectedDate = dates.find(d => d <= today) || dates[0];
-                            }
-                        }
-                        
-                        dateSelect.value = selectedDate;
-                        dateSelect.dispatchEvent(new Event('change'));
-                    } else {
-                        newsletterContainer.innerHTML = '<div class="loading">No valid dates found in XML</div>';
-                    }
-                    
-                } catch (error) {
-                    console.error('Error loading XML:', error);
-                    showMessage(`Error: ${error.message}`);
-                    newsletterContainer.innerHTML = `<div class="error-message">${error.message}</div>`;
                 }
+                
+                // If all paths fail
+                console.error('Failed to load hive from any path');
+                hiveDisplay.innerHTML = `<div class="hive-error">Hive not available for ${selectedDate}<br><small>Check console for path details</small></div>`;
             }
             
-            // Function to load puzzle for a selected date
-            function loadPuzzleForDate(selectedDate) {
-                try {
-                    if (!xmlContent) {
-                        newsletterContainer.innerHTML = '<div class="loading">Please load XML data first</div>';
-                        return;
-                    }
-                    
-                    newsletterContainer.innerHTML = '<div class="loading">Loading puzzle data...</div>';
-                    
-                    // Parse XML content
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
-                    
-                    // Check for parsing errors
-                    const parseError = xmlDoc.getElementsByTagName('parsererror');
-                    if (parseError.length > 0) {
-                        console.error("XML parsing error:", parseError[0].textContent);
-                        throw new Error("XML parsing error");
-                    }
-                    
-                    // Get all puzzles
-                    const puzzles = xmlDoc.getElementsByTagName('puzzle');
-                    console.log("Total puzzles found:", puzzles.length);
-                    
-                    // Sort puzzles by date (most recent first)
-                    const sortedPuzzles = Array.from(puzzles).sort((a, b) => {
-                        const dateA = new Date(a.getAttribute('date'));
-                        const dateB = new Date(b.getAttribute('date'));
-                        return dateB - dateA;
-                    });
-                    
-                    // If no date exists in URL, use the most recent puzzle
-                    if (!selectedDate && sortedPuzzles.length > 0) {
-                        selectedDate = sortedPuzzles[0].getAttribute('date');
-                        console.log("No date provided, using most recent puzzle: " + selectedDate);
-                    }
-                    
-                    // Clear loading option
-                    dateSelector.innerHTML = '';
-                    
-                    // Add option for each puzzle date
-                    for (let i = 0; i < sortedPuzzles.length; i++) {
-                        const puzzle = sortedPuzzles[i];
-                        const puzzleDate = puzzle.getAttribute('date');
-                        const formattedDate = formatDate(puzzleDate);
-                        
-                        const option = document.createElement('option');
-                        option.value = puzzleDate;
-                        option.textContent = formattedDate;
-                        
-                        // Select current date
-                        if (puzzleDate === selectedDate) {
-                            option.selected = true;
-                        }
-                        
-                        dateSelector.appendChild(option);
-                    }
-                    
-                    // If no options added (empty XML), show message
-                    if (dateSelector.options.length === 0) {
-                        const option = document.createElement('option');
-                        option.value = "";
-                        option.textContent = "No dates available in XML";
-                        dateSelector.appendChild(option);
-                    }
-                    
-                    // Find and display the current puzzle
-                    let foundPuzzle = null;
-                    for (let i = 0; i < puzzles.length; i++) {
-                        if (puzzles[i].getAttribute('date') === selectedDate) {
-                            foundPuzzle = puzzles[i];
-                            break;
-                        }
-                    }
-                    
-                    if (!puzzleFound) {
-                        newsletterContainer.innerHTML = `<div class="error-message">No puzzle found for date: ${selectedDate}</div>`;
-                    }
-                    
-                    // Add error option to dropdown
-                    dateSelector.innerHTML = '';
-                    const option = document.createElement('option');
-                    option.value = "";
-                    option.textContent = "Error loading dates";
-                    dateSelector.appendChild(option);
-                });
+            tryLoadSVG();
+        }
+
+        function updatePreviewAndCode(dateString, puzzleId = 'idgoeshere') {
+            let weekday = 'MONDAY', month = 'JUNE', day = '17', year = '2025';
             
-            // Handle dropdown change
-            dateSelector.addEventListener('change', function() {
-                const selectedDate = this.value;
-                if (selectedDate) {
-                    // Change URL and reload page
-                    window.location.href = `?date=${selectedDate}`;
-                }
+            if (dateString) {
+                const dateObj = new Date(dateString + 'T00:00:00');
+                weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+                month = dateObj.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+                day = dateObj.getDate();
+                year = dateObj.getFullYear();
             }
             
-            // Initial load if URL has date parameter
-            if (date) {
-                loadXmlData();
-            }
+            // Generate the HTML code
+            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="padding:40px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:#333;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#e6c600\'" ontouchend="this.style.background=\'#FFDC00\'" onmousedown="this.style.background=\'#d4b800\'" onmouseup="this.style.background=\'#FFDC00\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#7b27cc\'" ontouchend="this.style.background=\'#8A2BE2\'" onmousedown="this.style.background=\'#6b22b3\'" onmouseup="this.style.background=\'#8A2BE2\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#009e48\'" ontouchend="this.style.background=\'#00B050\'" onmousedown="this.style.background=\'#008a3e\'" onmouseup="this.style.background=\'#00B050\'">Today\'s Bee Peek</a><a href="https://bee-box.github.io/bee-box/grid.html?puzzleid=' + puzzleId + '" style="background:#0023FF;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none" ontouchstart="this.style.background=\'#001fe6\'" ontouchend="this.style.background=\'#0023FF\'" onmousedown="this.style.background=\'#001acc\'" onmouseup="this.style.background=\'#0023FF\'">Today\'s Bee Grid</a></div></div>';
+            
+            // Update the code output
+            document.getElementById('codeOutput').textContent = htmlCode;
+            
+            // Update the preview by inserting the HTML directly
+            document.getElementById('previewContainer').innerHTML = htmlCode;
+        }
+        
+        function copyToClipboard() {
+            const codeContent = document.getElementById('codeOutput');
+            const copyButton = document.getElementById('copyBtn');
+            
+            navigator.clipboard.writeText(codeContent.textContent).then(() => {
+                showCopySuccess(copyButton);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = codeContent.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                showCopySuccess(copyButton);
+            });
+        }
+        
+        function showCopySuccess(button) {
+            button.textContent = 'Copied!';
+            button.classList.add('success');
+            setTimeout(() => {
+                button.textContent = 'Copy to Clipboard';
+                button.classList.remove('success');
+            }, 2000);
+        }
+        
+        // Event listeners
+        document.getElementById('datePicker').addEventListener('change', function() {
+            const selectedDate = this.value;
+            const selectedId = puzzleDatabase[selectedDate] || 'idgoeshere';
+            updatePreviewAndCode(selectedDate, selectedId);
+            loadHiveForDate(selectedDate); // Load hive when date changes
         });
+
+        document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+        
+        // Initialize the application
+        loadPuzzleDatabase();
     </script>
 </body>
 </html>
