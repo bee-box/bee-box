@@ -12,10 +12,66 @@
       margin: 0;
       padding: 2rem;
     }
+    .controls {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .date-selector {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .date-selector label {
+      font-weight: bold;
+    }
+    .date-selector input, .date-selector select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .date-selector button {
+      padding: 0.5rem 1rem;
+      background: #007acc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .date-selector button:hover {
+      background: #005a9e;
+    }
     .record-row {
       display: flex;
       align-items: flex-start;
       margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #fafafa;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+    .date-header {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      background: #e9ecef;
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      min-width: 140px;
+      margin-right: 1rem;
+    }
+    .day-of-week {
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: normal;
     }
     .image-container {
       display: flex;
@@ -37,8 +93,8 @@
       color: white;
     }
     .thumb {
-      width: 20pt;
-      height: 20pt;
+      width: 32pt;
+      height: 32pt;
       object-fit: cover;
       border-radius: 8px;
       margin-right: 1.5rem;
@@ -46,8 +102,8 @@
       border: 1px solid #ccc;
     }
     .thumb-placeholder {
-      width: 20pt;
-      height: 20pt;
+      width: 32pt;
+      height: 32pt;
       border-radius: 8px;
       margin-right: 1.5rem;
       background: #f0f0f0;
@@ -55,7 +111,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12pt;
+      font-size: 16pt;
       color: #888;
       text-align: center;
       line-height: 1;
@@ -69,84 +125,293 @@
       flex: 1;
       overflow-x: auto;
     }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .stats {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+    .thumb {
+      cursor: pointer;
+    }
+    .thumb:hover {
+      opacity: 0.8;
+      transform: scale(1.05);
+      transition: all 0.2s ease;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      cursor: pointer;
+    }
+    .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .modal img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .close:hover {
+      background: rgba(0,0,0,0.8);
+    }
   </style>
 </head>
 <body>
-  <h2>Puzzle XML Records (Today + Next 10 Days)</h2>
+  <h2>Puzzle XML Records</h2>
+  
+  <div class="controls">
+    <div class="date-selector">
+      <label for="start-date">Start Date:</label>
+      <input type="date" id="start-date">
+      
+      <label for="end-date">End Date:</label>
+      <input type="date" id="end-date">
+      
+      <label for="quick-select">Quick Select:</label>
+      <select id="quick-select">
+        <option value="">Custom Range</option>
+        <option value="today">Today</option>
+        <option value="week">Next 7 Days</option>
+        <option value="month">Next 30 Days</option>
+        <option value="year">Rest of Year</option>
+      </select>
+      
+      <button onclick="applyDateFilter()">Apply Filter</button>
+    </div>
+  </div>
+  
+  <div class="stats" id="stats">Loading...</div>
   <div id="xml-records">Loading...</div>
+  
+  <!-- Modal for image popup -->
+  <div id="imageModal" class="modal">
+    <span class="close">&times;</span>
+    <div class="modal-content">
+      <img id="modalImg" src="" alt="">
+    </div>
+  </div>
+  
   <script>
+    let allPuzzles = [];
+    
     async function init() {
       try {
         const response = await fetch("../xml/puzzles.xml");
         const xmlText = await response.text();
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, "application/xml");
-        const puzzles = [...xml.getElementsByTagName("puzzle")];
+        allPuzzles = [...xml.getElementsByTagName("puzzle")];
+        
+        // Set default date range (today to end of year)
         const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        const endStr = getDateString(10);
-        const relevant = puzzles.filter(p => {
-          const d = p.getAttribute("date");
-          return d >= todayStr && d <= endStr;
+        const endOfYear = new Date(today.getFullYear(), 11, 31);
+        
+        document.getElementById('start-date').value = today.toISOString().split('T')[0];
+        document.getElementById('end-date').value = endOfYear.toISOString().split('T')[0];
+        
+        // Set quick select to "Rest of Year"
+        document.getElementById('quick-select').value = 'year';
+        
+        applyDateFilter();
+        
+        // Add event listeners for quick select
+        document.getElementById('quick-select').addEventListener('change', function() {
+          const value = this.value;
+          const today = new Date();
+          const startDate = document.getElementById('start-date');
+          const endDate = document.getElementById('end-date');
+          
+          switch(value) {
+            case 'today':
+              startDate.value = today.toISOString().split('T')[0];
+              endDate.value = today.toISOString().split('T')[0];
+              break;
+            case 'week':
+              startDate.value = today.toISOString().split('T')[0];
+              const weekEnd = new Date(today);
+              weekEnd.setDate(today.getDate() + 6);
+              endDate.value = weekEnd.toISOString().split('T')[0];
+              break;
+            case 'month':
+              startDate.value = today.toISOString().split('T')[0];
+              const monthEnd = new Date(today);
+              monthEnd.setDate(today.getDate() + 29);
+              endDate.value = monthEnd.toISOString().split('T')[0];
+              break;
+            case 'year':
+              startDate.value = today.toISOString().split('T')[0];
+              const yearEnd = new Date(today.getFullYear(), 11, 31);
+              endDate.value = yearEnd.toISOString().split('T')[0];
+              break;
+          }
+          
+          if (value) {
+            applyDateFilter();
+          }
         });
-        const container = document.getElementById("xml-records");
-        container.innerHTML = '';
-        relevant.forEach(p => {
-          const date = p.getAttribute("date");
-          const [yyyy, mm, dd] = date.split('-');
-          const imgUrl = `https://bee-box.github.io/bee-box/images/${mm}-${dd}.png`;
-          
-          // Convert month and day to spelled out format
-          const monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"];
-          const monthName = monthNames[parseInt(mm) - 1];
-          const dayNum = parseInt(dd);
-          const dayWithSuffix = getDayWithSuffix(dayNum);
-          
-          const row = document.createElement('div');
-          row.className = 'record-row';
-          
-          const imageContainer = document.createElement('div');
-          imageContainer.className = 'image-container';
-          
-          const img = document.createElement('img');
-          img.className = 'thumb';
-          img.src = imgUrl;
-          img.alt = `${mm}-${dd}`;
-          
-          const placeholder = document.createElement('div');
-          placeholder.className = 'thumb-placeholder';
-          placeholder.innerHTML = '🖼️';
-          placeholder.style.display = 'none';
-          
-          img.onerror = function() { 
-            this.style.display = 'none';
-            placeholder.style.display = 'flex';
-          };
-          
-          // Create ChatGPT link with pre-filled prompt for immediate image generation
-          const chatgptLink = document.createElement('a');
-          chatgptLink.className = 'chatgpt-link';
-          chatgptLink.textContent = 'AI';
-          chatgptLink.target = '_blank';
-          const prompt = encodeURIComponent(`Create an image. Show a bumble bee enjoying the National Day celebration for ${monthName} ${dayWithSuffix}. First look up what National Day is celebrated on ${monthName} ${dayWithSuffix} on https://www.nationaldaycalendar.com then show the bee participating in that specific celebration. Include bold text overlay: "${monthName} ${dayWithSuffix}" and the National Day name. Use bright, cheerful colors perfect for a newsletter header.`);
-          chatgptLink.href = `https://chat.openai.com/?q=${prompt}`;
-          
-          const pre = document.createElement('div');
-          pre.className = 'xml-text';
-          pre.textContent = p.outerHTML;
-          
-          imageContainer.appendChild(img);
-          imageContainer.appendChild(placeholder);
-          imageContainer.appendChild(chatgptLink);
-          row.appendChild(imageContainer);
-          row.appendChild(pre);
-          container.appendChild(row);
-        });
+        
       } catch (e) {
         document.getElementById("xml-records").textContent = "Error loading XML: " + e;
+        document.getElementById("stats").textContent = "Error loading data";
       }
     }
+    
+    function applyDateFilter() {
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      if (!startDate || !endDate) {
+        alert('Please select both start and end dates');
+        return;
+      }
+      
+      const relevant = allPuzzles.filter(p => {
+        const d = p.getAttribute("date");
+        return d >= startDate && d <= endDate;
+      });
+      
+      // Update stats
+      document.getElementById("stats").textContent = 
+        `Showing ${relevant.length} puzzle${relevant.length !== 1 ? 's' : ''} from ${formatDate(startDate)} to ${formatDate(endDate)}`;
+      
+      const container = document.getElementById("xml-records");
+      container.innerHTML = '';
+      
+      relevant.forEach(p => {
+        const date = p.getAttribute("date");
+        const [yyyy, mm, dd] = date.split('-');
+        const imgUrl = `https://bee-box.github.io/bee-box/images/${mm}-${dd}.png`;
+        
+        // Convert month and day to spelled out format
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"];
+        const monthName = monthNames[parseInt(mm) - 1];
+        const dayNum = parseInt(dd);
+        const dayWithSuffix = getDayWithSuffix(dayNum);
+        
+        // Get day of week
+        const dateObj = new Date(yyyy, parseInt(mm) - 1, parseInt(dd));
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayOfWeek = dayNames[dateObj.getDay()];
+        
+        const row = document.createElement('div');
+        row.className = 'record-row';
+        
+        const dateHeader = document.createElement('div');
+        dateHeader.className = 'date-header';
+        dateHeader.innerHTML = `${monthName} ${dayWithSuffix}<br><span class="day-of-week">${dayOfWeek}</span>`;
+        
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'image-container';
+        
+        const img = document.createElement('img');
+        img.className = 'thumb';
+        img.src = imgUrl;
+        img.alt = `${mm}-${dd}`;
+        
+        const placeholder = document.createElement('div');
+        placeholder.className = 'thumb-placeholder';
+        placeholder.innerHTML = '🖼️';
+        placeholder.style.display = 'none';
+        
+        img.onerror = function() { 
+          this.style.display = 'none';
+          placeholder.style.display = 'flex';
+        };
+        
+        // Add click handler for image popup
+        img.onclick = function() {
+          openModal(this.src, this.alt);
+        };
+        
+        // Create ChatGPT link with pre-filled prompt for immediate image generation
+        const chatgptLink = document.createElement('a');
+        chatgptLink.className = 'chatgpt-link';
+        chatgptLink.textContent = 'AI';
+        chatgptLink.target = '_blank';
+        const prompt = encodeURIComponent(`Create an image. Show a bumble bee enjoying the National Day celebration for ${monthName} ${dayWithSuffix}. First look up what National Day is celebrated on ${monthName} ${dayWithSuffix} on https://www.nationaldaycalendar.com then show the bee participating in that specific celebration. Include bold text overlay: "${monthName} ${dayWithSuffix}" and the National Day name. Use bright, cheerful colors perfect for a newsletter header.`);
+        chatgptLink.href = `https://chat.openai.com/?q=${prompt}`;
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'content-wrapper';
+        
+        const pre = document.createElement('div');
+        pre.className = 'xml-text';
+        pre.textContent = p.outerHTML;
+        
+        imageContainer.appendChild(img);
+        imageContainer.appendChild(placeholder);
+        imageContainer.appendChild(chatgptLink);
+        
+        contentWrapper.appendChild(pre);
+        
+        row.appendChild(dateHeader);
+        row.appendChild(imageContainer);
+        row.appendChild(contentWrapper);
+        container.appendChild(row);
+      });
+    }
+    
+    function openModal(src, alt) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      modal.style.display = 'block';
+      modalImg.src = src;
+      modalImg.alt = alt;
+    }
+    
+    function closeModal() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+    
+    // Modal event listeners
+    document.getElementById('imageModal').onclick = closeModal;
+    document.querySelector('.close').onclick = closeModal;
+    
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+    
     function getDayWithSuffix(day) {
       if (day >= 11 && day <= 13) {
         return day + "th";
@@ -158,11 +423,16 @@
         default: return day + "th";
       }
     }
-    function getDateString(daysAhead) {
-      const date = new Date();
-      date.setDate(date.getDate() + daysAhead);
-      return date.toISOString().split('T')[0];
+    
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
     }
+    
     init();
   </script>
 </body>
