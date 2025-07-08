@@ -72,7 +72,7 @@
   </style>
 </head>
 <body>
-  <h2>Puzzle XML Records (Today + Next 10 Days)</h2>
+  <h2>Puzzle XML Records (Today + Next 32 Days)</h2>
   <div id="xml-records">Loading...</div>
   <script>
     async function init() {
@@ -84,7 +84,7 @@
         const puzzles = [...xml.getElementsByTagName("puzzle")];
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
-        const endStr = getDateString(10);
+        const endStr = getDateString(32);
         const relevant = puzzles.filter(p => {
           const d = p.getAttribute("date");
           return d >= todayStr && d <= endStr;
