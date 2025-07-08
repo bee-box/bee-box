@@ -46,15 +46,6 @@
     .date-selector button:hover {
       background: #005a9e;
     }
-    .file-input {
-      margin-bottom: 1rem;
-    }
-    .file-input input[type="file"] {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-family: monospace;
-    }
     .record-row {
       display: flex;
       align-items: flex-start;
@@ -109,12 +100,6 @@
       margin-right: 1.5rem;
       background: #eee;
       border: 1px solid #ccc;
-      cursor: pointer;
-    }
-    .thumb:hover {
-      opacity: 0.8;
-      transform: scale(1.05);
-      transition: all 0.2s ease;
     }
     .thumb-placeholder {
       width: 32pt;
@@ -150,6 +135,14 @@
       color: #666;
       font-style: italic;
       margin-bottom: 1rem;
+    }
+    .thumb {
+      cursor: pointer;
+    }
+    .thumb:hover {
+      opacity: 0.8;
+      transform: scale(1.05);
+      transition: all 0.2s ease;
     }
     .modal {
       display: none;
@@ -198,52 +191,23 @@
     .close:hover {
       background: rgba(0,0,0,0.8);
     }
-    .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #f5c6cb;
-      margin-bottom: 1rem;
-    }
-    .sample-data {
-      background: #d1ecf1;
-      color: #0c5460;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #bee5eb;
-      margin-bottom: 1rem;
-    }
   </style>
 </head>
 <body>
-  <h2>Newsletter Helper - Puzzle XML Records</h2>
+  <h2>Puzzle XML Records (Today + Next 32 Days)</h2>
   
   <div class="controls">
-    <div class="file-input">
-      <label for="xml-file">Load XML File:</label>
-      <input type="file" id="xml-file" accept=".xml" onchange="handleFileLoad(event)">
-    </div>
     <div class="date-selector">
       <label for="start-date">Start Date:</label>
       <input type="date" id="start-date">
       <label for="end-date">End Date:</label>
       <input type="date" id="end-date">
       <button onclick="applyDateFilter()">Apply Filter</button>
-      <button onclick="loadSampleData()">Load Sample Data</button>
-      <button onclick="init()">Initialize</button>
     </div>
   </div>
   
-  <div id="stats" class="stats">Load an XML file or sample data to get started</div>
-  <div id="xml-records">
-    <div class="sample-data">
-      <strong>Instructions:</strong>
-      <br>1. Upload your puzzles.xml file using the file input above, or
-      <br>2. Click "Load Sample Data" to see how it works with example data
-      <br>3. Use the date filters to narrow down results
-    </div>
-  </div>
+  <div id="stats" class="stats">Loading...</div>
+  <div id="xml-records">Loading...</div>
   
   <!-- Modal for image popup -->
   <div id="imageModal" class="modal">
@@ -256,78 +220,43 @@
   <script>
     let allPuzzles = [];
     
-    function handleFileLoad(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const xmlText = e.target.result;
-          const parser = new DOMParser();
-          const xml = parser.parseFromString(xmlText, "application/xml");
-          
-          // Check for parsing errors
-          const parserError = xml.querySelector("parsererror");
-          if (parserError) {
-            throw new Error("XML parsing error: " + parserError.textContent);
-          }
-          
-          allPuzzles = [...xml.getElementsByTagName("puzzle")];
-          
-          if (allPuzzles.length === 0) {
-            throw new Error("No puzzle elements found in XML file");
-          }
-          
-          // Set default date range
-          setDefaultDateRange();
-          applyDateFilter();
-          
-        } catch (error) {
-          showError("Error loading XML file: " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-    
-    function loadSampleData() {
-      // Create sample XML data
-      const sampleXML = `<?xml version="1.0" encoding="UTF-8"?>
-<puzzles>
-  <puzzle date="2025-07-08" title="Sample Puzzle 1">
-    <description>Today's puzzle content</description>
-    <difficulty>Medium</difficulty>
-  </puzzle>
-  <puzzle date="2025-07-09" title="Sample Puzzle 2">
-    <description>Tomorrow's puzzle content</description>
-    <difficulty>Hard</difficulty>
-  </puzzle>
-  <puzzle date="2025-07-10" title="Sample Puzzle 3">
-    <description>Day after tomorrow's puzzle content</description>
-    <difficulty>Easy</difficulty>
-  </puzzle>
-</puzzles>`;
-      
+    async function init() {
       try {
+        const response = await fetch("../xml/puzzles.xml");
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const xmlText = await response.text();
         const parser = new DOMParser();
-        const xml = parser.parseFromString(sampleXML, "application/xml");
+        const xml = parser.parseFromString(xmlText, "application/xml");
+        
+        // Check for parsing errors
+        const parserError = xml.querySelector("parsererror");
+        if (parserError) {
+          throw new Error("XML parsing error: " + parserError.textContent);
+        }
+        
         allPuzzles = [...xml.getElementsByTagName("puzzle")];
         
-        setDefaultDateRange();
+        if (allPuzzles.length === 0) {
+          throw new Error("No puzzle elements found in XML file");
+        }
+        
+        // Set default date range (today + next 32 days)
+        const today = new Date();
+        const endDate = new Date(today);
+        endDate.setDate(today.getDate() + 32);
+        
+        document.getElementById('start-date').value = today.toISOString().split('T')[0];
+        document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+        
         applyDateFilter();
         
-      } catch (error) {
-        showError("Error loading sample data: " + error.message);
+      } catch (e) {
+        document.getElementById("xml-records").innerHTML = `<div style="color: red; padding: 1rem;">Error loading XML: ${e.message}</div>`;
+        document.getElementById("stats").textContent = "Error loading data";
       }
-    }
-    
-    function setDefaultDateRange() {
-      const today = new Date();
-      const endDate = new Date(today);
-      endDate.setDate(today.getDate() + 32);
-      
-      document.getElementById('start-date').value = today.toISOString().split('T')[0];
-      document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
     }
     
     function applyDateFilter() {
@@ -335,12 +264,7 @@
       const endDate = document.getElementById('end-date').value;
       
       if (!startDate || !endDate) {
-        showError('Please select both start and end dates');
-        return;
-      }
-      
-      if (allPuzzles.length === 0) {
-        showError('No puzzle data loaded. Please load an XML file first.');
+        alert('Please select both start and end dates');
         return;
       }
       
@@ -356,15 +280,8 @@
       const container = document.getElementById("xml-records");
       container.innerHTML = '';
       
-      if (relevant.length === 0) {
-        container.innerHTML = '<div class="error-message">No puzzles found in the selected date range.</div>';
-        return;
-      }
-      
       relevant.forEach(p => {
         const date = p.getAttribute("date");
-        if (!date) return;
-        
         const [yyyy, mm, dd] = date.split('-');
         const imgUrl = `https://bee-box.github.io/bee-box/images/${mm}-${dd}.png`;
         
@@ -438,12 +355,6 @@
       });
     }
     
-    function showError(message) {
-      const container = document.getElementById("xml-records");
-      container.innerHTML = `<div class="error-message"><strong>Error:</strong> ${message}</div>`;
-      document.getElementById("stats").textContent = "Error loading data";
-    }
-    
     function openModal(src, alt) {
       const modal = document.getElementById('imageModal');
       const modalImg = document.getElementById('modalImg');
@@ -488,8 +399,7 @@
       });
     }
     
-    // Initialize with default date range
-    setDefaultDateRange();
+    init();
   </script>
 </body>
 </html>
