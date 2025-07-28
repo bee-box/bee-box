@@ -194,30 +194,19 @@
   </style>
 </head>
 <body>
-  <h2>Puzzle XML Records</h2>
+  <h2>Puzzle XML Records (Today + Next 32 Days)</h2>
   
   <div class="controls">
     <div class="date-selector">
       <label for="start-date">Start Date:</label>
       <input type="date" id="start-date">
-      
       <label for="end-date">End Date:</label>
       <input type="date" id="end-date">
-      
-      <label for="quick-select">Quick Select:</label>
-      <select id="quick-select">
-        <option value="">Custom Range</option>
-        <option value="today">Today</option>
-        <option value="week">Next 7 Days</option>
-        <option value="month">Next 30 Days</option>
-        <option value="year">Rest of Year</option>
-      </select>
-      
       <button onclick="applyDateFilter()">Apply Filter</button>
     </div>
   </div>
   
-  <div class="stats" id="stats">Loading...</div>
+  <div id="stats" class="stats">Loading...</div>
   <div id="xml-records">Loading...</div>
   
   <!-- Modal for image popup -->
@@ -234,61 +223,38 @@
     async function init() {
       try {
         const response = await fetch("../xml/puzzles.xml");
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const xmlText = await response.text();
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, "application/xml");
+        
+        // Check for parsing errors
+        const parserError = xml.querySelector("parsererror");
+        if (parserError) {
+          throw new Error("XML parsing error: " + parserError.textContent);
+        }
+        
         allPuzzles = [...xml.getElementsByTagName("puzzle")];
         
-        // Set default date range (today to end of year)
+        if (allPuzzles.length === 0) {
+          throw new Error("No puzzle elements found in XML file");
+        }
+        
+        // Set default date range (today + next 32 days)
         const today = new Date();
-        const endOfYear = new Date(today.getFullYear(), 11, 31);
+        const endDate = new Date(today);
+        endDate.setDate(today.getDate() + 32);
         
         document.getElementById('start-date').value = today.toISOString().split('T')[0];
-        document.getElementById('end-date').value = endOfYear.toISOString().split('T')[0];
-        
-        // Set quick select to "Rest of Year"
-        document.getElementById('quick-select').value = 'year';
+        document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
         
         applyDateFilter();
         
-        // Add event listeners for quick select
-        document.getElementById('quick-select').addEventListener('change', function() {
-          const value = this.value;
-          const today = new Date();
-          const startDate = document.getElementById('start-date');
-          const endDate = document.getElementById('end-date');
-          
-          switch(value) {
-            case 'today':
-              startDate.value = today.toISOString().split('T')[0];
-              endDate.value = today.toISOString().split('T')[0];
-              break;
-            case 'week':
-              startDate.value = today.toISOString().split('T')[0];
-              const weekEnd = new Date(today);
-              weekEnd.setDate(today.getDate() + 6);
-              endDate.value = weekEnd.toISOString().split('T')[0];
-              break;
-            case 'month':
-              startDate.value = today.toISOString().split('T')[0];
-              const monthEnd = new Date(today);
-              monthEnd.setDate(today.getDate() + 29);
-              endDate.value = monthEnd.toISOString().split('T')[0];
-              break;
-            case 'year':
-              startDate.value = today.toISOString().split('T')[0];
-              const yearEnd = new Date(today.getFullYear(), 11, 31);
-              endDate.value = yearEnd.toISOString().split('T')[0];
-              break;
-          }
-          
-          if (value) {
-            applyDateFilter();
-          }
-        });
-        
       } catch (e) {
-        document.getElementById("xml-records").textContent = "Error loading XML: " + e;
+        document.getElementById("xml-records").innerHTML = `<div style="color: red; padding: 1rem;">Error loading XML: ${e.message}</div>`;
         document.getElementById("stats").textContent = "Error loading data";
       }
     }
@@ -304,7 +270,7 @@
       
       const relevant = allPuzzles.filter(p => {
         const d = p.getAttribute("date");
-        return d >= startDate && d <= endDate;
+        return d && d >= startDate && d <= endDate;
       });
       
       // Update stats
