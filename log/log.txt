@@ -772,3 +772,579 @@ TIMESTAMP,STATUS,MESSAGE
 [2025-06-26 02:25:15] ⚠️ Puzzle for 2025-06-23 already populated. Skipping.
 [2025-06-26 02:25:15] ⚠️ Puzzle for 2025-06-22 already populated. Skipping.
 [2025-06-26 02:25:17] ✅ Wax complete.
+2025-06-27 07:24:33 UTC,START,"Workflow started"
+2025-06-27 02:24:33 AM CDT,START,"Harvest process started"
+2025-06-27 02:24:33 AM CDT,INFO,"No existing backup found - creating new backup (2125668 bytes)"
+2025-06-27 02:24:33 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-27 02:24:33 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-06-27 02:24:33 AM CDT,INFO,"Successfully fetched puzzle for 2025-06-27 with 22 words"
+2025-06-27 02:24:33 AM CDT,INFO,"Successfully loaded existing words.xml with 2606 puzzles"
+2025-06-27 02:24:33 AM CDT,INFO,"Successfully wrote 2126103 bytes to words.xml"
+2025-06-27 02:24:33 AM CDT,INFO,"Current file (2126103 bytes) is larger than backup (2125668 bytes) - updating backup"
+2025-06-27 02:24:33 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-27 02:24:33 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-06-27 02:24:34] 🕯 Starting waxer process...
+[2025-06-27 02:24:34] 🔄 Filled placeholder puzzle for 2025-06-27.
+[2025-06-27 02:24:34] ⚠️ Puzzle for 2025-06-26 already populated. Skipping.
+[2025-06-27 02:24:34] ⚠️ Puzzle for 2025-06-25 already populated. Skipping.
+[2025-06-27 02:24:34] ⚠️ Puzzle for 2025-06-24 already populated. Skipping.
+[2025-06-27 02:24:34] ⚠️ Puzzle for 2025-06-23 already populated. Skipping.
+[2025-06-27 02:24:35] ✅ Wax complete.
+2025-06-28 07:22:19 UTC,START,"Workflow started"
+2025-06-28 02:22:20 AM CDT,START,"Harvest process started"
+2025-06-28 02:22:20 AM CDT,INFO,"No existing backup found - creating new backup (2126103 bytes)"
+2025-06-28 02:22:20 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-28 02:22:20 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-06-28 02:22:20 AM CDT,INFO,"Successfully fetched puzzle for 2025-06-28 with 70 words"
+2025-06-28 02:22:20 AM CDT,INFO,"Successfully loaded existing words.xml with 2607 puzzles"
+2025-06-28 02:22:20 AM CDT,INFO,"Successfully wrote 2127412 bytes to words.xml"
+2025-06-28 02:22:20 AM CDT,INFO,"Current file (2127412 bytes) is larger than backup (2126103 bytes) - updating backup"
+2025-06-28 02:22:20 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-28 02:22:20 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-06-28 02:22:20] 🕯 Starting waxer process...
+[2025-06-28 02:22:20] 🔄 Filled placeholder puzzle for 2025-06-28.
+[2025-06-28 02:22:20] ⚠️ Puzzle for 2025-06-27 already populated. Skipping.
+[2025-06-28 02:22:20] ⚠️ Puzzle for 2025-06-26 already populated. Skipping.
+[2025-06-28 02:22:20] ⚠️ Puzzle for 2025-06-25 already populated. Skipping.
+[2025-06-28 02:22:20] ⚠️ Puzzle for 2025-06-24 already populated. Skipping.
+[2025-06-28 02:22:22] ✅ Wax complete.
+2025-06-29 07:23:29 UTC,START,"Workflow started"
+2025-06-29 02:23:29 AM CDT,START,"Harvest process started"
+2025-06-29 02:23:29 AM CDT,INFO,"No existing backup found - creating new backup (2127412 bytes)"
+2025-06-29 02:23:29 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-29 02:23:29 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-06-29 02:23:29 AM CDT,INFO,"Successfully fetched puzzle for 2025-06-29 with 64 words"
+2025-06-29 02:23:29 AM CDT,INFO,"Successfully loaded existing words.xml with 2608 puzzles"
+2025-06-29 02:23:29 AM CDT,INFO,"Successfully wrote 2128682 bytes to words.xml"
+2025-06-29 02:23:29 AM CDT,INFO,"Current file (2128682 bytes) is larger than backup (2127412 bytes) - updating backup"
+2025-06-29 02:23:29 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-29 02:23:29 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-06-29 02:23:29] 🕯 Starting waxer process...
+[2025-06-29 02:23:30] 🔄 Filled placeholder puzzle for 2025-06-29.
+[2025-06-29 02:23:30] ⚠️ Puzzle for 2025-06-28 already populated. Skipping.
+[2025-06-29 02:23:30] ⚠️ Puzzle for 2025-06-27 already populated. Skipping.
+[2025-06-29 02:23:30] ⚠️ Puzzle for 2025-06-26 already populated. Skipping.
+[2025-06-29 02:23:30] ⚠️ Puzzle for 2025-06-25 already populated. Skipping.
+[2025-06-29 02:23:31] ✅ Wax complete.
+2025-06-30 07:26:18 UTC,START,"Workflow started"
+2025-06-30 02:26:18 AM CDT,START,"Harvest process started"
+2025-06-30 02:26:18 AM CDT,INFO,"No existing backup found - creating new backup (2128682 bytes)"
+2025-06-30 02:26:18 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-30 02:26:18 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-06-30 02:26:18 AM CDT,INFO,"Successfully fetched puzzle for 2025-06-30 with 55 words"
+2025-06-30 02:26:18 AM CDT,INFO,"Successfully loaded existing words.xml with 2609 puzzles"
+2025-06-30 02:26:18 AM CDT,INFO,"Successfully wrote 2129698 bytes to words.xml"
+2025-06-30 02:26:18 AM CDT,INFO,"Current file (2129698 bytes) is larger than backup (2128682 bytes) - updating backup"
+2025-06-30 02:26:18 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-06-30 02:26:18 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-06-30 02:26:19] 🕯 Starting waxer process...
+[2025-06-30 02:26:19] 🔄 Filled placeholder puzzle for 2025-06-30.
+[2025-06-30 02:26:19] ⚠️ Puzzle for 2025-06-29 already populated. Skipping.
+[2025-06-30 02:26:19] ⚠️ Puzzle for 2025-06-28 already populated. Skipping.
+[2025-06-30 02:26:19] ⚠️ Puzzle for 2025-06-27 already populated. Skipping.
+[2025-06-30 02:26:19] ⚠️ Puzzle for 2025-06-26 already populated. Skipping.
+[2025-06-30 02:26:20] ✅ Wax complete.
+2025-07-01 07:26:34 UTC,START,"Workflow started"
+2025-07-01 02:26:34 AM CDT,START,"Harvest process started"
+2025-07-01 02:26:34 AM CDT,INFO,"No existing backup found - creating new backup (2129698 bytes)"
+2025-07-01 02:26:34 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-01 02:26:34 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-01 02:26:35 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-01 with 29 words"
+2025-07-01 02:26:35 AM CDT,INFO,"Successfully loaded existing words.xml with 2610 puzzles"
+2025-07-01 02:26:35 AM CDT,INFO,"Successfully wrote 2130249 bytes to words.xml"
+2025-07-01 02:26:35 AM CDT,INFO,"Current file (2130249 bytes) is larger than backup (2129698 bytes) - updating backup"
+2025-07-01 02:26:35 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-01 02:26:35 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-01 02:26:35] 🕯 Starting waxer process...
+[2025-07-01 02:26:35] 🔄 Filled placeholder puzzle for 2025-07-01.
+[2025-07-01 02:26:35] ⚠️ Puzzle for 2025-06-30 already populated. Skipping.
+[2025-07-01 02:26:35] ⚠️ Puzzle for 2025-06-29 already populated. Skipping.
+[2025-07-01 02:26:35] ⚠️ Puzzle for 2025-06-28 already populated. Skipping.
+[2025-07-01 02:26:35] ⚠️ Puzzle for 2025-06-27 already populated. Skipping.
+[2025-07-01 02:26:37] ✅ Wax complete.
+2025-07-02 07:25:16 UTC,START,"Workflow started"
+2025-07-02 02:25:16 AM CDT,START,"Harvest process started"
+2025-07-02 02:25:16 AM CDT,INFO,"No existing backup found - creating new backup (2130249 bytes)"
+2025-07-02 02:25:16 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-02 02:25:16 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-02 02:25:16 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-02 with 44 words"
+2025-07-02 02:25:16 AM CDT,INFO,"Successfully loaded existing words.xml with 2611 puzzles"
+2025-07-02 02:25:16 AM CDT,INFO,"Successfully wrote 2131120 bytes to words.xml"
+2025-07-02 02:25:16 AM CDT,INFO,"Current file (2131120 bytes) is larger than backup (2130249 bytes) - updating backup"
+2025-07-02 02:25:16 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-02 02:25:16 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-02 02:25:16] 🕯 Starting waxer process...
+[2025-07-02 02:25:17] 🔄 Filled placeholder puzzle for 2025-07-02.
+[2025-07-02 02:25:17] ⚠️ Puzzle for 2025-07-01 already populated. Skipping.
+[2025-07-02 02:25:17] ⚠️ Puzzle for 2025-06-30 already populated. Skipping.
+[2025-07-02 02:25:17] ⚠️ Puzzle for 2025-06-29 already populated. Skipping.
+[2025-07-02 02:25:17] ⚠️ Puzzle for 2025-06-28 already populated. Skipping.
+[2025-07-02 02:25:18] ✅ Wax complete.
+2025-07-03 07:24:58 UTC,START,"Workflow started"
+2025-07-03 02:24:59 AM CDT,START,"Harvest process started"
+2025-07-03 02:24:59 AM CDT,INFO,"No existing backup found - creating new backup (2131120 bytes)"
+2025-07-03 02:24:59 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-03 02:24:59 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-03 02:24:59 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-03 with 41 words"
+2025-07-03 02:24:59 AM CDT,INFO,"Successfully loaded existing words.xml with 2612 puzzles"
+2025-07-03 02:24:59 AM CDT,INFO,"Successfully wrote 2131887 bytes to words.xml"
+2025-07-03 02:24:59 AM CDT,INFO,"Current file (2131887 bytes) is larger than backup (2131120 bytes) - updating backup"
+2025-07-03 02:24:59 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-03 02:24:59 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-03 02:24:59] 🕯 Starting waxer process...
+[2025-07-03 02:25:00] 🔄 Filled placeholder puzzle for 2025-07-03.
+[2025-07-03 02:25:00] ⚠️ Puzzle for 2025-07-02 already populated. Skipping.
+[2025-07-03 02:25:00] ⚠️ Puzzle for 2025-07-01 already populated. Skipping.
+[2025-07-03 02:25:00] ⚠️ Puzzle for 2025-06-30 already populated. Skipping.
+[2025-07-03 02:25:00] ⚠️ Puzzle for 2025-06-29 already populated. Skipping.
+[2025-07-03 02:25:01] ✅ Wax complete.
+2025-07-04 07:25:59 UTC,START,"Workflow started"
+2025-07-04 02:25:59 AM CDT,START,"Harvest process started"
+2025-07-04 02:25:59 AM CDT,INFO,"No existing backup found - creating new backup (2131887 bytes)"
+2025-07-04 02:26:00 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-04 02:26:00 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-04 02:26:00 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-04 with 61 words"
+2025-07-04 02:26:00 AM CDT,INFO,"Successfully loaded existing words.xml with 2613 puzzles"
+2025-07-04 02:26:00 AM CDT,INFO,"Successfully wrote 2133124 bytes to words.xml"
+2025-07-04 02:26:00 AM CDT,INFO,"Current file (2133124 bytes) is larger than backup (2131887 bytes) - updating backup"
+2025-07-04 02:26:00 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-04 02:26:00 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-04 02:26:00] 🕯 Starting waxer process...
+[2025-07-04 02:26:00] 🔄 Filled placeholder puzzle for 2025-07-04.
+[2025-07-04 02:26:00] ⚠️ Puzzle for 2025-07-03 already populated. Skipping.
+[2025-07-04 02:26:00] ⚠️ Puzzle for 2025-07-02 already populated. Skipping.
+[2025-07-04 02:26:00] ⚠️ Puzzle for 2025-07-01 already populated. Skipping.
+[2025-07-04 02:26:00] ⚠️ Puzzle for 2025-06-30 already populated. Skipping.
+[2025-07-04 02:26:01] ✅ Wax complete.
+2025-07-05 07:22:39 UTC,START,"Workflow started"
+2025-07-05 02:22:39 AM CDT,START,"Harvest process started"
+2025-07-05 02:22:39 AM CDT,INFO,"No existing backup found - creating new backup (2133124 bytes)"
+2025-07-05 02:22:39 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-05 02:22:39 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-05 02:22:40 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-05 with 69 words"
+2025-07-05 02:22:40 AM CDT,INFO,"Successfully loaded existing words.xml with 2614 puzzles"
+2025-07-05 02:22:40 AM CDT,INFO,"Successfully wrote 2134465 bytes to words.xml"
+2025-07-05 02:22:40 AM CDT,INFO,"Current file (2134465 bytes) is larger than backup (2133124 bytes) - updating backup"
+2025-07-05 02:22:40 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-05 02:22:40 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-05 02:22:40] 🕯 Starting waxer process...
+[2025-07-05 02:22:40] 🔄 Filled placeholder puzzle for 2025-07-05.
+[2025-07-05 02:22:40] ⚠️ Puzzle for 2025-07-04 already populated. Skipping.
+[2025-07-05 02:22:40] ⚠️ Puzzle for 2025-07-03 already populated. Skipping.
+[2025-07-05 02:22:40] ⚠️ Puzzle for 2025-07-02 already populated. Skipping.
+[2025-07-05 02:22:40] ⚠️ Puzzle for 2025-07-01 already populated. Skipping.
+[2025-07-05 02:22:41] ✅ Wax complete.
+2025-07-06 07:22:14 UTC,START,"Workflow started"
+2025-07-06 02:22:14 AM CDT,START,"Harvest process started"
+2025-07-06 02:22:14 AM CDT,INFO,"No existing backup found - creating new backup (2134465 bytes)"
+2025-07-06 02:22:14 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-06 02:22:14 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-06 02:22:15 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-06 with 47 words"
+2025-07-06 02:22:15 AM CDT,INFO,"Successfully loaded existing words.xml with 2615 puzzles"
+2025-07-06 02:22:15 AM CDT,INFO,"Successfully wrote 2135370 bytes to words.xml"
+2025-07-06 02:22:15 AM CDT,INFO,"Current file (2135370 bytes) is larger than backup (2134465 bytes) - updating backup"
+2025-07-06 02:22:15 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-06 02:22:15 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-06 02:22:15] 🕯 Starting waxer process...
+[2025-07-06 02:22:15] 🔄 Filled placeholder puzzle for 2025-07-06.
+[2025-07-06 02:22:15] ⚠️ Puzzle for 2025-07-05 already populated. Skipping.
+[2025-07-06 02:22:15] ⚠️ Puzzle for 2025-07-04 already populated. Skipping.
+[2025-07-06 02:22:15] ⚠️ Puzzle for 2025-07-03 already populated. Skipping.
+[2025-07-06 02:22:15] ⚠️ Puzzle for 2025-07-02 already populated. Skipping.
+[2025-07-06 02:22:16] ✅ Wax complete.
+2025-07-07 07:26:14 UTC,START,"Workflow started"
+2025-07-07 02:26:14 AM CDT,START,"Harvest process started"
+2025-07-07 02:26:15 AM CDT,INFO,"No existing backup found - creating new backup (2135370 bytes)"
+2025-07-07 02:26:15 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-07 02:26:15 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-07 02:26:15 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-07 with 29 words"
+2025-07-07 02:26:15 AM CDT,INFO,"Successfully loaded existing words.xml with 2616 puzzles"
+2025-07-07 02:26:15 AM CDT,INFO,"Successfully wrote 2135916 bytes to words.xml"
+2025-07-07 02:26:15 AM CDT,INFO,"Current file (2135916 bytes) is larger than backup (2135370 bytes) - updating backup"
+2025-07-07 02:26:15 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-07 02:26:15 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-07 02:26:15] 🕯 Starting waxer process...
+[2025-07-07 02:26:15] 🔄 Filled placeholder puzzle for 2025-07-07.
+[2025-07-07 02:26:15] ⚠️ Puzzle for 2025-07-06 already populated. Skipping.
+[2025-07-07 02:26:15] ⚠️ Puzzle for 2025-07-05 already populated. Skipping.
+[2025-07-07 02:26:15] ⚠️ Puzzle for 2025-07-04 already populated. Skipping.
+[2025-07-07 02:26:15] ⚠️ Puzzle for 2025-07-03 already populated. Skipping.
+[2025-07-07 02:26:16] ✅ Wax complete.
+2025-07-08 07:25:44 UTC,START,"Workflow started"
+2025-07-08 02:25:44 AM CDT,START,"Harvest process started"
+2025-07-08 02:25:44 AM CDT,INFO,"No existing backup found - creating new backup (2135916 bytes)"
+2025-07-08 02:25:44 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-08 02:25:44 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-08 02:25:44 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-08 with 37 words"
+2025-07-08 02:25:45 AM CDT,INFO,"Successfully loaded existing words.xml with 2617 puzzles"
+2025-07-08 02:25:45 AM CDT,INFO,"Successfully wrote 2136657 bytes to words.xml"
+2025-07-08 02:25:45 AM CDT,INFO,"Current file (2136657 bytes) is larger than backup (2135916 bytes) - updating backup"
+2025-07-08 02:25:45 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-08 02:25:45 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-08 02:25:45] 🕯 Starting waxer process...
+[2025-07-08 02:25:45] 🔄 Filled placeholder puzzle for 2025-07-08.
+[2025-07-08 02:25:45] ⚠️ Puzzle for 2025-07-07 already populated. Skipping.
+[2025-07-08 02:25:45] ⚠️ Puzzle for 2025-07-06 already populated. Skipping.
+[2025-07-08 02:25:45] ⚠️ Puzzle for 2025-07-05 already populated. Skipping.
+[2025-07-08 02:25:45] ⚠️ Puzzle for 2025-07-04 already populated. Skipping.
+[2025-07-08 02:25:46] ✅ Wax complete.
+2025-07-09 07:25:57 UTC,START,"Workflow started"
+2025-07-09 02:25:58 AM CDT,START,"Harvest process started"
+2025-07-09 02:25:58 AM CDT,INFO,"No existing backup found - creating new backup (2136656 bytes)"
+2025-07-09 02:25:58 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-09 02:25:58 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-09 02:25:58 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-09 with 61 words"
+2025-07-09 02:25:58 AM CDT,INFO,"Successfully loaded existing words.xml with 2618 puzzles"
+2025-07-09 02:25:58 AM CDT,INFO,"Successfully wrote 2137853 bytes to words.xml"
+2025-07-09 02:25:58 AM CDT,INFO,"Current file (2137853 bytes) is larger than backup (2136656 bytes) - updating backup"
+2025-07-09 02:25:58 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-09 02:25:58 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-09 02:25:58] 🕯 Starting waxer process...
+[2025-07-09 02:25:59] 🔄 Filled placeholder puzzle for 2025-07-09.
+[2025-07-09 02:25:59] ⚠️ Puzzle for 2025-07-08 already populated. Skipping.
+[2025-07-09 02:25:59] ⚠️ Puzzle for 2025-07-07 already populated. Skipping.
+[2025-07-09 02:25:59] ⚠️ Puzzle for 2025-07-06 already populated. Skipping.
+[2025-07-09 02:25:59] ⚠️ Puzzle for 2025-07-05 already populated. Skipping.
+[2025-07-09 02:26:00] ✅ Wax complete.
+2025-07-10 07:26:08 UTC,START,"Workflow started"
+2025-07-10 02:26:08 AM CDT,START,"Harvest process started"
+2025-07-10 02:26:08 AM CDT,INFO,"No existing backup found - creating new backup (2137853 bytes)"
+2025-07-10 02:26:08 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-10 02:26:08 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-10 02:26:09 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-10 with 53 words"
+2025-07-10 02:26:09 AM CDT,INFO,"Successfully loaded existing words.xml with 2619 puzzles"
+2025-07-10 02:26:09 AM CDT,INFO,"Successfully wrote 2138863 bytes to words.xml"
+2025-07-10 02:26:09 AM CDT,INFO,"Current file (2138863 bytes) is larger than backup (2137853 bytes) - updating backup"
+2025-07-10 02:26:09 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-10 02:26:09 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-10 02:26:09] 🕯 Starting waxer process...
+[2025-07-10 02:26:09] 🔄 Filled placeholder puzzle for 2025-07-10.
+[2025-07-10 02:26:09] ⚠️ Puzzle for 2025-07-09 already populated. Skipping.
+[2025-07-10 02:26:09] ⚠️ Puzzle for 2025-07-08 already populated. Skipping.
+[2025-07-10 02:26:09] ⚠️ Puzzle for 2025-07-07 already populated. Skipping.
+[2025-07-10 02:26:09] ⚠️ Puzzle for 2025-07-06 already populated. Skipping.
+[2025-07-10 02:26:10] ✅ Wax complete.
+2025-07-11 07:26:30 UTC,START,"Workflow started"
+2025-07-11 02:26:30 AM CDT,START,"Harvest process started"
+2025-07-11 02:26:30 AM CDT,INFO,"No existing backup found - creating new backup (2138863 bytes)"
+2025-07-11 02:26:30 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-11 02:26:30 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-11 02:26:30 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-11 with 42 words"
+2025-07-11 02:26:30 AM CDT,INFO,"Successfully loaded existing words.xml with 2620 puzzles"
+2025-07-11 02:26:31 AM CDT,INFO,"Successfully wrote 2139641 bytes to words.xml"
+2025-07-11 02:26:31 AM CDT,INFO,"Current file (2139641 bytes) is larger than backup (2138863 bytes) - updating backup"
+2025-07-11 02:26:31 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-11 02:26:31 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-11 02:26:31] 🕯 Starting waxer process...
+[2025-07-11 02:26:31] 🔄 Filled placeholder puzzle for 2025-07-11.
+[2025-07-11 02:26:31] ⚠️ Puzzle for 2025-07-10 already populated. Skipping.
+[2025-07-11 02:26:31] ⚠️ Puzzle for 2025-07-09 already populated. Skipping.
+[2025-07-11 02:26:31] ⚠️ Puzzle for 2025-07-08 already populated. Skipping.
+[2025-07-11 02:26:31] ⚠️ Puzzle for 2025-07-07 already populated. Skipping.
+[2025-07-11 02:26:32] ✅ Wax complete.
+2025-07-12 07:23:50 UTC,START,"Workflow started"
+2025-07-12 02:23:51 AM CDT,START,"Harvest process started"
+2025-07-12 02:23:51 AM CDT,INFO,"No existing backup found - creating new backup (2139641 bytes)"
+2025-07-12 02:23:51 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-12 02:23:51 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-12 02:23:51 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-12 with 53 words"
+2025-07-12 02:23:51 AM CDT,INFO,"Successfully loaded existing words.xml with 2621 puzzles"
+2025-07-12 02:23:51 AM CDT,INFO,"Successfully wrote 2140671 bytes to words.xml"
+2025-07-12 02:23:51 AM CDT,INFO,"Current file (2140671 bytes) is larger than backup (2139641 bytes) - updating backup"
+2025-07-12 02:23:51 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-12 02:23:51 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-12 02:23:51] 🕯 Starting waxer process...
+[2025-07-12 02:23:51] 🔄 Filled placeholder puzzle for 2025-07-12.
+[2025-07-12 02:23:51] ⚠️ Puzzle for 2025-07-11 already populated. Skipping.
+[2025-07-12 02:23:51] ⚠️ Puzzle for 2025-07-10 already populated. Skipping.
+[2025-07-12 02:23:51] ⚠️ Puzzle for 2025-07-09 already populated. Skipping.
+[2025-07-12 02:23:51] ⚠️ Puzzle for 2025-07-08 already populated. Skipping.
+[2025-07-12 02:23:53] ✅ Wax complete.
+2025-07-13 07:25:51 UTC,START,"Workflow started"
+2025-07-13 02:25:51 AM CDT,START,"Harvest process started"
+2025-07-13 02:25:51 AM CDT,INFO,"No existing backup found - creating new backup (2140671 bytes)"
+2025-07-13 02:25:51 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-13 02:25:51 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-13 02:25:51 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-13 with 57 words"
+2025-07-13 02:25:51 AM CDT,INFO,"Successfully loaded existing words.xml with 2622 puzzles"
+2025-07-13 02:25:51 AM CDT,INFO,"Successfully wrote 2141785 bytes to words.xml"
+2025-07-13 02:25:51 AM CDT,INFO,"Current file (2141785 bytes) is larger than backup (2140671 bytes) - updating backup"
+2025-07-13 02:25:51 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-13 02:25:51 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-13 02:25:52] 🕯 Starting waxer process...
+[2025-07-13 02:25:52] 🔄 Filled placeholder puzzle for 2025-07-13.
+[2025-07-13 02:25:52] ⚠️ Puzzle for 2025-07-12 already populated. Skipping.
+[2025-07-13 02:25:52] ⚠️ Puzzle for 2025-07-11 already populated. Skipping.
+[2025-07-13 02:25:52] ⚠️ Puzzle for 2025-07-10 already populated. Skipping.
+[2025-07-13 02:25:52] ⚠️ Puzzle for 2025-07-09 already populated. Skipping.
+[2025-07-13 02:25:53] ✅ Wax complete.
+2025-07-14 07:28:56 UTC,START,"Workflow started"
+2025-07-14 02:28:57 AM CDT,START,"Harvest process started"
+2025-07-14 02:28:57 AM CDT,INFO,"No existing backup found - creating new backup (2141785 bytes)"
+2025-07-14 02:28:57 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-14 02:28:57 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-14 02:28:57 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-14 with 49 words"
+2025-07-14 02:28:57 AM CDT,INFO,"Successfully loaded existing words.xml with 2623 puzzles"
+2025-07-14 02:28:57 AM CDT,INFO,"Successfully wrote 2142708 bytes to words.xml"
+2025-07-14 02:28:57 AM CDT,INFO,"Current file (2142708 bytes) is larger than backup (2141785 bytes) - updating backup"
+2025-07-14 02:28:57 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-14 02:28:57 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-14 02:28:57] 🕯 Starting waxer process...
+[2025-07-14 02:28:58] 🔄 Filled placeholder puzzle for 2025-07-14.
+[2025-07-14 02:28:58] ⚠️ Puzzle for 2025-07-13 already populated. Skipping.
+[2025-07-14 02:28:58] ⚠️ Puzzle for 2025-07-12 already populated. Skipping.
+[2025-07-14 02:28:58] ⚠️ Puzzle for 2025-07-11 already populated. Skipping.
+[2025-07-14 02:28:58] ⚠️ Puzzle for 2025-07-10 already populated. Skipping.
+[2025-07-14 02:28:59] ✅ Wax complete.
+2025-07-15 07:27:40 UTC,START,"Workflow started"
+2025-07-15 02:27:40 AM CDT,START,"Harvest process started"
+2025-07-15 02:27:41 AM CDT,INFO,"No existing backup found - creating new backup (2142708 bytes)"
+2025-07-15 02:27:41 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-15 02:27:41 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-15 02:27:41 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-15 with 39 words"
+2025-07-15 02:27:41 AM CDT,INFO,"Successfully loaded existing words.xml with 2624 puzzles"
+2025-07-15 02:27:41 AM CDT,INFO,"Successfully wrote 2143439 bytes to words.xml"
+2025-07-15 02:27:41 AM CDT,INFO,"Current file (2143439 bytes) is larger than backup (2142708 bytes) - updating backup"
+2025-07-15 02:27:41 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-15 02:27:41 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-15 02:27:41] 🕯 Starting waxer process...
+[2025-07-15 02:27:41] 🔄 Filled placeholder puzzle for 2025-07-15.
+[2025-07-15 02:27:41] ⚠️ Puzzle for 2025-07-14 already populated. Skipping.
+[2025-07-15 02:27:41] ⚠️ Puzzle for 2025-07-13 already populated. Skipping.
+[2025-07-15 02:27:41] ⚠️ Puzzle for 2025-07-12 already populated. Skipping.
+[2025-07-15 02:27:41] ⚠️ Puzzle for 2025-07-11 already populated. Skipping.
+[2025-07-15 02:27:42] ✅ Wax complete.
+2025-07-16 07:26:58 UTC,START,"Workflow started"
+2025-07-16 02:26:59 AM CDT,START,"Harvest process started"
+2025-07-16 02:26:59 AM CDT,INFO,"No existing backup found - creating new backup (2143439 bytes)"
+2025-07-16 02:26:59 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-16 02:26:59 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-16 02:26:59 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-16 with 37 words"
+2025-07-16 02:26:59 AM CDT,INFO,"Successfully loaded existing words.xml with 2625 puzzles"
+2025-07-16 02:26:59 AM CDT,INFO,"Successfully wrote 2144161 bytes to words.xml"
+2025-07-16 02:26:59 AM CDT,INFO,"Current file (2144161 bytes) is larger than backup (2143439 bytes) - updating backup"
+2025-07-16 02:26:59 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-16 02:26:59 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-16 02:26:59] 🕯 Starting waxer process...
+[2025-07-16 02:27:00] 🔄 Filled placeholder puzzle for 2025-07-16.
+[2025-07-16 02:27:00] ⚠️ Puzzle for 2025-07-15 already populated. Skipping.
+[2025-07-16 02:27:00] ⚠️ Puzzle for 2025-07-14 already populated. Skipping.
+[2025-07-16 02:27:00] ⚠️ Puzzle for 2025-07-13 already populated. Skipping.
+[2025-07-16 02:27:00] ⚠️ Puzzle for 2025-07-12 already populated. Skipping.
+[2025-07-16 02:27:01] ✅ Wax complete.
+2025-07-17 07:27:03 UTC,START,"Workflow started"
+2025-07-17 02:27:04 AM CDT,START,"Harvest process started"
+2025-07-17 02:27:04 AM CDT,INFO,"No existing backup found - creating new backup (2144161 bytes)"
+2025-07-17 02:27:04 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-17 02:27:04 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-17 02:27:04 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-17 with 51 words"
+2025-07-17 02:27:04 AM CDT,INFO,"Successfully loaded existing words.xml with 2626 puzzles"
+2025-07-17 02:27:04 AM CDT,INFO,"Successfully wrote 2145167 bytes to words.xml"
+2025-07-17 02:27:04 AM CDT,INFO,"Current file (2145167 bytes) is larger than backup (2144161 bytes) - updating backup"
+2025-07-17 02:27:04 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-17 02:27:04 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-17 02:27:04] 🕯 Starting waxer process...
+[2025-07-17 02:27:05] 🔄 Filled placeholder puzzle for 2025-07-17.
+[2025-07-17 02:27:05] ⚠️ Puzzle for 2025-07-16 already populated. Skipping.
+[2025-07-17 02:27:05] ⚠️ Puzzle for 2025-07-15 already populated. Skipping.
+[2025-07-17 02:27:05] ⚠️ Puzzle for 2025-07-14 already populated. Skipping.
+[2025-07-17 02:27:05] ⚠️ Puzzle for 2025-07-13 already populated. Skipping.
+[2025-07-17 02:27:06] ✅ Wax complete.
+2025-07-18 07:27:37 UTC,START,"Workflow started"
+2025-07-18 02:27:37 AM CDT,START,"Harvest process started"
+2025-07-18 02:27:37 AM CDT,INFO,"No existing backup found - creating new backup (2145167 bytes)"
+2025-07-18 02:27:38 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-18 02:27:38 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-18 02:27:38 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-18 with 37 words"
+2025-07-18 02:27:38 AM CDT,INFO,"Successfully loaded existing words.xml with 2627 puzzles"
+2025-07-18 02:27:38 AM CDT,INFO,"Successfully wrote 2145881 bytes to words.xml"
+2025-07-18 02:27:38 AM CDT,INFO,"Current file (2145881 bytes) is larger than backup (2145167 bytes) - updating backup"
+2025-07-18 02:27:38 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-18 02:27:38 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-18 02:27:38] 🕯 Starting waxer process...
+[2025-07-18 02:27:38] 🔄 Filled placeholder puzzle for 2025-07-18.
+[2025-07-18 02:27:38] ⚠️ Puzzle for 2025-07-17 already populated. Skipping.
+[2025-07-18 02:27:38] ⚠️ Puzzle for 2025-07-16 already populated. Skipping.
+[2025-07-18 02:27:38] ⚠️ Puzzle for 2025-07-15 already populated. Skipping.
+[2025-07-18 02:27:38] ⚠️ Puzzle for 2025-07-14 already populated. Skipping.
+[2025-07-18 02:27:40] ✅ Wax complete.
+2025-07-19 07:24:13 UTC,START,"Workflow started"
+2025-07-19 02:24:14 AM CDT,START,"Harvest process started"
+2025-07-19 02:24:14 AM CDT,INFO,"No existing backup found - creating new backup (2145881 bytes)"
+2025-07-19 02:24:14 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-19 02:24:14 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-19 02:24:14 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-19 with 54 words"
+2025-07-19 02:24:14 AM CDT,INFO,"Successfully loaded existing words.xml with 2628 puzzles"
+2025-07-19 02:24:14 AM CDT,INFO,"Successfully wrote 2146903 bytes to words.xml"
+2025-07-19 02:24:14 AM CDT,INFO,"Current file (2146903 bytes) is larger than backup (2145881 bytes) - updating backup"
+2025-07-19 02:24:14 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-19 02:24:14 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-19 02:24:14] 🕯 Starting waxer process...
+[2025-07-19 02:24:15] 🔄 Filled placeholder puzzle for 2025-07-19.
+[2025-07-19 02:24:15] ⚠️ Puzzle for 2025-07-18 already populated. Skipping.
+[2025-07-19 02:24:15] ⚠️ Puzzle for 2025-07-17 already populated. Skipping.
+[2025-07-19 02:24:15] ⚠️ Puzzle for 2025-07-16 already populated. Skipping.
+[2025-07-19 02:24:15] ⚠️ Puzzle for 2025-07-15 already populated. Skipping.
+[2025-07-19 02:24:16] ✅ Wax complete.
+2025-07-20 07:24:03 UTC,START,"Workflow started"
+2025-07-20 02:24:03 AM CDT,START,"Harvest process started"
+2025-07-20 02:24:03 AM CDT,INFO,"No existing backup found - creating new backup (2146903 bytes)"
+2025-07-20 02:24:03 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-20 02:24:03 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-20 02:24:04 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-20 with 72 words"
+2025-07-20 02:24:04 AM CDT,INFO,"Successfully loaded existing words.xml with 2629 puzzles"
+2025-07-20 02:24:04 AM CDT,INFO,"Successfully wrote 2148319 bytes to words.xml"
+2025-07-20 02:24:04 AM CDT,INFO,"Current file (2148319 bytes) is larger than backup (2146903 bytes) - updating backup"
+2025-07-20 02:24:04 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-20 02:24:04 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-20 02:24:04] 🕯 Starting waxer process...
+[2025-07-20 02:24:04] 🔄 Filled placeholder puzzle for 2025-07-20.
+[2025-07-20 02:24:04] ⚠️ Puzzle for 2025-07-19 already populated. Skipping.
+[2025-07-20 02:24:04] ⚠️ Puzzle for 2025-07-18 already populated. Skipping.
+[2025-07-20 02:24:04] ⚠️ Puzzle for 2025-07-17 already populated. Skipping.
+[2025-07-20 02:24:04] ⚠️ Puzzle for 2025-07-16 already populated. Skipping.
+[2025-07-20 02:24:05] ✅ Wax complete.
+2025-07-21 07:33:28 UTC,START,"Workflow started"
+2025-07-21 02:33:29 AM CDT,START,"Harvest process started"
+2025-07-21 02:33:29 AM CDT,INFO,"No existing backup found - creating new backup (2148319 bytes)"
+2025-07-21 02:33:29 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-21 02:33:29 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-21 02:33:29 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-21 with 50 words"
+2025-07-21 02:33:29 AM CDT,INFO,"Successfully loaded existing words.xml with 2630 puzzles"
+2025-07-21 02:33:29 AM CDT,INFO,"Successfully wrote 2149263 bytes to words.xml"
+2025-07-21 02:33:29 AM CDT,INFO,"Current file (2149263 bytes) is larger than backup (2148319 bytes) - updating backup"
+2025-07-21 02:33:29 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-21 02:33:29 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-21 02:33:29] 🕯 Starting waxer process...
+[2025-07-21 02:33:30] 🔄 Filled placeholder puzzle for 2025-07-21.
+[2025-07-21 02:33:30] ⚠️ Puzzle for 2025-07-20 already populated. Skipping.
+[2025-07-21 02:33:30] ⚠️ Puzzle for 2025-07-19 already populated. Skipping.
+[2025-07-21 02:33:30] ⚠️ Puzzle for 2025-07-18 already populated. Skipping.
+[2025-07-21 02:33:30] ⚠️ Puzzle for 2025-07-17 already populated. Skipping.
+[2025-07-21 02:33:31] ✅ Wax complete.
+2025-07-22 07:28:00 UTC,START,"Workflow started"
+2025-07-22 02:28:01 AM CDT,START,"Harvest process started"
+2025-07-22 02:28:01 AM CDT,INFO,"No existing backup found - creating new backup (2149263 bytes)"
+2025-07-22 02:28:01 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-22 02:28:01 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-22 02:28:01 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-22 with 31 words"
+2025-07-22 02:28:01 AM CDT,INFO,"Successfully loaded existing words.xml with 2631 puzzles"
+2025-07-22 02:28:01 AM CDT,INFO,"Successfully wrote 2149855 bytes to words.xml"
+2025-07-22 02:28:01 AM CDT,INFO,"Current file (2149855 bytes) is larger than backup (2149263 bytes) - updating backup"
+2025-07-22 02:28:01 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-22 02:28:01 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-22 02:28:01] 🕯 Starting waxer process...
+[2025-07-22 02:28:02] 🔄 Filled placeholder puzzle for 2025-07-22.
+[2025-07-22 02:28:02] ⚠️ Puzzle for 2025-07-21 already populated. Skipping.
+[2025-07-22 02:28:02] ⚠️ Puzzle for 2025-07-20 already populated. Skipping.
+[2025-07-22 02:28:02] ⚠️ Puzzle for 2025-07-19 already populated. Skipping.
+[2025-07-22 02:28:02] ⚠️ Puzzle for 2025-07-18 already populated. Skipping.
+[2025-07-22 02:28:03] ✅ Wax complete.
+2025-07-23 07:29:20 UTC,START,"Workflow started"
+2025-07-23 02:29:21 AM CDT,START,"Harvest process started"
+2025-07-23 02:29:21 AM CDT,INFO,"No existing backup found - creating new backup (2149855 bytes)"
+2025-07-23 02:29:21 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-23 02:29:21 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-23 02:29:21 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-23 with 41 words"
+2025-07-23 02:29:21 AM CDT,INFO,"Successfully loaded existing words.xml with 2632 puzzles"
+2025-07-23 02:29:21 AM CDT,INFO,"Successfully wrote 2150663 bytes to words.xml"
+2025-07-23 02:29:21 AM CDT,INFO,"Current file (2150663 bytes) is larger than backup (2149855 bytes) - updating backup"
+2025-07-23 02:29:21 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-23 02:29:21 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-23 02:29:21] 🕯 Starting waxer process...
+[2025-07-23 02:29:21] 🔄 Filled placeholder puzzle for 2025-07-23.
+[2025-07-23 02:29:21] ⚠️ Puzzle for 2025-07-22 already populated. Skipping.
+[2025-07-23 02:29:21] ⚠️ Puzzle for 2025-07-21 already populated. Skipping.
+[2025-07-23 02:29:21] ⚠️ Puzzle for 2025-07-20 already populated. Skipping.
+[2025-07-23 02:29:21] ⚠️ Puzzle for 2025-07-19 already populated. Skipping.
+[2025-07-23 02:29:23] ✅ Wax complete.
+2025-07-24 07:28:27 UTC,START,"Workflow started"
+2025-07-24 02:28:27 AM CDT,START,"Harvest process started"
+2025-07-24 02:28:27 AM CDT,INFO,"No existing backup found - creating new backup (2150663 bytes)"
+2025-07-24 02:28:27 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-24 02:28:28 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-24 02:28:28 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-24 with 48 words"
+2025-07-24 02:28:28 AM CDT,INFO,"Successfully loaded existing words.xml with 2633 puzzles"
+2025-07-24 02:28:28 AM CDT,INFO,"Successfully wrote 2151575 bytes to words.xml"
+2025-07-24 02:28:28 AM CDT,INFO,"Current file (2151575 bytes) is larger than backup (2150663 bytes) - updating backup"
+2025-07-24 02:28:28 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-24 02:28:28 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-24 02:28:28] 🕯 Starting waxer process...
+[2025-07-24 02:28:28] 🔄 Filled placeholder puzzle for 2025-07-24.
+[2025-07-24 02:28:28] ⚠️ Puzzle for 2025-07-23 already populated. Skipping.
+[2025-07-24 02:28:28] ⚠️ Puzzle for 2025-07-22 already populated. Skipping.
+[2025-07-24 02:28:28] ⚠️ Puzzle for 2025-07-21 already populated. Skipping.
+[2025-07-24 02:28:28] ⚠️ Puzzle for 2025-07-20 already populated. Skipping.
+[2025-07-24 02:28:29] ✅ Wax complete.
+2025-07-25 07:28:11 UTC,START,"Workflow started"
+2025-07-25 02:28:11 AM CDT,START,"Harvest process started"
+2025-07-25 02:28:11 AM CDT,INFO,"No existing backup found - creating new backup (2151575 bytes)"
+2025-07-25 02:28:12 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-25 02:28:12 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-25 02:28:12 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-25 with 44 words"
+2025-07-25 02:28:12 AM CDT,INFO,"Successfully loaded existing words.xml with 2634 puzzles"
+2025-07-25 02:28:12 AM CDT,INFO,"Successfully wrote 2152432 bytes to words.xml"
+2025-07-25 02:28:12 AM CDT,INFO,"Current file (2152432 bytes) is larger than backup (2151575 bytes) - updating backup"
+2025-07-25 02:28:12 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-25 02:28:12 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-25 02:28:12] 🕯 Starting waxer process...
+[2025-07-25 02:28:12] 🔄 Filled placeholder puzzle for 2025-07-25.
+[2025-07-25 02:28:12] ⚠️ Puzzle for 2025-07-24 already populated. Skipping.
+[2025-07-25 02:28:12] ⚠️ Puzzle for 2025-07-23 already populated. Skipping.
+[2025-07-25 02:28:12] ⚠️ Puzzle for 2025-07-22 already populated. Skipping.
+[2025-07-25 02:28:12] ⚠️ Puzzle for 2025-07-21 already populated. Skipping.
+[2025-07-25 02:28:13] ✅ Wax complete.
+2025-07-26 07:24:45 UTC,START,"Workflow started"
+2025-07-26 02:24:45 AM CDT,START,"Harvest process started"
+2025-07-26 02:24:46 AM CDT,INFO,"No existing backup found - creating new backup (2152432 bytes)"
+2025-07-26 02:24:46 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-26 02:24:46 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-26 02:24:46 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-26 with 57 words"
+2025-07-26 02:24:46 AM CDT,INFO,"Successfully loaded existing words.xml with 2635 puzzles"
+2025-07-26 02:24:46 AM CDT,INFO,"Successfully wrote 2153518 bytes to words.xml"
+2025-07-26 02:24:46 AM CDT,INFO,"Current file (2153518 bytes) is larger than backup (2152432 bytes) - updating backup"
+2025-07-26 02:24:46 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-26 02:24:46 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-26 02:24:46] 🕯 Starting waxer process...
+[2025-07-26 02:24:47] 🔄 Filled placeholder puzzle for 2025-07-26.
+[2025-07-26 02:24:47] ⚠️ Puzzle for 2025-07-25 already populated. Skipping.
+[2025-07-26 02:24:47] ⚠️ Puzzle for 2025-07-24 already populated. Skipping.
+[2025-07-26 02:24:47] ⚠️ Puzzle for 2025-07-23 already populated. Skipping.
+[2025-07-26 02:24:47] ⚠️ Puzzle for 2025-07-22 already populated. Skipping.
+[2025-07-26 02:24:48] ✅ Wax complete.
+2025-07-27 07:24:33 UTC,START,"Workflow started"
+2025-07-27 02:24:33 AM CDT,START,"Harvest process started"
+2025-07-27 02:24:33 AM CDT,INFO,"No existing backup found - creating new backup (2153518 bytes)"
+2025-07-27 02:24:33 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-27 02:24:34 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-27 02:24:34 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-27 with 38 words"
+2025-07-27 02:24:34 AM CDT,INFO,"Successfully loaded existing words.xml with 2636 puzzles"
+2025-07-27 02:24:34 AM CDT,INFO,"Successfully wrote 2154289 bytes to words.xml"
+2025-07-27 02:24:34 AM CDT,INFO,"Current file (2154289 bytes) is larger than backup (2153518 bytes) - updating backup"
+2025-07-27 02:24:34 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-27 02:24:34 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-27 02:24:34] 🕯 Starting waxer process...
+[2025-07-27 02:24:34] 🔄 Filled placeholder puzzle for 2025-07-27.
+[2025-07-27 02:24:34] ⚠️ Puzzle for 2025-07-26 already populated. Skipping.
+[2025-07-27 02:24:34] ⚠️ Puzzle for 2025-07-25 already populated. Skipping.
+[2025-07-27 02:24:34] ⚠️ Puzzle for 2025-07-24 already populated. Skipping.
+[2025-07-27 02:24:34] ⚠️ Puzzle for 2025-07-23 already populated. Skipping.
+[2025-07-27 02:24:35] ✅ Wax complete.
+2025-07-28 07:31:07 UTC,START,"Workflow started"
+2025-07-28 02:31:08 AM CDT,START,"Harvest process started"
+2025-07-28 02:31:08 AM CDT,INFO,"No existing backup found - creating new backup (2154289 bytes)"
+2025-07-28 02:31:08 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-28 02:31:08 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2025-07-28 02:31:08 AM CDT,INFO,"Successfully fetched puzzle for 2025-07-28 with 35 words"
+2025-07-28 02:31:08 AM CDT,INFO,"Successfully loaded existing words.xml with 2637 puzzles"
+2025-07-28 02:31:08 AM CDT,INFO,"Successfully wrote 2154948 bytes to words.xml"
+2025-07-28 02:31:08 AM CDT,INFO,"Current file (2154948 bytes) is larger than backup (2154289 bytes) - updating backup"
+2025-07-28 02:31:08 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2025-07-28 02:31:08 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2025-07-28 02:31:08] 🕯 Starting waxer process...
+[2025-07-28 02:31:09] 🔄 Filled placeholder puzzle for 2025-07-28.
+[2025-07-28 02:31:09] ⚠️ Puzzle for 2025-07-27 already populated. Skipping.
+[2025-07-28 02:31:09] ⚠️ Puzzle for 2025-07-26 already populated. Skipping.
+[2025-07-28 02:31:09] ⚠️ Puzzle for 2025-07-25 already populated. Skipping.
+[2025-07-28 02:31:09] ⚠️ Puzzle for 2025-07-24 already populated. Skipping.
+[2025-07-28 02:31:10] ✅ Wax complete.
