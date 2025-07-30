@@ -9,12 +9,14 @@ import os
 import json
 # === END: imports ===
 
+
 # === START: configuration ===
 GHOST_ADMIN_API_URL = 'https://beebox.ghost.io/ghost/api/admin'
 GHOST_ADMIN_API_KEY = '68890d47ec9644000185b866:36724bdf69b417f92fec3ef552fdf14f297935007748e877145f05feaa966499'
 XML_FILE = os.path.join(os.path.dirname(__file__), '..', 'xml', 'puzzles.xml')
 local_tz = pytz.timezone('America/Chicago')
 # === END: configuration ===
+
 
 # === START: token creation ===
 def create_token(api_key):
@@ -29,6 +31,7 @@ def create_token(api_key):
     )
 # === END: token creation ===
 
+
 # === START: HTML formatter ===
 def format_html(puzzle):
     letters = puzzle.attrib.get("letters", "")
@@ -42,11 +45,11 @@ def format_html(puzzle):
         return "<p>No words yet for this puzzle.</p>"
 
     words_html = "<ul>" + "".join(
-        f"<li>{w.text} <span style='color: gray;'>({w.attrib['points']} pts)</span></li>" for w in words
+        f"<li>{w.text} <span class='points'>({w.attrib['points']} pts)</span></li>" for w in words
     ) + "</ul>"
 
     return f"""
-    <div style="font-family: sans-serif; padding: 1rem;">
+    <div class='swiss-post'>
         <p><strong>Letters:</strong> {letters}</p>
         <p><strong>Word count:</strong> {count} |
            <strong>Pangrams:</strong> {pangrams} |
@@ -54,16 +57,17 @@ def format_html(puzzle):
            <strong>Queen Bee score:</strong> {queenbee}</p>
         <h3>Today's Words</h3>
         {words_html}
-        <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
-            <a href="#" style="background: black; color: white; text-decoration: none; padding: 0.5rem 1rem; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; border-radius: 4px;">Try Again</a>
-            <a href="#" style="background: black; color: white; text-decoration: none; padding: 0.5rem 1rem; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; border-radius: 4px;">Shuffle</a>
-            <a href="#" style="background: black; color: white; text-decoration: none; padding: 0.5rem 1rem; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; border-radius: 4px;">Hint</a>
-            <a href="#" style="background: black; color: white; text-decoration: none; padding: 0.5rem 1rem; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; border-radius: 4px;">Reveal</a>
-            <a href="https://bee-box.github.io/bee-box/sheet.html" style="background: darkgreen; color: white; text-decoration: none; padding: 0.5rem 1rem; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; border-radius: 4px;">BEE SHEET</a>
+        <div style='margin-top: 20px;'>
+            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Try Again</a>
+            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Shuffle</a>
+            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Hint</a>
+            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Reveal</a>
+            <a href='https://bee-box.github.io/bee-box/sheet.html' style='display:inline-block;padding:10px 20px;margin:5px;background:#FFD700;color:black;text-decoration:none;font-weight:bold;border-radius:4px;'>BEE SHEET</a>
         </div>
     </div>
     """
 # === END: HTML formatter ===
+
 
 # === START: main function ===
 def generate_newsletters():
@@ -134,6 +138,7 @@ def generate_newsletters():
             "posts": [{
                 "title": title,
                 "mobiledoc": mobiledoc,
+                "custom_excerpt": "The Completely Unauthorized Games Toolbox",
                 "status": "scheduled",
                 "feature_image": feature_image_url,
                 "published_at": utc_dt.isoformat()
@@ -144,11 +149,12 @@ def generate_newsletters():
         if response.ok:
             print(f"\u2713 Scheduled: {title} ({utc_dt.strftime('%Y-%m-%d %H:%M')} UTC)")
         else:
-            print(f"\u2717 Failed to schedule '{title}' — {response.status_code}. Ghost API said:\n{response.text}")
+            print(f"\u2717 Failed: {title} — {response.status_code}, {response.text}")
 
     if not found:
         print("No matching puzzles found.")
 # === END: main function ===
+
 
 # === START: script entry point ===
 if __name__ == "__main__":
