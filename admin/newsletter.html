@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscriber's Only - Spelling Bee Tools</title>
-    
+    <title>The Completely Unauthorized Games Toolbox - Newsletter Maker</title>
     <style>
         * {
             margin: 0;
@@ -13,686 +12,526 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: transparent;
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+            font-family: 'Georgia', serif;
+            background: #f5f5f0;
             padding: 20px;
-            gap: 40px;
+            line-height: 1.4;
         }
 
-        .left-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-            max-width: 500px;
-        }
-
-        .right-section {
-            flex: 1;
-            max-width: 700px;
-        }
-
-        .main-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
-            width: 100%;
+        .maker-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
-        .main-title {
-            text-align: center;
-            color: #333;
-            font-size: 18px;
-            font-weight: 700;
+        .maker-header {
+            background: #2c3e50;
+            color: white;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            margin: 0;
-        }
-
-        .card-content {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .date-panel {
-            background: #f7da21;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .date-info {
             text-align: center;
-            color: #333;
         }
 
-        .weekday {
+        .date-selector {
+            padding: 20px;
+            background: #ecf0f1;
+            text-align: center;
+        }
+
+        .date-selector input {
+            padding: 10px;
             font-size: 16px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            margin-right: 10px;
         }
 
-        .month-name {
-            font-size: 20px;
-            font-weight: 700;
+        .generate-btn {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .generate-btn:hover {
+            background: #d35400;
+        }
+
+        .newsletter-preview {
+            margin: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        /* Newsletter Styles */
+        .newsletter {
+            background: #fff;
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: Georgia, serif;
+        }
+
+        .newsletter-header-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .toolbox {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .toolbox-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .toolbox-btn {
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .day-num {
-            font-size: 52px;
-            font-weight: 900;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .year-num {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .content-panel {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .action-btn {
-            border: 3px solid #333;
-            border-radius: 12px;
-            padding: 18px 28px;
-            font-family: inherit;
-            font-size: 17px;
-            font-weight: 700;
-            text-decoration: none;
+            transition: all 0.3s;
+            border: 2px solid #000;
             display: block;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            min-height: 56px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            margin: 5px 0;
         }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        .bee-sheet {
+            background: #FFD700;
+            color: black;
         }
 
-        .action-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .sheet-btn {
-            background: #FFDC00;
-            color: #333;
-        }
-
-        .sheet-btn:hover {
-            background: #e6c600;
-        }
-
-        .sheet-btn:active {
-            background: #d4b800;
-        }
-
-        .jumble-btn {
+        .bee-jumble {
             background: #8A2BE2;
             color: white;
         }
 
-        .jumble-btn:hover {
-            background: #7b27cc;
-        }
-
-        .jumble-btn:active {
-            background: #6b22b3;
-        }
-
-        .peek-btn {
-            background: #00B050;
+        .bee-peek {
+            background: #228B22;
             color: white;
         }
 
-        .peek-btn:hover {
-            background: #009e48;
-        }
-
-        .peek-btn:active {
-            background: #008a3e;
-        }
-
-        .grid-btn {
-            background: #0023FF;
+        .bee-grid {
+            background: #0066FF;
             color: white;
         }
 
-        .grid-btn:hover {
-            background: #001fe6;
+        .toolbox-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .grid-btn:active {
-            background: #001acc;
-        }
-
-        .picker-container {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            width: 100%;
+        .spelling-bee-section {
+            background: #fff;
+            padding: 25px;
             text-align: center;
         }
 
-        .picker-title {
-            color: #333;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
+        .spelling-bee-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
         }
 
-        .picker-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .date-input {
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            font-size: 16px;
-            min-width: 200px;
-            background: white;
-            cursor: pointer;
-            min-height: 48px;
-            touch-action: manipulation;
-        }
-
-        .date-input:focus {
-            outline: none;
-            border-color: #FFDC00;
-            box-shadow: 0 0 0 3px rgba(255, 220, 0, 0.2);
-        }
-
-        .copy-btn {
-            background: #4a5568;
+        .play-now-btn {
+            background: #f39c12;
             color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            cursor: pointer;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 25px;
             font-size: 16px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            width: 100%;
-            min-height: 48px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            margin-top: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-top: 15px;
+            transition: background 0.3s;
         }
 
-        .copy-btn:hover {
-            background: #2d3748;
+        .play-now-btn:hover {
+            background: #e67e22;
         }
 
-        .copy-btn:active {
-            background: #1a202c;
-            transform: scale(0.98);
-        }
-
-        .copy-btn.success {
-            background: #00B050;
-        }
-
-        .code-container {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            width: 100%;
+        .code-section {
+            margin: 20px;
+            background: #2c3e50;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .code-header {
-            color: #333;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
+            background: #34495e;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        .copy-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #2ecc71;
+        }
+
+        .copy-btn.copied {
+            background: #e74c3c;
+        }
+
+        .code-content {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
             font-size: 12px;
             line-height: 1.4;
-            margin-bottom: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-            word-break: break-all;
             white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
-        /* Hive section styles */
-        .hive-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        .hive-title {
-            text-align: center;
-            color: #333;
-            font-size: 18px;
-            font-weight: 700;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            margin: 0;
-        }
-
-        .hive-display {
-            padding: 40px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.3);
-            min-height: 280px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hive-display svg {
-            max-width: 100%;
-            height: auto;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-        }
-
-        .hive-loading {
-            color: #7f8c8d;
-            font-style: italic;
-            font-size: 16px;
-        }
-
-        .hive-error {
-            color: #e74c3c;
-            font-size: 16px;
-        }
-
-        @media (max-width: 1200px) {
-            body {
+        @media (max-width: 600px) {
+            .toolbox-buttons {
                 flex-direction: column;
-                align-items: center;
-                gap: 30px;
+                gap: 8px;
             }
             
-            .left-section {
-                width: 100%;
-                max-width: 500px;
-            }
-            
-            .right-section {
-                width: 100%;
-                max-width: 600px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-                gap: 20px;
-            }
-            
-            .date-panel {
-                padding: 30px;
-            }
-
-            .content-panel {
-                padding: 30px;
-            }
-            
-            .main-title {
-                font-size: 16px;
-                padding: 15px;
-            }
-            
-            .action-btn {
-                padding: 20px 24px;
-                font-size: 16px;
-                min-height: 60px;
-                border-radius: 16px;
-            }
-
-            .picker-container,
-            .code-container {
-                padding: 20px;
-            }
-
-            .code-block {
-                font-size: 12px;
-                padding: 15px;
-            }
-
-            .date-input {
-                min-width: 100%;
-                width: 100%;
-                font-size: 16px;
-            }
-
-            .copy-btn {
-                font-size: 16px;
-                padding: 16px 24px;
-                min-height: 56px;
-            }
-
-            .hive-display {
-                padding: 30px;
-                min-height: 240px;
-            }
-
-            .hive-title {
-                font-size: 16px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-
-            .main-card {
-                border-radius: 16px;
-            }
-
-            .date-panel {
-                padding: 20px;
-            }
-
-            .content-panel {
-                padding: 20px;
-            }
-
-            .action-btn {
-                padding: 18px 20px;
-                font-size: 15px;
-                min-height: 56px;
-                gap: 16px;
-            }
-
-            .btn-group {
-                gap: 16px;
-            }
-
-            .picker-container,
-            .code-container {
-                padding: 16px;
-                border-radius: 12px;
-            }
-
-            .day-num {
-                font-size: 44px;
-            }
-
-            .month-name {
-                font-size: 18px;
-            }
-
-            .weekday {
-                font-size: 14px;
-            }
-
-            .year-num {
-                font-size: 18px;
-            }
-
-            .hive-display {
-                padding: 20px;
-                min-height: 200px;
-            }
-
-            .hive-container {
-                border-radius: 16px;
-            }
-        }
-
-        @media (hover: none) and (pointer: coarse) {
-            .action-btn:hover {
-                transform: none;
-                box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
-            }
-            
-            .copy-btn:hover {
-                background: #4a5568;
+            .toolbox-btn {
+                display: block;
+                margin: 0 auto;
+                max-width: 200px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="left-section">
-        <!-- HIVE CONTAINER -->
-        <div class="hive-container">
-            <div class="hive-title">Today's Hive</div>
-            <div id="hiveDisplay" class="hive-display">
-                <div class="hive-loading">Select a date to load the hive...</div>
+    <div class="maker-container">
+        <div class="maker-header">
+            <h1>The Completely Unauthorized Games Toolbox</h1>
+            <h2>Newsletter Template Maker</h2>
+            <p>Select a date to generate your newsletter</p>
+        </div>
+
+        <div class="date-selector">
+            <input type="date" id="dateInput" />
+            <button class="generate-btn" onclick="generateNewsletter()">Generate Newsletter</button>
+        </div>
+
+        <div class="newsletter-preview" id="newsletterPreview">
+            <div class="newsletter" id="newsletterContent">
+                <!-- Newsletter content will be generated here -->
             </div>
         </div>
 
-        <!-- PREVIEW CONTAINER: This will be populated by the generated HTML -->
-        <div id="previewContainer">
-            <!-- The generated HTML will be inserted here -->
-        </div>
-    </div>
-
-    <div class="right-section">
-        <div class="picker-container">
-            <h3 class="picker-title">Date Selector</h3>
-            <label for="datePicker" class="picker-label">Select Date:</label>
-            <input type="date" id="datePicker" class="date-input">
-            <button class="copy-btn" id="copyBtn">
-                Copy to Clipboard
-            </button>
-        </div>
-        
-        <div class="code-container">
-            <h2 class="code-header">Ghost.org HTML Code</h2>
-            
-            <div class="code-block" id="codeOutput">
-                Loading code snippet...
+        <div class="code-section" id="codeSection" style="display: none;">
+            <div class="code-header">
+                <span>HTML Code</span>
+                <button class="copy-btn" onclick="copyToClipboard()">Copy Options ▼</button>
             </div>
+            <div class="code-content" id="codeContent"></div>
         </div>
     </div>
 
     <script>
-        let puzzleDatabase = {};
-        
-        async function loadPuzzleDatabase() {
-            try {
-                console.log('Loading puzzle database...');
-                const response = await fetch('../../xml/puzzles.xml');
-                const xmlText = await response.text();
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-                
-                const puzzleElements = xmlDoc.getElementsByTagName('puzzle');
-                for (let puzzle of puzzleElements) {
-                    const date = puzzle.getAttribute('date');
-                    const id = puzzle.getAttribute('id');
-                    if (date && id) {
-                        puzzleDatabase[date] = id;
-                    }
-                }
-                
-                console.log(`Loaded ${Object.keys(puzzleDatabase).length} puzzles`);
-                initializeDatePicker();
-            } catch (error) {
-                console.error('Error loading puzzle database:', error);
-                initializeDatePicker();
-            }
-        }
-        
-        function initializeDatePicker() {
-            const picker = document.getElementById('datePicker');
-            const availableDates = Object.keys(puzzleDatabase).sort();
-            
-            if (availableDates.length > 0) {
-                picker.min = availableDates[0];
-                picker.max = availableDates[availableDates.length - 1];
-            }
-            
-            const now = new Date();
-            const centralTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
-            const tomorrow = new Date(centralTime);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            const tomorrowString = tomorrow.getFullYear() + '-' + 
-                String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
-                String(tomorrow.getDate()).padStart(2, '0');
-            
-            picker.value = tomorrowString;
-            
-            const puzzleId = puzzleDatabase[tomorrowString] || 'idgoeshere';
-            updatePreviewAndCode(tomorrowString, puzzleId);
-            loadHiveForDate(tomorrowString);
-        }
+        // Set today's date as default
+        document.getElementById('dateInput').valueAsDate = new Date();
 
-        // Function to load hive SVG for selected date
-        function loadHiveForDate(selectedDate) {
-            const hiveDisplay = document.getElementById('hiveDisplay');
-            
-            if (!selectedDate) {
-                hiveDisplay.innerHTML = '<div class="hive-loading">Select a date to load the hive...</div>';
+        function generateNewsletter() {
+            const dateInput = document.getElementById('dateInput').value;
+            if (!dateInput) {
+                alert('Please select a date');
                 return;
             }
+
+            const date = new Date(dateInput);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const year = date.getFullYear();
+
+            // Format date for display
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const displayDate = date.toLocaleDateString('en-US', options);
+
+            // Generate image URL
+            const imageUrl = `https://bee-box.github.io/bee-box/images/${month}-${day}.png`;
+            console.log('Generated image URL:', imageUrl);
             
-            hiveDisplay.innerHTML = '<div class="hive-loading">Loading hive...</div>';
+            // Generate slug for Ghost
+            const slug = `newsletter-${year}-${month}-${day}`;
+
+            // Generate newsletter HTML
+            const newsletterHTML = generateNewsletterHTML(imageUrl, displayDate);
             
-            // Try multiple possible paths for the SVG
-            const possiblePaths = [
-                `images/${selectedDate}.svg`,     // Same level as this file
-                `../images/${selectedDate}.svg`,  // One level up
-                `../../images/${selectedDate}.svg`, // Two levels up
-                `/images/${selectedDate}.svg`,    // Root level
-                `https://bee-box.github.io/bee-box/images/${selectedDate}.svg` // Full URL
-            ];
+            // Display preview
+            document.getElementById('newsletterContent').innerHTML = newsletterHTML;
+            document.getElementById('newsletterPreview').style.display = 'block';
             
-            async function tryLoadSVG() {
-                for (const svgPath of possiblePaths) {
-                    try {
-                        console.log(`Trying to load SVG from: ${svgPath}`);
-                        const response = await fetch(svgPath);
-                        if (response.ok) {
-                            const svgContent = await response.text();
-                            hiveDisplay.innerHTML = svgContent;
-                            console.log(`Successfully loaded SVG from: ${svgPath}`);
-                            return;
-                        }
-                    } catch (error) {
-                        console.log(`Failed to load from ${svgPath}:`, error);
-                        continue;
-                    }
-                }
-                
-                // If all paths fail
-                console.error('Failed to load hive from any path');
-                hiveDisplay.innerHTML = `<div class="hive-error">Hive not available for ${selectedDate}<br><small>Check console for path details</small></div>`;
-            }
-            
-            tryLoadSVG();
+            // Generate and display code
+            // Generate Ghost.org API friendly JSON
+            const ghostPost = {
+                title: `Games Toolbox - ${displayDate}`,
+                slug: slug,
+                html: newsletterHTML,
+                feature_image: imageUrl,
+                excerpt: `Daily puzzle tools and today's Spelling Bee for ${displayDate}`,
+                tags: ['newsletter', 'games', 'spelling-bee', 'puzzles'],
+                authors: ['games-toolbox'],
+                status: 'draft',
+                visibility: 'members',
+                email_only: true,
+                newsletter: true,
+                meta_title: `The Completely Unauthorized Games Toolbox - ${displayDate}`,
+                meta_description: `Exclusive subscriber tools and today's Spelling Bee puzzle for ${displayDate}`,
+                og_title: `Games Toolbox Newsletter - ${displayDate}`,
+                og_description: `Your daily dose of puzzle tools and Spelling Bee fun!`,
+                twitter_title: `🐝 Games Toolbox - ${displayDate}`,
+                twitter_description: `Daily puzzle tools + NY Times Spelling Bee`,
+                custom_excerpt: `Exclusive tools for subscribers: Bee Sheet, Bee Jumble, Bee Peek, Bee Grid plus today's Spelling Bee puzzle!`,
+                created_at: new Date().toISOString(),
+                published_at: null
+            };
+
+            // Generate complete HTML
+            const completeHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Completely Unauthorized Games Toolbox - ${displayDate}</title>
+</head>
+<body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; line-height: 1.6;">
+    ${newsletterHTML}
+</body>
+</html>`;
+
+            // Update displays
+            document.getElementById('codeContent').innerHTML = `
+<div style="margin-bottom: 20px; padding: 15px; background: #e8f5e8; border-left: 4px solid #4caf50; border-radius: 4px;">
+    <strong>📚 Ghost.org API JSON Format:</strong>
+    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 11px; overflow-x: auto;">${JSON.stringify(ghostPost, null, 2)}</pre>
+</div>
+
+<div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+    <strong>🌐 Standalone HTML:</strong>
+    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 11px; overflow-x: auto;">${completeHTML.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+</div>
+
+<div style="padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px;">
+    <strong>💡 Usage Instructions:</strong>
+    <ul style="margin: 10px 0; padding-left: 20px; font-size: 12px;">
+        <li><strong>Ghost API:</strong> Use the JSON format above with Ghost's Posts API</li>
+        <li><strong>Manual Import:</strong> Copy the HTML section into Ghost's HTML editor</li>
+        <li><strong>Newsletter:</strong> Set to members-only with email_only: true</li>
+        <li><strong>Tags:</strong> Automatically tagged for organization</li>
+    </ul>
+</div>
+            `;
+            document.getElementById('codeSection').style.display = 'block';
         }
 
-        function updatePreviewAndCode(dateString, puzzleId = 'idgoeshere') {
-            let weekday = 'MONDAY', month = 'JUNE', day = '17', year = '2025';
+        function generateNewsletterHTML(imageUrl, displayDate) {
+            return `
+        <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
             
-            if (dateString) {
-                const dateObj = new Date(dateString + 'T00:00:00');
-                weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-                month = dateObj.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
-                day = dateObj.getDate();
-                year = dateObj.getFullYear();
-            }
-            
-            // Generate the HTML code
-            const htmlCode = '<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 25px 45px rgba(0,0,0,0.1);width:100%;margin:20px auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;overflow:hidden"><div style="text-align:center;color:#333;font-size:18px;font-weight:700;padding:20px;background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.1)">Subscriber\'s Only</div><div style="padding:40px"><a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid=' + puzzleId + '" style="background:#FFDC00;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:#333;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#e6c600\'" ontouchend="this.style.background=\'#FFDC00\'" onmousedown="this.style.background=\'#d4b800\'" onmouseup="this.style.background=\'#FFDC00\'">Today\'s Bee Sheet</a><a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid=' + puzzleId + '" style="background:#8A2BE2;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#7b27cc\'" ontouchend="this.style.background=\'#8A2BE2\'" onmousedown="this.style.background=\'#6b22b3\'" onmouseup="this.style.background=\'#8A2BE2\'">Today\'s Bee Jumble</a><a href="https://bee-box.github.io/bee-box/peek.html?puzzleid=' + puzzleId + '" style="background:#00B050;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;margin-bottom:18px" ontouchstart="this.style.background=\'#009e48\'" ontouchend="this.style.background=\'#00B050\'" onmousedown="this.style.background=\'#008a3e\'" onmouseup="this.style.background=\'#00B050\'">Today\'s Bee Peek</a><a href="https://bee-box.github.io/bee-box/grid.html?puzzleid=' + puzzleId + '" style="background:#0023FF;border:3px solid #333;border-radius:12px;padding:18px 28px;font-family:inherit;font-size:17px;font-weight:700;color:white;text-decoration:none;display:block;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;transition:all 0.2s ease;text-transform:uppercase;letter-spacing:0.5px;min-height:56px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none" ontouchstart="this.style.background=\'#001fe6\'" ontouchend="this.style.background=\'#0023FF\'" onmousedown="this.style.background=\'#001acc\'" onmouseup="this.style.background=\'#0023FF\'">Today\'s Bee Grid</a></div></div>';
-            
-            // Update the code output
-            document.getElementById('codeOutput').textContent = htmlCode;
-            
-            // Update the preview by inserting the HTML directly
-            document.getElementById('previewContainer').innerHTML = htmlCode;
+            <!-- Header Image or Fallback -->
+            <div style="position: relative; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px; display: flex; align-items: center; justify-content: center; text-align: center;">
+                <img src="${imageUrl}" alt="The Completely Unauthorized Games Toolbox - ${displayDate}" 
+                     style="width: 100%; height: 200px; object-fit: cover; position: absolute; top: 0; left: 0;" 
+                     onload="this.nextElementSibling.style.display='none';" 
+                     onerror="this.style.display='none';" />
+                <div style="color: white; z-index: 2; padding: 20px;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">🐝</div>
+                    <h1 style="font-size: 24px; font-weight: 700; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">The Completely Unauthorized<br>Games Toolbox</h1>
+                    <p style="font-size: 14px; margin: 0; opacity: 0.9;">${displayDate}</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div style="padding: 32px 24px;">
+                
+                <!-- Bee Games Section -->
+                <div style="margin-bottom: 32px;">
+                    <h2 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 16px 0; text-align: center;">🔐 Today's Tools for Subscribers Only</h2>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="#" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; text-decoration: none; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; transition: all 0.3s; box-shadow: 0 2px 8px rgba(255,215,0,0.3); border: none; display: block;">
+                            🐝 Bee Sheet
+                        </a>
+                        <a href="#" style="background: linear-gradient(135deg, #8A2BE2, #9370DB); color: white; text-decoration: none; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; transition: all 0.3s; box-shadow: 0 2px 8px rgba(138,43,226,0.3); border: none; display: block;">
+                            🧩 Bee Jumble
+                        </a>
+                        <a href="#" style="background: linear-gradient(135deg, #228B22, #32CD32); color: white; text-decoration: none; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; transition: all 0.3s; box-shadow: 0 2px 8px rgba(34,139,34,0.3); border: none; display: block;">
+                            👀 Bee Peek
+                        </a>
+                        <a href="#" style="background: linear-gradient(135deg, #0066FF, #4169E1); color: white; text-decoration: none; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,102,255,0.3); border: none; display: block;">
+                            📊 Bee Grid
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Spelling Bee Section -->
+                <div style="background: linear-gradient(135deg, #f8f9ff, #fff8e7); border-radius: 16px; padding: 24px; text-align: center; border: 2px solid #f0f0f0;">
+                    <div style="font-size: 24px; margin-bottom: 12px;">🏆</div>
+                    <h3 style="font-size: 22px; font-weight: 700; color: #2c3e50; margin: 0 0 8px 0;">Today's New York Times</h3>
+                    <h3 style="font-size: 22px; font-weight: 700; color: #f39c12; margin: 0 0 16px 0;">Spelling Bee</h3>
+                    <p style="color: #666; font-size: 16px; margin: 0 0 20px 0; line-height: 1.5;">Ready to test your word skills? Dive into today's puzzle and see how many words you can find!</p>
+                    <a href="https://www.nytimes.com/puzzles/spelling-bee" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; text-decoration: none; padding: 16px 32px; border-radius: 50px; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-block; transition: all 0.3s; box-shadow: 0 4px 15px rgba(243,156,18,0.4); border: none;">
+                        🎯 Play Now
+                    </a>
+                </div>
+
+                <!-- Footer -->
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; text-align: center;">
+                    <p style="color: #888; font-size: 14px; margin: 0; line-height: 1.5;">
+                        Happy puzzling! 🧠✨<br>
+                        <em>The Completely Unauthorized Games Toolbox</em>
+                    </p>
+                </div>
+            </div>
+        </div>`;
         }
-        
-        function copyToClipboard() {
-            const codeContent = document.getElementById('codeOutput');
-            const copyButton = document.getElementById('copyBtn');
+
+        async function copyToClipboard() {
+            const copyBtn = document.querySelector('.copy-btn');
+            const activeSection = document.querySelector('#codeContent .active-section');
             
-            navigator.clipboard.writeText(codeContent.textContent).then(() => {
-                showCopySuccess(copyButton);
-            }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = codeContent.textContent;
-                document.body.appendChild(textarea);
-                textarea.select();
+            // Create a selection menu if not exists
+            if (!document.querySelector('.copy-options')) {
+                const options = document.createElement('div');
+                options.className = 'copy-options';
+                options.style.cssText = 'position: absolute; right: 0; top: 40px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; min-width: 150px;';
+                options.innerHTML = `
+                    <div onclick="copyGhostJSON()" style="padding: 8px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #eee;">📚 Ghost API JSON</div>
+                    <div onclick="copyHTML()" style="padding: 8px 12px; cursor: pointer; font-size: 12px;">🌐 Standalone HTML</div>
+                `;
+                copyBtn.parentElement.style.position = 'relative';
+                copyBtn.parentElement.appendChild(options);
+                
+                setTimeout(() => options.remove(), 3000);
+                return;
+            }
+        }
+
+        async function copyGhostJSON() {
+            const dateInput = document.getElementById('dateInput').value;
+            const date = new Date(dateInput);
+            const displayDate = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const slug = `newsletter-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const imageUrl = `https://bee-box.github.io/bee-box/images/${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}.png`;
+            const newsletterHTML = generateNewsletterHTML(imageUrl, displayDate);
+            
+            const ghostPost = {
+                title: `Games Toolbox - ${displayDate}`,
+                slug: slug,
+                html: newsletterHTML,
+                feature_image: imageUrl,
+                excerpt: `Daily puzzle tools and today's Spelling Bee for ${displayDate}`,
+                tags: ['newsletter', 'games', 'spelling-bee', 'puzzles'],
+                authors: ['games-toolbox'],
+                status: 'draft',
+                visibility: 'members',
+                email_only: true,
+                newsletter: true,
+                meta_title: `The Completely Unauthorized Games Toolbox - ${displayDate}`,
+                meta_description: `Exclusive subscriber tools and today's Spelling Bee puzzle for ${displayDate}`,
+                og_title: `Games Toolbox Newsletter - ${displayDate}`,
+                og_description: `Your daily dose of puzzle tools and Spelling Bee fun!`,
+                twitter_title: `🐝 Games Toolbox - ${displayDate}`,
+                twitter_description: `Daily puzzle tools + NY Times Spelling Bee`,
+                custom_excerpt: `Exclusive tools for subscribers: Bee Sheet, Bee Jumble, Bee Peek, Bee Grid plus today's Spelling Bee puzzle!`,
+                created_at: new Date().toISOString(),
+                published_at: null
+            };
+            
+            await copyToClipboardHelper(JSON.stringify(ghostPost, null, 2), '📚 Ghost JSON Copied!');
+        }
+
+        async function copyHTML() {
+            const dateInput = document.getElementById('dateInput').value;
+            const date = new Date(dateInput);
+            const displayDate = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const imageUrl = `https://bee-box.github.io/bee-box/images/${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}.png`;
+            const newsletterHTML = generateNewsletterHTML(imageUrl, displayDate);
+            
+            const completeHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Completely Unauthorized Games Toolbox - ${displayDate}</title>
+</head>
+<body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; line-height: 1.6;">
+    ${newsletterHTML}
+</body>
+</html>`;
+            
+            await copyToClipboardHelper(completeHTML, '🌐 HTML Copied!');
+        }
+
+        async function copyToClipboardHelper(content, message) {
+            const copyBtn = document.querySelector('.copy-btn');
+            
+            try {
+                await navigator.clipboard.writeText(content);
+                copyBtn.textContent = message;
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Options ▼';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                document.body.appendChild(textArea);
+                textArea.select();
                 document.execCommand('copy');
-                document.body.removeChild(textarea);
+                document.body.removeChild(textArea);
                 
-                showCopySuccess(copyButton);
-            });
+                copyBtn.textContent = message;
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Options ▼';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }
         }
-        
-        function showCopySuccess(button) {
-            button.textContent = 'Copied!';
-            button.classList.add('success');
-            setTimeout(() => {
-                button.textContent = 'Copy to Clipboard';
-                button.classList.remove('success');
-            }, 2000);
-        }
-        
-        // Event listeners
-        document.getElementById('datePicker').addEventListener('change', function() {
-            const selectedDate = this.value;
-            const selectedId = puzzleDatabase[selectedDate] || 'idgoeshere';
-            updatePreviewAndCode(selectedDate, selectedId);
-            loadHiveForDate(selectedDate); // Load hive when date changes
-        });
 
-        document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
-        
-        // Initialize the application
-        loadPuzzleDatabase();
+        // Generate newsletter for today by default
+        generateNewsletter();
     </script>
 </body>
 </html>
