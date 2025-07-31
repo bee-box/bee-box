@@ -1,4 +1,3 @@
-# === START: imports ===
 import xml.etree.ElementTree as ET
 import requests
 import jwt
@@ -7,8 +6,6 @@ from datetime import datetime
 import pytz
 import os
 import json
-# === END: imports ===
-
 
 # === START: configuration ===
 GHOST_ADMIN_API_URL = 'https://beebox.ghost.io/ghost/api/admin'
@@ -16,7 +13,6 @@ GHOST_ADMIN_API_KEY = '68890d47ec9644000185b866:36724bdf69b417f92fec3ef552fdf14f
 XML_FILE = os.path.join(os.path.dirname(__file__), '..', 'xml', 'puzzles.xml')
 local_tz = pytz.timezone('America/Chicago')
 # === END: configuration ===
-
 
 # === START: token creation ===
 def create_token(api_key):
@@ -31,43 +27,47 @@ def create_token(api_key):
     )
 # === END: token creation ===
 
-
 # === START: HTML formatter ===
 def format_html(puzzle):
-    letters = puzzle.attrib.get("letters", "")
-    count = puzzle.attrib.get("count", "0")
-    pangrams = puzzle.attrib.get("pangrams", "0")
-    perfect = puzzle.attrib.get("perfectpangrams", "0")
-    queenbee = puzzle.attrib.get("queenbee", "—")
-
-    words = puzzle.findall("word")
-    if not words:
-        return "<p>No words yet for this puzzle.</p>"
-
-    words_html = "<ul>" + "".join(
-        f"<li>{w.text} <span class='points'>({w.attrib['points']} pts)</span></li>" for w in words
-    ) + "</ul>"
+    puzzle_id = puzzle.attrib.get("id", "unknown")
 
     return f"""
-    <div class='swiss-post'>
-        <p><strong>Letters:</strong> {letters}</p>
-        <p><strong>Word count:</strong> {count} |
-           <strong>Pangrams:</strong> {pangrams} |
-           <strong>Perfect pangrams:</strong> {perfect} |
-           <strong>Queen Bee score:</strong> {queenbee}</p>
-        <h3>Today's Words</h3>
-        {words_html}
-        <div style='margin-top: 20px;'>
-            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Try Again</a>
-            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Shuffle</a>
-            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Hint</a>
-            <a href='#' style='display:inline-block;padding:10px 20px;margin:5px;background:black;color:white;text-decoration:none;font-weight:bold;border-radius:4px;'>Reveal</a>
-            <a href='https://bee-box.github.io/bee-box/sheet.html' style='display:inline-block;padding:10px 20px;margin:5px;background:#FFD700;color:black;text-decoration:none;font-weight:bold;border-radius:4px;'>BEE SHEET</a>
+<div style="background: white; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; border-radius: 8px; overflow: hidden;">
+    <div style="padding: 30px 20px; background: white;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Subscriber's Only</h1>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+            <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid={puzzle_id}" style="background: #FFDC00; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #333; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
+                Bee Sheet
+            </a>
+            <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid={puzzle_id}" style="background: #8A2BE2; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
+                Bee Jumble
+            </a>
+            <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid={puzzle_id}" style="background: #00B050; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
+                Bee Peek
+            </a>
+            <a href="https://bee-box.github.io/bee-box/grid.html?puzzleid={puzzle_id}" style="background: #0023FF; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
+                Bee Grid
+            </a>
+        </div>
+        
+        <div style="background: #FFDC00; border: 3px solid #333; border-radius: 12px; padding: 25px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <h2 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Today's New York Times Spelling Bee</h2>
+            <p style="margin: 5px 0 20px 0; font-size: 16px; font-weight: 600; color: #333; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Skip all this other stuff...</p>
+            <a href="https://www.nytimes.com/puzzles/spelling-bee/hub" style="background: #333; color: #FFDC00; border: none; border-radius: 8px; padding: 15px 30px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">
+                Play Now
+            </a>
+        </div>
+        
+        <div style="text-align: center; padding: 20px 0 0 0;">
+            <a href="https://thecompletelyunauthorizedgamestoolbox.com/" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #333; text-decoration: underline;">
+                The Completely Unauthorized Games Toolbox
+            </a>
         </div>
     </div>
-    """
+</div>    """
 # === END: HTML formatter ===
-
 
 # === START: main function ===
 def generate_newsletters():
@@ -94,6 +94,7 @@ def generate_newsletters():
 
     tree = ET.parse(XML_FILE)
     root = tree.getroot()
+    print(f"Found {len(root.findall('puzzle'))} puzzles in XML")
     token = create_token(GHOST_ADMIN_API_KEY)
     headers = {
         'Authorization': f'Ghost {token}',
@@ -104,27 +105,33 @@ def generate_newsletters():
     for puzzle in root.findall("puzzle"):
         date_str = puzzle.attrib.get("date")
         if not date_str:
+            print(f"Skipping puzzle with no date attribute")
             continue
 
         try:
             puzzle_date = datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
+            print(f"Skipping puzzle with invalid date: {date_str}")
             continue
 
         if not date_filter(puzzle_date):
+            print(f"Skipping puzzle for {date_str}, does not match filter")
             continue
 
         found = True
+        puzzle_id = puzzle.attrib.get("id", "unknown")
+        print(f"Processing puzzle for {date_str}, ID: {puzzle_id}, Words: {len(puzzle.findall('word'))}")
         day_suffix = lambda d: f"{d}{'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')}"
         day_ordinal = day_suffix(puzzle_date.day)
         pretty_date = puzzle_date.strftime("%A, %B") + f" {day_ordinal}"
-        title = f"\U0001F41D {pretty_date}"
+        title = f"{pretty_date} \U0001F41D Games Toolbox"
         local_dt = local_tz.localize(puzzle_date.replace(hour=3))
         utc_dt = local_dt.astimezone(pytz.utc)
         mm_dd = puzzle_date.strftime("%m-%d")
         feature_image_url = f"https://bee-box.github.io/bee-box/images/{mm_dd}.png"
 
         formatted_html = format_html(puzzle)
+        print(f"Generated HTML: {formatted_html}")  # Debug: Log the exact HTML
 
         mobiledoc = json.dumps({
             "version": "0.3.1",
@@ -140,6 +147,7 @@ def generate_newsletters():
                 "mobiledoc": mobiledoc,
                 "custom_excerpt": "The Completely Unauthorized Games Toolbox",
                 "status": "scheduled",
+                "visibility": "members",
                 "feature_image": feature_image_url,
                 "published_at": utc_dt.isoformat()
             }]
@@ -154,7 +162,6 @@ def generate_newsletters():
     if not found:
         print("No matching puzzles found.")
 # === END: main function ===
-
 
 # === START: script entry point ===
 if __name__ == "__main__":
