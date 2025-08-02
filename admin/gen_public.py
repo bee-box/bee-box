@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import requests
 import jwt
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import os
 import json
@@ -34,14 +34,15 @@ def format_html(puzzle):
     return f"""
 <div style="background: white; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; border-radius: 8px; overflow: hidden;">
     <div style="padding: 30px 20px; background: white;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Subscriber's Only</h1>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <p style="margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #666; line-height: 1.5;">Here is our entire archive of tools to help you with the Bee. To get TODAY'S tools delivered to your email every morning subscribe for free at the bottom of this post.</p>
+            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Toolbox Archives</h1>
         </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
             <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid={puzzle_id}" style="background: #FFDC00; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #333; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
                 Bee Sheet
             </a>
-            <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid={puzzle_id}" style="background: #8A2BE2; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segue UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
+            <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid={puzzle_id}" style="background: #8A2BE2; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
                 Bee Jumble
             </a>
             <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid={puzzle_id}" style="background: #00B050; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
@@ -92,8 +93,6 @@ def generate_newsletters():
         print("Invalid choice.")
         return
 
-    print("Email-only delivery selected (no website posts will be created)")
-
     tree = ET.parse(XML_FILE)
     root = tree.getroot()
     print(f"Found {len(root.findall('puzzle'))} puzzles in XML")
@@ -126,8 +125,10 @@ def generate_newsletters():
         day_suffix = lambda d: f"{d}{'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')}"
         day_ordinal = day_suffix(puzzle_date.day)
         pretty_date = puzzle_date.strftime("%A, %B") + f" {day_ordinal}"
-        title = f"{pretty_date} \U0001F41D Games Toolbox"
+        title = f"{pretty_date} \U0001F41D Games Toolbox Archive"
         local_dt = local_tz.localize(puzzle_date.replace(hour=3))
+        # Add 24 hours to the publish time
+        local_dt = local_dt + timedelta(days=1)
         utc_dt = local_dt.astimezone(pytz.utc)
         mm_dd = puzzle_date.strftime("%m-%d")
         feature_image_url = f"https://bee-box.github.io/bee-box/images/{mm_dd}.png"
@@ -142,55 +143,25 @@ def generate_newsletters():
             "sections": [[10, 0]]
         })
 
-        # Step 1: Create the post as a draft first
-        draft_payload = {
+        # Fixed settings for post-only (no email, public visibility)
+        payload = {
             "posts": [{
                 "title": title,
-                "mobiledoc": mobiledoc,  # Use mobiledoc instead of html
+                "mobiledoc": mobiledoc,
                 "custom_excerpt": "The Completely Unauthorized Games Toolbox",
-                "status": "draft",
+                "status": "scheduled",
                 "visibility": "public",
                 "feature_image": feature_image_url,
-                "email_only": True
+                "published_at": utc_dt.isoformat(),
+                "send_email_when_published": False
             }]
         }
 
-        # Create the draft post
-        response = requests.post(f"{GHOST_ADMIN_API_URL}/posts/", headers=headers, json=draft_payload)
-        
-        if not response.ok:
-            print(f"\u2717 Failed to create draft: {title} — {response.status_code}, {response.text}")
-            continue
-            
-        draft_data = response.json()
-        post_id = draft_data['posts'][0]['id']
-        updated_at = draft_data['posts'][0]['updated_at']
-        
-        # Step 2: Edit the post to schedule it as email-only
-        schedule_payload = {
-            "posts": [{
-                "id": post_id,
-                "updated_at": updated_at,
-                "status": "scheduled",
-                "published_at": utc_dt.isoformat(),
-                "email_only": True
-            }]
-        }
-        
-        # Schedule the post with newsletter parameters
-        schedule_response = requests.put(
-            f"{GHOST_ADMIN_API_URL}/posts/{post_id}/", 
-            headers=headers, 
-            json=schedule_payload,
-            params={
-                'newsletter': 'default-newsletter',
-                'email_segment': 'all'
-            }
-        )
-        if schedule_response.ok:
-            print(f"\u2713 Scheduled (email only): {title} ({utc_dt.strftime('%Y-%m-%d %H:%M')} UTC)")
+        response = requests.post(f"{GHOST_ADMIN_API_URL}/posts/", headers=headers, json=payload)
+        if response.ok:
+            print(f"\u2713 Scheduled (post only): {title} ({utc_dt.strftime('%Y-%m-%d %H:%M')} UTC)")
         else:
-            print(f"\u2717 Failed to schedule: {title} — {schedule_response.status_code}, {schedule_response.text}")
+            print(f"\u2717 Failed: {title} — {response.status_code}, {response.text}")
 
     if not found:
         print("No matching puzzles found.")
