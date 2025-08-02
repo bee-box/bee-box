@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 import os
 import json
+import calendar
 
 # === START: configuration ===
 GHOST_ADMIN_API_URL = 'https://beebox.ghost.io/ghost/api/admin'
@@ -102,7 +103,8 @@ def generate_newsletters():
         'Content-Type': 'application/json'
     }
 
-    found = False
+    # Collect matching puzzles first
+    matching_puzzles = []
     for puzzle in root.findall("puzzle"):
         date_str = puzzle.attrib.get("date")
         if not date_str:
@@ -115,13 +117,23 @@ def generate_newsletters():
             print(f"Skipping puzzle with invalid date: {date_str}")
             continue
 
-        if not date_filter(puzzle_date):
-            print(f"Skipping puzzle for {date_str}, does not match filter")
-            continue
+        if date_filter(puzzle_date):
+            matching_puzzles.append((puzzle, puzzle_date))
 
-        found = True
+    if not matching_puzzles:
+        print("No matching puzzles found.")
+        return
+
+    # Sort by date in descending order (latest to earliest)
+    matching_puzzles.sort(key=lambda x: x[1], reverse=True)
+    
+    print(f"Processing {len(matching_puzzles)} puzzles in reverse chronological order...")
+
+    for puzzle, puzzle_date in matching_puzzles:
         puzzle_id = puzzle.attrib.get("id", "unknown")
+        date_str = puzzle_date.strftime("%Y-%m-%d")
         print(f"Processing puzzle for {date_str}, ID: {puzzle_id}, Words: {len(puzzle.findall('word'))}")
+        
         day_suffix = lambda d: f"{d}{'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')}"
         day_ordinal = day_suffix(puzzle_date.day)
         pretty_date = puzzle_date.strftime("%A, %B") + f" {day_ordinal}"
@@ -162,9 +174,6 @@ def generate_newsletters():
             print(f"\u2713 Scheduled (post only): {title} ({utc_dt.strftime('%Y-%m-%d %H:%M')} UTC)")
         else:
             print(f"\u2717 Failed: {title} — {response.status_code}, {response.text}")
-
-    if not found:
-        print("No matching puzzles found.")
 # === END: main function ===
 
 # === START: script entry point ===

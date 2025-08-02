@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+Newsletter Generator for Games Toolbox
+Generates and schedules email-only newsletters for spelling bee puzzles.
+"""
+
 import xml.etree.ElementTree as ET
 import requests
 import jwt
@@ -16,6 +22,7 @@ local_tz = pytz.timezone('America/Chicago')
 
 # === START: token creation ===
 def create_token(api_key):
+    """Create JWT token for Ghost Admin API authentication."""
     key_id, secret = api_key.split(':')
     iat = int(time.time())
     exp = iat + 5 * 60
@@ -29,48 +36,117 @@ def create_token(api_key):
 
 # === START: HTML formatter ===
 def format_html(puzzle):
+    """Format puzzle data into HTML email template."""
     puzzle_id = puzzle.attrib.get("id", "unknown")
 
     return f"""
-<div style="background: white; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; border-radius: 8px; overflow: hidden;">
-    <div style="padding: 30px 20px; background: white;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Subscriber's Only</h1>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
-            <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid={puzzle_id}" style="background: #FFDC00; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #333; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
-                Bee Sheet
+<div style="max-width: 600px; margin: 0 auto;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: white; border: 1px solid #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <tr>
+        <td style="padding: 30px 20px; background-color: white;">
+            <!-- Header -->
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                    <td style="text-align: center; padding-bottom: 20px;">
+                        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Subscriber's Only</h1>
+                    </td>
+                </tr>
+            </table>
+            
+            <!-- Button Grid (2x2) -->
+            <table cellpadding="0" cellspacing="7" border="0" width="100%" style="margin-bottom: 30px;">
+                <tr>
+                    <!-- First Row -->
+                    <td width="50%" style="vertical-align: top;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border: 3px solid #333; background-color: #FFDC00;">
+                            <tr>
+                                <td style="padding: 0; text-align: center; height: 56px; vertical-align: middle;">
+                                    <a href="https://bee-box.github.io/bee-box/sheet.html?puzzleid={puzzle_id}" style="text-decoration: none !important; display: block; white-space: nowrap; padding: 18px 12px; width: 100%; height: 100%; box-sizing: border-box;">
+                                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #333 !important; text-transform: uppercase; letter-spacing: 0.5px;">BEE SHEET</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="50%" style="vertical-align: top;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border: 3px solid #333; background-color: #8A2BE2;">
+                            <tr>
+                                <td style="padding: 0; text-align: center; height: 56px; vertical-align: middle;">
+                                    <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid={puzzle_id}" style="text-decoration: none !important; display: block; white-space: nowrap; padding: 18px 12px; width: 100%; height: 100%; box-sizing: border-box;">
+                                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white !important; text-transform: uppercase; letter-spacing: 0.5px;">BEE JUMBLE</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- Second Row -->
+                    <td width="50%" style="vertical-align: top;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border: 3px solid #333; background-color: #00B050;">
+                            <tr>
+                                <td style="padding: 0; text-align: center; height: 56px; vertical-align: middle;">
+                                    <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid={puzzle_id}" style="text-decoration: none !important; display: block; white-space: nowrap; padding: 18px 12px; width: 100%; height: 100%; box-sizing: border-box;">
+                                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white !important; text-transform: uppercase; letter-spacing: 0.5px;">BEE PEEK</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="50%" style="vertical-align: top;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border: 3px solid #333; background-color: #0023FF;">
+                            <tr>
+                                <td style="padding: 0; text-align: center; height: 56px; vertical-align: middle;">
+                                    <a href="https://bee-box.github.io/bee-box/grid.html?puzzleid={puzzle_id}" style="text-decoration: none !important; display: block; white-space: nowrap; padding: 18px 12px; width: 100%; height: 100%; box-sizing: border-box;">
+                                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white !important; text-transform: uppercase; letter-spacing: 0.5px;">BEE GRID</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <!-- NYT Spelling Bee Section -->
+    <tr>
+        <td style="padding: 0 20px 30px 20px;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border: 3px solid #333; background-color: #FFDC00;">
+                <tr>
+                    <td style="padding: 25px; text-align: center;">
+                        <h2 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Today's New York Times Spelling Bee</h2>
+                        <p style="margin: 5px 0 20px 0; font-size: 16px; font-weight: 600; color: #333; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Skip all this other stuff...</p>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto; border: none; background-color: #333; width: auto;">
+                            <tr>
+                                <td style="padding: 0; text-align: center;">
+                                    <a href="https://www.nytimes.com/puzzles/spelling-bee/hub" style="text-decoration: none !important; display: block; padding: 15px 30px; width: 100%; box-sizing: border-box;">
+                                        <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; font-weight: 700; color: #FFDC00 !important; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;">PLAY NOW</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <!-- Footer -->
+    <tr>
+        <td style="text-align: center; padding: 20px;">
+            <a href="https://thecompletelyunauthorizedgamestoolbox.com/" style="text-decoration: underline;">
+                <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #333 !important;">The Completely Unauthorized Games Toolbox</span>
             </a>
-            <a href="https://bee-box.github.io/bee-box/jumble.html?puzzleid={puzzle_id}" style="background: #8A2BE2; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segue UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
-                Bee Jumble
-            </a>
-            <a href="https://bee-box.github.io/bee-box/peek.html?puzzleid={puzzle_id}" style="background: #00B050; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
-                Bee Peek
-            </a>
-            <a href="https://bee-box.github.io/bee-box/grid.html?puzzleid={puzzle_id}" style="background: #0023FF; border: 3px solid #333; border-radius: 8px; padding: 18px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; min-height: 56px;">
-                Bee Grid
-            </a>
-        </div>
-        
-        <div style="background: #FFDC00; border: 3px solid #333; border-radius: 12px; padding: 25px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-            <h2 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Today's New York Times Spelling Bee</h2>
-            <p style="margin: 5px 0 20px 0; font-size: 16px; font-weight: 600; color: #333; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Skip all this other stuff...</p>
-            <a href="https://www.nytimes.com/puzzles/spelling-bee/hub" style="background: #333; color: #FFDC00; border: none; border-radius: 8px; padding: 15px 30px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">
-                Play Now
-            </a>
-        </div>
-        
-        <div style="text-align: center; padding: 20px 0 0 0;">
-            <a href="https://thecompletelyunauthorizedgamestoolbox.com/" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #333; text-decoration: underline;">
-                The Completely Unauthorized Games Toolbox
-            </a>
-        </div>
-    </div>
-</div>    """
+        </td>
+    </tr>
+</table>
+</div>"""
 # === END: HTML formatter ===
 
 # === START: main function ===
 def generate_newsletters():
+    """Main function to generate and schedule newsletters."""
     print("What do you want to send?")
     print("1. A full month (e.g. August 2025)")
     print("2. A specific day (e.g. 2025-08-03)")
@@ -80,11 +156,13 @@ def generate_newsletters():
         month = input("Enter month (1–12): ").zfill(2)
         year = input("Enter year (e.g. 2025): ")
         date_filter = lambda d: d.strftime("%Y") == year and d.strftime("%m") == month
+        process_reverse = True  # Flag to process in reverse order for full month
     elif choice == "2":
         target_date = input("Enter date (YYYY-MM-DD): ").strip()
         try:
             day = datetime.strptime(target_date, "%Y-%m-%d").date()
             date_filter = lambda d: d.date() == day
+            process_reverse = False  # No need to reverse for single day
         except ValueError:
             print("Invalid date format.")
             return
@@ -103,7 +181,8 @@ def generate_newsletters():
         'Content-Type': 'application/json'
     }
 
-    found = False
+    # Collect matching puzzles first
+    matching_puzzles = []
     for puzzle in root.findall("puzzle"):
         date_str = puzzle.attrib.get("date")
         if not date_str:
@@ -116,24 +195,44 @@ def generate_newsletters():
             print(f"Skipping puzzle with invalid date: {date_str}")
             continue
 
-        if not date_filter(puzzle_date):
-            print(f"Skipping puzzle for {date_str}, does not match filter")
-            continue
+        if date_filter(puzzle_date):
+            matching_puzzles.append((puzzle, puzzle_date))
 
-        found = True
+    if not matching_puzzles:
+        print("No matching puzzles found.")
+        return
+
+    # Sort puzzles by date (reverse order for full month, normal for single day)
+    if process_reverse:
+        matching_puzzles.sort(key=lambda x: x[1], reverse=True)
+        print(f"Processing {len(matching_puzzles)} puzzles in reverse chronological order (last day to first day)")
+    else:
+        matching_puzzles.sort(key=lambda x: x[1])
+        print(f"Processing {len(matching_puzzles)} puzzles")
+
+    # Process the sorted puzzles
+    for puzzle, puzzle_date in matching_puzzles:
         puzzle_id = puzzle.attrib.get("id", "unknown")
+        date_str = puzzle_date.strftime("%Y-%m-%d")
         print(f"Processing puzzle for {date_str}, ID: {puzzle_id}, Words: {len(puzzle.findall('word'))}")
+        
+        # Create pretty date string with ordinal suffix
         day_suffix = lambda d: f"{d}{'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')}"
         day_ordinal = day_suffix(puzzle_date.day)
         pretty_date = puzzle_date.strftime("%A, %B") + f" {day_ordinal}"
         title = f"{pretty_date} \U0001F41D Games Toolbox"
+        
+        # Convert to UTC for scheduling
         local_dt = local_tz.localize(puzzle_date.replace(hour=3))
         utc_dt = local_dt.astimezone(pytz.utc)
+        
+        # Feature image URL
         mm_dd = puzzle_date.strftime("%m-%d")
         feature_image_url = f"https://bee-box.github.io/bee-box/images/{mm_dd}.png"
 
         formatted_html = format_html(puzzle)
 
+        # Create mobiledoc structure for Ghost
         mobiledoc = json.dumps({
             "version": "0.3.1",
             "atoms": [],
@@ -146,7 +245,7 @@ def generate_newsletters():
         draft_payload = {
             "posts": [{
                 "title": title,
-                "mobiledoc": mobiledoc,  # Use mobiledoc instead of html
+                "mobiledoc": mobiledoc,
                 "custom_excerpt": "The Completely Unauthorized Games Toolbox",
                 "status": "draft",
                 "visibility": "public",
@@ -187,13 +286,12 @@ def generate_newsletters():
                 'email_segment': 'all'
             }
         )
+        
         if schedule_response.ok:
             print(f"\u2713 Scheduled (email only): {title} ({utc_dt.strftime('%Y-%m-%d %H:%M')} UTC)")
         else:
             print(f"\u2717 Failed to schedule: {title} — {schedule_response.status_code}, {schedule_response.text}")
 
-    if not found:
-        print("No matching puzzles found.")
 # === END: main function ===
 
 # === START: script entry point ===
