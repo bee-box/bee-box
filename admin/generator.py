@@ -48,7 +48,7 @@ def format_html(puzzle):
             <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                     <td style="text-align: center; padding-bottom: 20px;">
-                        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Subscriber's Only</h1>
+                        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Subscribers Only</h1>
                     </td>
                 </tr>
             </table>
