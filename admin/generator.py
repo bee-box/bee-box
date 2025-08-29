@@ -25,7 +25,7 @@ def create_token(api_key):
     """Create JWT token for Ghost Admin API authentication."""
     key_id, secret = api_key.split(':')
     iat = int(time.time())
-    exp = iat + 5 * 60
+    exp = iat + 5 * 602
     return jwt.encode(
         {'iat': iat, 'exp': exp, 'aud': '/admin/'},
         bytes.fromhex(secret),
