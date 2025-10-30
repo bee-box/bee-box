@@ -150,7 +150,8 @@ def generate_newsletters():
     print("What do you want to send?")
     print("1. A full month (e.g. August 2025)")
     print("2. A specific day (e.g. 2025-08-03)")
-    choice = input("Enter 1 or 2: ").strip()
+    print("3. A week (7 days starting from a date)")
+    choice = input("Enter 1, 2, or 3: ").strip()
 
     if choice == "1":
         month = input("Enter month (1–12): ").zfill(2)
@@ -163,6 +164,17 @@ def generate_newsletters():
             day = datetime.strptime(target_date, "%Y-%m-%d").date()
             date_filter = lambda d: d.date() == day
             process_reverse = False  # No need to reverse for single day
+        except ValueError:
+            print("Invalid date format.")
+            return
+    elif choice == "3":
+        start_date = input("Enter start date (YYYY-MM-DD): ").strip()
+        try:
+            from datetime import timedelta
+            start_day = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_day = start_day + timedelta(days=6)
+            date_filter = lambda d: start_day <= d.date() <= end_day
+            process_reverse = False  # No need to reverse for week
         except ValueError:
             print("Invalid date format.")
             return
