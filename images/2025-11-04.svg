@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="280" height="260" 
+     viewBox="-120 -110 240 220" 
+     xmlns="http://www.w3.org/2000/svg">
+
+    <polygon points="40.0,0.0 20.000000000000004,34.64101615137754 -19.999999999999993,34.64101615137755 -40.0,4.898587196589413e-15 -20.000000000000018,-34.64101615137754 19.99999999999997,-34.64101615137756" 
+             fill="#FFDC00" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="0" y="2" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">U</text>
+    <polygon points="40.0,-70.0 20.000000000000004,-35.35898384862246 -19.999999999999993,-35.35898384862245 -40.0,-70.0 -20.000000000000018,-104.64101615137754 19.99999999999997,-104.64101615137756" 
+             fill="#E6E6E6" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="0" y="-68" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">A</text>
+    <polygon points="100.0,-35.0 80.0,-0.3589838486224579 40.00000000000001,-0.3589838486224508 20.0,-34.99999999999999 39.999999999999986,-69.64101615137754 79.99999999999997,-69.64101615137756" 
+             fill="#E6E6E6" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="60" y="-33" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">C</text>
+    <polygon points="100.0,35.0 80.0,69.64101615137754 40.00000000000001,69.64101615137756 20.0,35.00000000000001 39.999999999999986,0.3589838486224579 79.99999999999997,0.3589838486224366" 
+             fill="#E6E6E6" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="60" y="37" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">E</text>
+    <polygon points="40.0,70.0 20.000000000000004,104.64101615137754 -19.999999999999993,104.64101615137756 -40.0,70.0 -20.000000000000018,35.35898384862246 19.99999999999997,35.35898384862244" 
+             fill="#E6E6E6" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="0" y="72" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">F</text>
+    <polygon points="-20.0,35.0 -40.0,69.64101615137754 -80.0,69.64101615137756 -100.0,35.00000000000001 -80.00000000000001,0.3589838486224579 -40.00000000000003,0.3589838486224366" 
+             fill="#E6E6E6" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="-60" y="37" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">L</text>
+    <polygon points="-20.0,-35.0 -40.0,-0.3589838486224579 -80.0,-0.3589838486224508 -100.0,-34.99999999999999 -80.00000000000001,-69.64101615137754 -40.00000000000003,-69.64101615137756" 
+             fill="#E6E6E6" 
+             stroke="#FFFFFF" 
+             stroke-width="2"/>
+    <text x="-60" y="-33" 
+          text-anchor="middle" 
+          dominant-baseline="middle" 
+          font-size="24" 
+          font-weight="bold" 
+          font-family="'Helvetica Neue', Arial, sans-serif">T</text>
+</svg>
