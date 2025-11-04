@@ -5,7 +5,12 @@ permissions:
 
 on:
   schedule:
-    - cron: '2 7 * * *'  # Runs daily at 2:02 AM Central (8:02 UTC during DST)
+    # Two cron schedules ensure 2:02 AM Central Time year-round
+    # GitHub Actions only supports UTC, so we need both to handle DST transitions
+    - cron: '2 8 * * *'  # Runs daily at 2:02 AM CST (Nov-Mar, UTC-6)
+    - cron: '2 7 * * *'  # Runs daily at 2:02 AM CDT (Mar-Nov, UTC-5)
+    # During DST transition days, this will run twice (2:02 AM and 3:02 AM)
+    # but the script handles duplicate runs gracefully with "no changes to commit"
   workflow_dispatch:
 
 jobs:
