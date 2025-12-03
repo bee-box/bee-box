@@ -6,7 +6,9 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(dir images*.jpg /b)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(del nul)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
