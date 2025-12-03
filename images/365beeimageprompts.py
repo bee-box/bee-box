@@ -28,7 +28,7 @@ IMAGE_SIZE = "1024x1024"  # Options: "1024x1024", "1792x1024", "1024x1792"
 IMAGE_QUALITY = "standard"  # Options: "standard", "hd" (hd costs more)
 
 # Output directory for images
-OUTPUT_DIR = "./bee_images"
+OUTPUT_DIR = "."
 
 # Delay between API calls (in seconds) to avoid rate limits
 DELAY_BETWEEN_CALLS = 3
@@ -119,17 +119,38 @@ def generate_image_grok(prompt, date_str):
         raise Exception(f"Grok API Error: {response.status_code} - {response.text}")
 
 
+def date_str_to_mmdd(date_str):
+    """Convert date string like 'January 1st' to 'mm-dd' format"""
+    try:
+        # Remove ordinal suffixes and parse date
+        clean_date = date_str.replace("st", "").replace("nd", "").replace("rd", "").replace("th", "")
+        date_obj = datetime.strptime(clean_date, "%B %d")
+        # Set year to 2024 for leap year handling
+        date_obj = date_obj.replace(year=2024)
+        return date_obj.strftime("%m-%d")
+    except Exception:
+        # Fallback to sanitized filename
+        return date_str.replace(" ", "_").replace("/", "-")
+
+
 def save_image(image_data, date_str, output_dir):
-    """Save image data to PNG file"""
-    # Create safe filename from date
-    safe_filename = date_str.replace(" ", "_").replace("/", "-")
-    filepath = Path(output_dir) / f"{safe_filename}.png"
-    
+    """Save image data to JPG file"""
+    # Convert date to mm-dd format
+    filename = date_str_to_mmdd(date_str)
+    filepath = Path(output_dir) / f"{filename}.jpg"
+
     with open(filepath, 'wb') as f:
         f.write(image_data)
-    
+
     print(f"  Saved: {filepath}")
     return filepath
+
+
+def image_exists(date_str, output_dir):
+    """Check if image already exists for this date"""
+    filename = date_str_to_mmdd(date_str)
+    filepath = Path(output_dir) / f"{filename}.jpg"
+    return filepath.exists()
 
 
 # ============================================================================
@@ -209,11 +230,17 @@ def main():
     
     for i, (date, prompt) in enumerate(prompts, 1):
         print(f"\n[{i}/{len(prompts)}] {date}")
+
+        # Check if image already exists
+        if image_exists(date, OUTPUT_DIR):
+            print(f"  SKIPPED: Image already exists ({date_str_to_mmdd(date)}.jpg)")
+            continue
+
         print(f"  Prompt: {prompt[:80]}...")
-        
+
         # Enhance prompt with prefix/suffix
         full_prompt = f"{PROMPT_PREFIX}{prompt}{PROMPT_SUFFIX}".strip()
-        
+
         try:
             # Generate image
             if API_PROVIDER == "openai":
@@ -222,20 +249,20 @@ def main():
                 image_data = generate_image_grok(full_prompt, date)
             else:
                 raise Exception(f"Unknown API provider: {API_PROVIDER}")
-            
+
             # Save image
             save_image(image_data, date, OUTPUT_DIR)
             success_count += 1
             print(f"  SUCCESS")
-            
+
         except Exception as e:
             print(f"  X ERROR: {str(e)}")
             error_count += 1
-            
+
             # Log error to file
             with open(Path(OUTPUT_DIR) / "errors.log", 'a') as f:
                 f.write(f"{datetime.now()}: {date} - {str(e)}\n")
-        
+
         # Delay between calls to respect rate limits
         if i < len(prompts):
             print(f"  Waiting {DELAY_BETWEEN_CALLS} seconds...")

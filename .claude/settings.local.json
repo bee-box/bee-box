@@ -4,7 +4,9 @@
       "Bash(python:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(dir images*.jpg /b)",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []
