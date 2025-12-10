@@ -1,142 +1,4 @@
-#!/usr/bin/env python3
-"""
-365 Bee Image Prompts Organizer (No API Required)
-Organizes prompts by date range for manual generation
-"""
-
-import xml.etree.ElementTree as ET
-from pathlib import Path
-from datetime import datetime
-import os
-
-# ============================================================================
-# CONFIGURATION
-# ============================================================================
-
-# General prompt additions
-PROMPT_PREFIX = ""
-PROMPT_SUFFIX = ", high quality, detailed, professional photography"
-
-# ============================================================================
-# FUNCTIONS
-# ============================================================================
-
-def date_str_to_date(date_str):
-    """Convert date string like 'January 1st' to date object"""
-    try:
-        # Remove ordinal suffixes and parse date
-        clean_date = date_str.replace("st", "").replace("nd", "").replace("rd", "").replace("th", "")
-        date_obj = datetime.strptime(clean_date, "%B %d")
-        # Set year to 2024 for leap year handling
-        date_obj = date_obj.replace(year=2024)
-        return date_obj
-    except Exception:
-        return None
-
-
-def date_str_to_mmdd(date_str):
-    """Convert date string like 'January 1st' to 'mm-dd' format"""
-    date_obj = date_str_to_date(date_str)
-    if date_obj:
-        return date_obj.strftime("%m-%d")
-    return date_str.replace(" ", "_").replace("/", "-")
-
-
-def load_prompts(xml_file):
-    """Load prompts from XML file"""
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    
-    prompts = []
-    for prompt_elem in root.findall('.//prompt'):
-        day = prompt_elem.get('day')
-        prompt_text = prompt_elem.text
-        prompts.append((day, prompt_text))
-    
-    return prompts
-
-
-def parse_date_input(date_input):
-    """Parse user date input like 'January 1st' or '01-01'"""
-    # Try mm-dd format first
-    try:
-        date_obj = datetime.strptime(date_input, "%m-%d")
-        date_obj = date_obj.replace(year=2024)
-        return date_obj
-    except:
-        pass
-    
-    # Try full date name
-    try:
-        clean_date = date_input.replace("st", "").replace("nd", "").replace("rd", "").replace("th", "")
-        date_obj = datetime.strptime(clean_date, "%B %d")
-        date_obj = date_obj.replace(year=2024)
-        return date_obj
-    except:
-        pass
-    
-    return None
-
-
-def filter_prompts_by_range(prompts, start_date_str, end_date_str):
-    """Filter prompts by date range"""
-    start_date = parse_date_input(start_date_str)
-    end_date = parse_date_input(end_date_str)
-    
-    if not start_date or not end_date:
-        print("Error: Invalid date format. Use 'January 1st' or '01-01'")
-        return []
-    
-    filtered = []
-    for day_str, prompt in prompts:
-        day_date = date_str_to_date(day_str)
-        if day_date and start_date <= day_date <= end_date:
-            filtered.append((day_str, prompt))
-    
-    return filtered
-
-
-def create_text_file(prompts, output_file):
-    """Create a text file with prompts for copy-paste"""
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.write("=" * 80 + "\n")
-        f.write("BEE IMAGE PROMPTS - COPY & PASTE INTO IMAGE GENERATOR\n")
-        f.write("=" * 80 + "\n\n")
-        f.write(f"Total Prompts: {len(prompts)}\n")
-        f.write("Save images as: mm-dd.jpg (e.g., 01-01.jpg, 01-02.jpg)\n")
-        f.write("\n" + "=" * 80 + "\n\n")
-        
-        for day, prompt in prompts:
-            filename = date_str_to_mmdd(day)
-            full_prompt = f"{PROMPT_PREFIX}{prompt}{PROMPT_SUFFIX}".strip()
-            
-            f.write(f"FILE: {filename}.jpg\n")
-            f.write(f"DATE: {day}\n")
-            f.write(f"PROMPT:\n{full_prompt}\n")
-            f.write("\n" + "-" * 80 + "\n\n")
-    
-    print(f"✓ Created: {output_file}")
-
-
-def create_csv_file(prompts, output_file):
-    """Create a CSV file for spreadsheet import"""
-    import csv
-    
-    with open(output_file, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(['Filename', 'Date', 'Prompt'])
-        
-        for day, prompt in prompts:
-            filename = date_str_to_mmdd(day)
-            full_prompt = f"{PROMPT_PREFIX}{prompt}{PROMPT_SUFFIX}".strip()
-            writer.writerow([f"{filename}.jpg", day, full_prompt])
-    
-    print(f"✓ Created: {output_file}")
-
-
-def create_batch_html(prompts, output_file):
-    """Create an HTML file with interactive checklist"""
-    html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -289,32 +151,55 @@ def create_batch_html(prompts, output_file):
     </div>
     
     <div id="prompts-container">
-"""
-    
-    # Add each prompt card
-    for day, prompt in prompts:
-        filename = date_str_to_mmdd(day)
-        full_prompt = f"{PROMPT_PREFIX}{prompt}{PROMPT_SUFFIX}".strip()
-        
-        html_content += f"""
-        <div class="prompt-card" id="card-{filename}" data-completed="false">
+
+        <div class="prompt-card" id="card-01-20" data-completed="false">
             <div class="prompt-header">
                 <div>
-                    <div class="filename">{filename}.jpg</div>
-                    <div class="date">{day}</div>
+                    <div class="filename">01-20.jpg</div>
+                    <div class="date">January 20th</div>
                 </div>
-                <input type="checkbox" class="checkbox" onchange="toggleComplete('{filename}')">
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('01-20')">
             </div>
-            <div class="prompt-text" id="prompt-{filename}">{full_prompt}</div>
+            <div class="prompt-text" id="prompt-01-20">Magazine fashion photography: glamorous bee on runway, high fashion editorial style, dramatic makeup and lighting, Vogue aesthetic, "January 20th" in elegant serif magazine typography, high quality, detailed, professional photography</div>
             <div class="actions">
-                <button class="copy-btn" onclick="copyPrompt('{filename}')">📋 Copy Prompt</button>
-                <button class="done-btn" onclick="markDone('{filename}')">✓ Mark Done</button>
-                <button class="undo-btn" onclick="markUndone('{filename}')" style="display:none;">↶ Undo</button>
+                <button class="copy-btn" onclick="copyPrompt('01-20')">📋 Copy Prompt</button>
+                <button class="done-btn" onclick="markDone('01-20')">✓ Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('01-20')" style="display:none;">↶ Undo</button>
             </div>
         </div>
-"""
-    
-    html_content += """
+
+        <div class="prompt-card" id="card-01-21" data-completed="false">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">01-21.jpg</div>
+                    <div class="date">January 21st</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('01-21')">
+            </div>
+            <div class="prompt-text" id="prompt-01-21">Celtic illuminated manuscript: bee surrounded by intricate knotwork and spirals, Book of Kells inspired, gold leaf details, rich medieval colors, "JANUARY 21ST" in ornate initial cap, high quality, detailed, professional photography</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('01-21')">📋 Copy Prompt</button>
+                <button class="done-btn" onclick="markDone('01-21')">✓ Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('01-21')" style="display:none;">↶ Undo</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-01-22" data-completed="false">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">01-22.jpg</div>
+                    <div class="date">January 22nd</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('01-22')">
+            </div>
+            <div class="prompt-text" id="prompt-01-22">Psychedelic 1960s poster art: bee amid swirling patterns and melting colors, Peter Max style, groovy vibrations, "January 22nd" in wavy rainbow lettering, high quality, detailed, professional photography</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('01-22')">📋 Copy Prompt</button>
+                <button class="done-btn" onclick="markDone('01-22')">✓ Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('01-22')" style="display:none;">↶ Undo</button>
+            </div>
+        </div>
+
     </div>
     
     <script>
@@ -435,110 +320,3 @@ def create_batch_html(prompts, output_file):
     </script>
 </body>
 </html>
-"""
-    
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    print(f"✓ Created: {output_file}")
-
-
-# ============================================================================
-# MAIN SCRIPT
-# ============================================================================
-
-def main():
-    print("=" * 70)
-    print("365 BEE IMAGE PROMPTS ORGANIZER")
-    print("(No API Required - Manual Generation Helper)")
-    print("=" * 70)
-    
-    # Get the directory where this script is located
-    script_dir = Path(__file__).parent
-    xml_file = script_dir / "365beeimageprompts.xml"
-    
-    if not xml_file.exists():
-        print(f"\nERROR: {xml_file.name} not found!")
-        print(f"Make sure the XML file is in the same directory as this script.")
-        print(f"Script location: {script_dir}")
-        return
-    
-    print(f"\nLoading prompts from {xml_file.name}...")
-    prompts = load_prompts(xml_file)
-    print(f"Loaded {len(prompts)} prompts")
-    
-    # Ask user for date range
-    print("\n" + "=" * 70)
-    print("DATE RANGE SELECTION")
-    print("=" * 70)
-    print("Enter dates in format: 'January 1st' or '01-01'")
-    print("Examples: 'January 1st', 'December 31st', '01-01', '12-31'")
-    print("\nPress Enter without typing to use ALL dates (full year)")
-    print()
-    
-    start_input = input("Start date (or press Enter for January 1st): ").strip()
-    if not start_input:
-        start_input = "January 1st"
-    
-    end_input = input("End date (or press Enter for December 31st): ").strip()
-    if not end_input:
-        end_input = "December 31st"
-    
-    # Filter prompts
-    filtered_prompts = filter_prompts_by_range(prompts, start_input, end_input)
-    
-    if not filtered_prompts:
-        print("\nNo prompts found in that date range!")
-        return
-    
-    print(f"\nFiltered to {len(filtered_prompts)} prompts")
-    print(f"From: {filtered_prompts[0][0]}")
-    print(f"To: {filtered_prompts[-1][0]}")
-    
-    # Ask for output format
-    print("\n" + "=" * 70)
-    print("OUTPUT FORMAT")
-    print("=" * 70)
-    print("1. Text file (simple copy-paste)")
-    print("2. CSV file (for spreadsheets)")
-    print("3. Interactive HTML (recommended - with progress tracking)")
-    print("4. All formats")
-    print()
-    
-    format_choice = input("Choose format (1-4, default: 3): ").strip()
-    if not format_choice:
-        format_choice = "3"
-    
-    # Create output files
-    output_dir = Path(".")
-    base_name = f"bee_prompts_{date_str_to_mmdd(filtered_prompts[0][0])}_to_{date_str_to_mmdd(filtered_prompts[-1][0])}"
-    
-    print("\n" + "=" * 70)
-    print("GENERATING FILES...")
-    print("=" * 70)
-    
-    if format_choice in ["1", "4"]:
-        create_text_file(filtered_prompts, output_dir / f"{base_name}.txt")
-    
-    if format_choice in ["2", "4"]:
-        create_csv_file(filtered_prompts, output_dir / f"{base_name}.csv")
-    
-    if format_choice in ["3", "4"]:
-        create_batch_html(filtered_prompts, output_dir / f"{base_name}.html")
-    
-    print("\n" + "=" * 70)
-    print("COMPLETE!")
-    print("=" * 70)
-    print(f"\nGenerated files for {len(filtered_prompts)} prompts")
-    print("\nHOW TO USE:")
-    print("1. Open the HTML file in your web browser")
-    print("2. Click 'Copy Prompt' for each image")
-    print("3. Paste into your image generator (Grok, ChatGPT, etc.)")
-    print("4. Save the image as the filename shown (e.g., 01-01.jpg)")
-    print("5. Click 'Mark Done' to track your progress")
-    print("\nYour progress is saved automatically in your browser!")
-    print("=" * 70)
-
-
-if __name__ == "__main__":
-    main()
