@@ -8,7 +8,8 @@
       "Bash(dir images*.jpg /b)",
       "Bash(powershell -Command:*)",
       "Bash(del nul)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
