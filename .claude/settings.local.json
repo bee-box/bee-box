@@ -9,7 +9,10 @@
       "Bash(powershell -Command:*)",
       "Bash(del nul)",
       "Bash(rm:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(chcp:*)",
+      "Bash(cat:*)",
+      "Bash(del \\.c:Codebee-boxnul)"
     ],
     "deny": [],
     "ask": []

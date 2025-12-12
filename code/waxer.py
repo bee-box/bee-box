@@ -41,8 +41,12 @@ def log(message):
     timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
     full_msg = f"[{timestamp}] {message}"
     
-    # Print to console
-    print(full_msg)
+    # Print to console (with error handling for emoji characters)
+    try:
+        print(full_msg)
+    except UnicodeEncodeError:
+        # Fallback for Windows console encoding issues
+        print(full_msg.encode('ascii', 'replace').decode('ascii'))
     
     # Write to log file
     with open(LOG_FILE, "a", encoding="utf-8") as f:
@@ -384,7 +388,7 @@ def wax():
     
     # Calculate date range for placeholders
     today = date.today()
-    end_date = date(today.year, 12, 31) + timedelta(days=3)  # Through Jan 3 of next year
+    end_date = date(today.year, 12, 31) + timedelta(days=95)  # Through ~April 5 of next year
     
     # Add placeholders for missing dates
     for delta in range((end_date - today).days + 1):
