@@ -81,8 +81,9 @@ def compute_holidays():
         add(e - timedelta(2),             "Good Friday",            floating=True)
         add(nth_weekday(year, 5, 6, 2),  "Mother's Day",           floating=True)
         add(nth_weekday(year, 6, 6, 3),  "Father's Day",           floating=True)
-        add(nth_weekday(year, 3, 6, 2),  "Daylight Saving Starts", floating=True)
-        add(nth_weekday(year, 11, 6, 1), "Daylight Saving Ends",   floating=True)
+        add(nth_weekday(year, 3, 6, 2),  "Daylight Saving Starts",          floating=True)
+        add(nth_weekday(year, 11, 6, 1), "Daylight Saving Ends",            floating=True)
+        add(nth_weekday(year, 7, 5, 2),  "Running of the Bulls (New Orleans)", floating=True)
 
     add(date(2025, 12, 14), "Hanukkah", floating=True)
     add(date(2026, 12,  4), "Hanukkah", floating=True)
@@ -174,7 +175,8 @@ for stem in all_stems:
 html = src
 before, rest = html.split('<div id="prompts-container">', 1)
 _, after = rest.split('\n    </div>\n\n    <script>', 1)
-html = before + '<div id="prompts-container">' + container + '    </div>\n\n    <script>' + after
+holiday_groups_div = '\n    <div id="holiday-groups" style="display:none;"></div>\n'
+html = before + '<div id="prompts-container">' + container + '    </div>\n' + holiday_groups_div + '\n    <script>' + after
 
 # ── Extra CSS ─────────────────────────────────────────────────────────────────
 
@@ -299,6 +301,47 @@ extra_css = """
         .fname-btn { background: #546E7A; color: white; font-family: monospace; }
         .fname-btn:hover { background: #37474F; }
         .fname-btn.copied { background: #4CAF50; }
+        .tag-toggle-btn { background: #E53935; color: white; }
+        .tag-toggle-btn:hover { background: #B71C1C; }
+        .tag-toggle-btn.active { background: #B71C1C; outline: 2px solid #FFC107; }
+
+        /* ── Holiday groups view ─────────────────────────────────── */
+        .holiday-group { margin-bottom: 20px; }
+        .holiday-group-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #B71C1C;
+            padding: 4px 8px;
+            background: #FFEBEE;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        .holiday-group-cards {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 6px;
+            align-items: stretch;
+        }
+        .holiday-today-divider {
+            width: 3px;
+            min-height: 100px;
+            background: #FFC107;
+            border-radius: 2px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .holiday-today-divider::after {
+            content: 'TODAY';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(90deg);
+            font-size: 7px;
+            font-weight: bold;
+            color: #795548;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
 """
 
 html = html.replace('    </style>', extra_css + '    </style>')
@@ -329,6 +372,8 @@ modal_html = """
 override_js = """
     <script>
         let _modalStem = null;
+        let _tagsOnly = false;
+        let _groupByTag = false;
 
         function openModal(stem) {
             const card = document.getElementById('card-' + stem);
@@ -490,7 +535,107 @@ override_js = """
                     || (currentFilter === 'todo'      && !done)
                     || (currentFilter === 'completed' && done);
                 const okMonth = currentMonth === 'all' || month === currentMonth;
-                card.style.display = (okStatus && okMonth) ? '' : 'none';
+                const okTags  = !_tagsOnly || card.classList.contains('holiday');
+                card.style.display = (okStatus && okMonth && okTags) ? '' : 'none';
+            });
+        }
+
+        function toggleTagsOnly() {
+            _tagsOnly = !_tagsOnly;
+            document.getElementById('fb-tags').classList.toggle('active', _tagsOnly);
+            applyFilters();
+        }
+
+        function toggleGroupByTag() {
+            _groupByTag = !_groupByTag;
+            document.getElementById('fb-group-tags').classList.toggle('active', _groupByTag);
+            const container = document.getElementById('prompts-container');
+            const groups    = document.getElementById('holiday-groups');
+            if (_groupByTag) {
+                renderHolidayGroups();
+                container.style.display = 'none';
+                groups.style.display    = 'block';
+            } else {
+                container.style.display = '';
+                groups.style.display    = 'none';
+            }
+        }
+
+        function renderHolidayGroups() {
+            // Build map: holiday name -> [{card, year}]
+            // year is null for fixed holidays (same MM-DD every year)
+            const groups = {};
+            const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+            document.querySelectorAll('.cal-card.holiday').forEach(card => {
+                const attr = card.dataset.holiday || '';
+                attr.split(' | ').forEach(entry => {
+                    const parts = entry.split(' \u00b7 ');
+                    const name  = parts[1] || entry;
+                    const yearNums = parts[0].split(';').map(y => parseInt(y.trim()));
+                    // floating = single year per card; fixed = multiple years, one card
+                    const year = yearNums.length === 1 ? yearNums[0] : null;
+                    if (year === null) return; // skip fixed holidays
+                    if (!groups[name]) groups[name] = [];
+                    groups[name].push({ card, year });
+                });
+            });
+
+            // Pre-sort each group's items by (year, stem)
+            const itemSort = (a, b) =>
+                (a.year + '-' + a.card.dataset.stem).localeCompare(b.year + '-' + b.card.dataset.stem);
+            Object.values(groups).forEach(items => items.sort(itemSort));
+
+            const container = document.getElementById('holiday-groups');
+            container.innerHTML = '';
+
+            Object.keys(groups)
+                .sort((a, b) => {
+                    const aFirst = groups[a][0];
+                    const bFirst = groups[b][0];
+                    return (aFirst.year + '-' + aFirst.card.dataset.stem)
+                        .localeCompare(bFirst.year + '-' + bFirst.card.dataset.stem);
+                })
+                .forEach(name => {
+                const items = groups[name];
+
+                const section = document.createElement('div');
+                section.className = 'holiday-group';
+
+                const header = document.createElement('div');
+                header.className = 'holiday-group-header';
+                header.textContent = name + '  (' + items.length + ')';
+                section.appendChild(header);
+
+                const cardsRow = document.createElement('div');
+                cardsRow.className = 'holiday-group-cards';
+
+                let dividerInserted = false;
+                items.forEach(({ card, year }) => {
+                    // Insert today-divider before the first card that is today or in the future
+                    // Only meaningful for floating holidays (year !== null) with multiple cards
+                    if (!dividerInserted && year !== null && items.length > 1) {
+                        const itemDate = year + '-' + card.dataset.stem;
+                        if (itemDate >= todayStr) {
+                            const div = document.createElement('div');
+                            div.className = 'holiday-today-divider';
+                            cardsRow.appendChild(div);
+                            dividerInserted = true;
+                        }
+                    }
+
+                    const clone = card.cloneNode(true);
+                    const stem  = card.dataset.stem;
+                    clone.onclick = () => openModal(stem);
+                    if (year !== null) {
+                        const lbl = clone.querySelector('.cal-label');
+                        if (lbl) lbl.textContent = year + ' · ' + stem;
+                    }
+                    cardsRow.appendChild(clone);
+                });
+
+                section.appendChild(cardsRow);
+                container.appendChild(section);
             });
         }
 

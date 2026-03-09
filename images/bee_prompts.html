@@ -97,6 +97,9 @@
         .filter-btn { background: #9E9E9E; color: white; }
         .filter-btn:hover { background: #757575; }
         .filter-btn.active { background: #424242; }
+        .tag-toggle-btn { background: #E53935; color: white; }
+        .tag-toggle-btn:hover { background: #B71C1C; }
+        .tag-toggle-btn.active { background: #B71C1C; outline: 2px solid #FFC107; }
         .month-btn { background: #5C6BC0; color: white; font-size: 12px; padding: 6px 10px; }
         .month-btn:hover { background: #3949AB; }
         .month-btn.active { background: #1A237E; }
@@ -235,6 +238,47 @@
         .fname-btn { background: #546E7A; color: white; font-family: monospace; }
         .fname-btn:hover { background: #37474F; }
         .fname-btn.copied { background: #4CAF50; }
+        .tag-toggle-btn { background: #E53935; color: white; }
+        .tag-toggle-btn:hover { background: #B71C1C; }
+        .tag-toggle-btn.active { background: #B71C1C; outline: 2px solid #FFC107; }
+
+        /* ── Holiday groups view ─────────────────────────────────── */
+        .holiday-group { margin-bottom: 20px; }
+        .holiday-group-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #B71C1C;
+            padding: 4px 8px;
+            background: #FFEBEE;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        .holiday-group-cards {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 6px;
+            align-items: stretch;
+        }
+        .holiday-today-divider {
+            width: 3px;
+            min-height: 100px;
+            background: #FFC107;
+            border-radius: 2px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .holiday-today-divider::after {
+            content: 'TODAY';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(90deg);
+            font-size: 7px;
+            font-weight: bold;
+            color: #795548;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
@@ -257,6 +301,9 @@
         <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All</button>
         <button class="filter-btn" id="fb-todo" onclick="setFilter('todo')">To-Do</button>
         <button class="filter-btn" id="fb-done" onclick="setFilter('completed')">Done</button>
+        <span style="width:10px"></span>
+        <button class="tag-toggle-btn" id="fb-tags" onclick="toggleTagsOnly()">&#x1F3F7; Tags Only</button>
+        <button class="tag-toggle-btn" id="fb-group-tags" onclick="toggleGroupByTag()">&#x1F4C5; By Holiday</button>
     </div>
 
     <div class="controls" style="margin-top:0">
@@ -1054,74 +1101,74 @@
             <img src="04-20.png" alt="04-20" loading="lazy">
             <div class="cal-label">04-20</div>
         </div>
-        <div class="cal-card missing" id="card-04-21"
-             data-stem="04-21" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-21"
+             data-stem="04-21" data-month="04" data-completed="true"
              data-prompt="Tea Day delicate Chinese porcelain painting style: bee hovering over steaming teacup, blue and white ceramics aesthetic, elegant flowing lines, &quot;April 21st&quot; in decorative tea tin label, high quality, detailed, linocut print" data-date="April 21st"
              onclick="openModal('04-21')">
-            <div class="cal-x">✕</div>
+            <img src="04-21.png" alt="04-21" loading="lazy">
             <div class="cal-label">04-21</div>
         </div>
-        <div class="cal-card missing" id="card-04-22"
-             data-stem="04-22" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-22"
+             data-stem="04-22" data-month="04" data-completed="true"
              data-prompt="Earth Day environmental poster art: bee as planet Earth protector with recycling symbol, bold graphic design, green activism style, powerful message, &quot;APRIL 22ND&quot; in eco-friendly font, high quality, detailed, comic book style" data-date="April 22nd"
              onclick="openModal('04-22')">
-            <div class="cal-x">✕</div>
+            <img src="04-22.png" alt="04-22" loading="lazy">
             <div class="cal-label">04-22</div>
         </div>
-        <div class="cal-card missing" id="card-04-23"
-             data-stem="04-23" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-23"
+             data-stem="04-23" data-month="04" data-completed="true"
              data-prompt="Take A Chance Day Las Vegas neon sign style: bee with dice and playing cards, glowing neon tubes, retro casino aesthetic, electric colors, &quot;April 23rd&quot; in vintage Vegas lettering, high quality, detailed, flat design vector art" data-date="April 23rd"
              onclick="openModal('04-23')">
-            <div class="cal-x">✕</div>
+            <img src="04-23.png" alt="04-23" loading="lazy">
             <div class="cal-label">04-23</div>
         </div>
-        <div class="cal-card missing" id="card-04-24"
-             data-stem="04-24" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-24"
+             data-stem="04-24" data-month="04" data-completed="true"
              data-prompt="Pigs In A Blanket Day cozy hygge photography: bee wrapped in tiny knitted blanket by fireplace, warm candlelight, Danish comfort aesthetic, &quot;APRIL 24TH&quot; on wooden sign, high quality, detailed, comic book style" data-date="April 24th"
              onclick="openModal('04-24')">
-            <div class="cal-x">✕</div>
+            <img src="04-24.png" alt="04-24" loading="lazy">
             <div class="cal-label">04-24</div>
         </div>
-        <div class="cal-card missing" id="card-04-25"
-             data-stem="04-25" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-25"
+             data-stem="04-25" data-month="04" data-completed="true"
              data-prompt="Penguin Day children&#x27;s cartoon animation cel: bee and penguin as best friends, Disney classic 2D animation style, bright cheerful colors, &quot;April 25th&quot; on Antarctica sign, high quality, detailed, vintage botanical illustration" data-date="April 25th"
              onclick="openModal('04-25')">
-            <div class="cal-x">✕</div>
+            <img src="04-25.png" alt="04-25" loading="lazy">
             <div class="cal-label">04-25</div>
         </div>
-        <div class="cal-card missing" id="card-04-26"
-             data-stem="04-26" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-26"
+             data-stem="04-26" data-month="04" data-completed="true"
              data-prompt="Pretzel Day Bavarian folk art: bee in lederhosen serving giant pretzel, German decorative painting style, alpine flowers, &quot;APRIL 26TH&quot; in Gothic blackletter font, high quality, detailed, impressionist painting" data-date="April 26th"
              onclick="openModal('04-26')">
-            <div class="cal-x">✕</div>
+            <img src="04-26.png" alt="04-26" loading="lazy">
             <div class="cal-label">04-26</div>
         </div>
-        <div class="cal-card missing" id="card-04-27"
-             data-stem="04-27" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-27"
+             data-stem="04-27" data-month="04" data-completed="true"
              data-prompt="Tell A Story Day storybook spread illustration: bee as storyteller to young bees around campfire, Arthur Rackham fairy tale style, magical twilight atmosphere, &quot;April 27th&quot; as chapter heading, high quality, detailed, flat design vector art" data-date="April 27th"
              onclick="openModal('04-27')">
-            <div class="cal-x">✕</div>
+            <img src="04-27.png" alt="04-27" loading="lazy">
             <div class="cal-label">04-27</div>
         </div>
-        <div class="cal-card missing" id="card-04-28"
-             data-stem="04-28" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-28"
+             data-stem="04-28" data-month="04" data-completed="true"
              data-prompt="Superhero Day comic book cover art: bee superhero flying over city, dynamic action pose, bold outlines, vintage Marvel Comics style, &quot;APRIL 28TH ISSUE #1&quot; in corner box, high quality, detailed, pencil sketch" data-date="April 28th"
              onclick="openModal('04-28')">
-            <div class="cal-x">✕</div>
+            <img src="04-28.png" alt="04-28" loading="lazy">
             <div class="cal-label">04-28</div>
         </div>
-        <div class="cal-card missing" id="card-04-29"
-             data-stem="04-29" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-29"
+             data-stem="04-29" data-month="04" data-completed="true"
              data-prompt="Shrimp Scampi Day upscale restaurant photography: bee as food critic with shrimp scampi plate, Michelin-star presentation, dramatic side lighting, &quot;April 29th&quot; on elegant menu, high quality, detailed, pixel art" data-date="April 29th"
              onclick="openModal('04-29')">
-            <div class="cal-x">✕</div>
+            <img src="04-29.png" alt="04-29" loading="lazy">
             <div class="cal-label">04-29</div>
         </div>
-        <div class="cal-card missing" id="card-04-30"
-             data-stem="04-30" data-month="04" data-completed="false"
+        <div class="cal-card" id="card-04-30"
+             data-stem="04-30" data-month="04" data-completed="true"
              data-prompt="Honesty Day transparent layered illustration: bee with visible internal organs and honey stomach, medical cross-section style, educational transparency, &quot;APRIL 30TH&quot; in honest handwriting, high quality, detailed, digital illustration" data-date="April 30th"
              onclick="openModal('04-30')">
-            <div class="cal-x">✕</div>
+            <img src="04-30.png" alt="04-30" loading="lazy">
             <div class="cal-label">04-30</div>
         </div>
         <div class="cal-card" id="card-05-01"
@@ -1607,23 +1654,23 @@
             <img src="07-09.png" alt="07-09" loading="lazy">
             <div class="cal-label">07-09</div>
         </div>
-        <div class="cal-card" id="card-07-10"
+        <div class="cal-card holiday" id="card-07-10"
              data-stem="07-10" data-month="07" data-completed="true"
-             data-prompt="" data-date="07-10"
+             data-prompt="" data-date="07-10" data-holiday="2027 · Running of the Bulls (New Orleans) · Floating"
              onclick="openModal('07-10')">
             <img src="07-10.png" alt="07-10" loading="lazy">
             <div class="cal-label">07-10</div>
         </div>
-        <div class="cal-card" id="card-07-11"
+        <div class="cal-card holiday" id="card-07-11"
              data-stem="07-11" data-month="07" data-completed="true"
-             data-prompt="" data-date="07-11"
+             data-prompt="" data-date="07-11" data-holiday="2026 · Running of the Bulls (New Orleans) · Floating"
              onclick="openModal('07-11')">
             <img src="07-11.png" alt="07-11" loading="lazy">
             <div class="cal-label">07-11</div>
         </div>
-        <div class="cal-card" id="card-07-12"
+        <div class="cal-card holiday" id="card-07-12"
              data-stem="07-12" data-month="07" data-completed="true"
-             data-prompt="" data-date="07-12"
+             data-prompt="" data-date="07-12" data-holiday="2025 · Running of the Bulls (New Orleans) · Floating"
              onclick="openModal('07-12')">
             <img src="07-12.png" alt="07-12" loading="lazy">
             <div class="cal-label">07-12</div>
@@ -2841,6 +2888,8 @@
         </div>
     </div>
 
+    <div id="holiday-groups" style="display:none;"></div>
+
     <script>
         const STORAGE_KEY = 'bee-prompts-completed';
         let currentFilter = 'all';
@@ -2989,6 +3038,8 @@
 
     <script>
         let _modalStem = null;
+        let _tagsOnly = false;
+        let _groupByTag = false;
 
         function openModal(stem) {
             const card = document.getElementById('card-' + stem);
@@ -3150,7 +3201,107 @@
                     || (currentFilter === 'todo'      && !done)
                     || (currentFilter === 'completed' && done);
                 const okMonth = currentMonth === 'all' || month === currentMonth;
-                card.style.display = (okStatus && okMonth) ? '' : 'none';
+                const okTags  = !_tagsOnly || card.classList.contains('holiday');
+                card.style.display = (okStatus && okMonth && okTags) ? '' : 'none';
+            });
+        }
+
+        function toggleTagsOnly() {
+            _tagsOnly = !_tagsOnly;
+            document.getElementById('fb-tags').classList.toggle('active', _tagsOnly);
+            applyFilters();
+        }
+
+        function toggleGroupByTag() {
+            _groupByTag = !_groupByTag;
+            document.getElementById('fb-group-tags').classList.toggle('active', _groupByTag);
+            const container = document.getElementById('prompts-container');
+            const groups    = document.getElementById('holiday-groups');
+            if (_groupByTag) {
+                renderHolidayGroups();
+                container.style.display = 'none';
+                groups.style.display    = 'block';
+            } else {
+                container.style.display = '';
+                groups.style.display    = 'none';
+            }
+        }
+
+        function renderHolidayGroups() {
+            // Build map: holiday name -> [{card, year}]
+            // year is null for fixed holidays (same MM-DD every year)
+            const groups = {};
+            const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+            document.querySelectorAll('.cal-card.holiday').forEach(card => {
+                const attr = card.dataset.holiday || '';
+                attr.split(' | ').forEach(entry => {
+                    const parts = entry.split(' · ');
+                    const name  = parts[1] || entry;
+                    const yearNums = parts[0].split(';').map(y => parseInt(y.trim()));
+                    // floating = single year per card; fixed = multiple years, one card
+                    const year = yearNums.length === 1 ? yearNums[0] : null;
+                    if (year === null) return; // skip fixed holidays
+                    if (!groups[name]) groups[name] = [];
+                    groups[name].push({ card, year });
+                });
+            });
+
+            // Pre-sort each group's items by (year, stem)
+            const itemSort = (a, b) =>
+                (a.year + '-' + a.card.dataset.stem).localeCompare(b.year + '-' + b.card.dataset.stem);
+            Object.values(groups).forEach(items => items.sort(itemSort));
+
+            const container = document.getElementById('holiday-groups');
+            container.innerHTML = '';
+
+            Object.keys(groups)
+                .sort((a, b) => {
+                    const aFirst = groups[a][0];
+                    const bFirst = groups[b][0];
+                    return (aFirst.year + '-' + aFirst.card.dataset.stem)
+                        .localeCompare(bFirst.year + '-' + bFirst.card.dataset.stem);
+                })
+                .forEach(name => {
+                const items = groups[name];
+
+                const section = document.createElement('div');
+                section.className = 'holiday-group';
+
+                const header = document.createElement('div');
+                header.className = 'holiday-group-header';
+                header.textContent = name + '  (' + items.length + ')';
+                section.appendChild(header);
+
+                const cardsRow = document.createElement('div');
+                cardsRow.className = 'holiday-group-cards';
+
+                let dividerInserted = false;
+                items.forEach(({ card, year }) => {
+                    // Insert today-divider before the first card that is today or in the future
+                    // Only meaningful for floating holidays (year !== null) with multiple cards
+                    if (!dividerInserted && year !== null && items.length > 1) {
+                        const itemDate = year + '-' + card.dataset.stem;
+                        if (itemDate >= todayStr) {
+                            const div = document.createElement('div');
+                            div.className = 'holiday-today-divider';
+                            cardsRow.appendChild(div);
+                            dividerInserted = true;
+                        }
+                    }
+
+                    const clone = card.cloneNode(true);
+                    const stem  = card.dataset.stem;
+                    clone.onclick = () => openModal(stem);
+                    if (year !== null) {
+                        const lbl = clone.querySelector('.cal-label');
+                        if (lbl) lbl.textContent = year + ' · ' + stem;
+                    }
+                    cardsRow.appendChild(clone);
+                });
+
+                section.appendChild(cardsRow);
+                container.appendChild(section);
             });
         }
 

@@ -97,6 +97,9 @@
         .filter-btn { background: #9E9E9E; color: white; }
         .filter-btn:hover { background: #757575; }
         .filter-btn.active { background: #424242; }
+        .tag-toggle-btn { background: #E53935; color: white; }
+        .tag-toggle-btn:hover { background: #B71C1C; }
+        .tag-toggle-btn.active { background: #B71C1C; outline: 2px solid #FFC107; }
         .month-btn { background: #5C6BC0; color: white; font-size: 12px; padding: 6px 10px; }
         .month-btn:hover { background: #3949AB; }
         .month-btn.active { background: #1A237E; }
@@ -136,6 +139,9 @@
         <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All</button>
         <button class="filter-btn" id="fb-todo" onclick="setFilter('todo')">To-Do</button>
         <button class="filter-btn" id="fb-done" onclick="setFilter('completed')">Done</button>
+        <span style="width:10px"></span>
+        <button class="tag-toggle-btn" id="fb-tags" onclick="toggleTagsOnly()">&#x1F3F7; Tags Only</button>
+        <button class="tag-toggle-btn" id="fb-group-tags" onclick="toggleGroupByTag()">&#x1F4C5; By Holiday</button>
     </div>
 
     <div class="controls" style="margin-top:0">
