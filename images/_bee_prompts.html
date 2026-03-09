@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bee Image Prompts Batch Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #FFC107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0; color: #333; }
+        .stats { margin-top: 10px; color: #666; }
+        .prompt-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s;
+        }
+        .prompt-card.current-prompt {
+            box-shadow: 0 0 0 3px #FFC107, 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .prompt-card.completed {
+            opacity: 0.6;
+            background: #e8f5e9;
+        }
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .filename { font-weight: bold; color: #1976D2; font-size: 18px; }
+        .date { color: #666; font-size: 14px; }
+        .prompt-text {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .copy-btn { background: #4CAF50; color: white; }
+        .copy-btn:hover { background: #45a049; }
+        .done-btn { background: #2196F3; color: white; }
+        .done-btn:hover { background: #0b7dda; }
+        .undo-btn { background: #FF9800; color: white; }
+        .undo-btn:hover { background: #e68900; }
+        .next-btn { background: #9C27B0; color: white; font-weight: bold; }
+        .next-btn:hover { background: #7B1FA2; }
+        .progress {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-bar {
+            background: #4CAF50;
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            min-width: 40px;
+        }
+        .checkbox { width: 24px; height: 24px; cursor: pointer; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+            align-items: center;
+        }
+        .filter-btn { background: #9E9E9E; color: white; }
+        .filter-btn:hover { background: #757575; }
+        .filter-btn.active { background: #424242; }
+        .month-btn { background: #5C6BC0; color: white; font-size: 12px; padding: 6px 10px; }
+        .month-btn:hover { background: #3949AB; }
+        .month-btn.active { background: #1A237E; }
+        .jump-next-btn {
+            background: #9C27B0;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 10px 20px;
+        }
+        .jump-next-btn:hover { background: #7B1FA2; }
+        .section-label {
+            font-size: 12px;
+            color: #888;
+            margin-right: 4px;
+            align-self: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>&#x1F41D; 365 Bee Image Prompts</h1>
+        <div class="stats">
+            <strong id="total-count">0</strong> total |
+            <strong id="completed-count">0</strong> done |
+            <strong id="remaining-count">0</strong> remaining
+        </div>
+        <div class="progress">
+            <div class="progress-bar" id="progress-bar" style="width:0%">0%</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="jump-next-btn" onclick="jumpToNext()">&#x27A1;&#xFE0F; Next Prompt</button>
+        <span style="flex:1"></span>
+        <span class="section-label">Filter:</span>
+        <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" id="fb-todo" onclick="setFilter('todo')">To-Do</button>
+        <button class="filter-btn" id="fb-done" onclick="setFilter('completed')">Done</button>
+    </div>
+
+    <div class="controls" style="margin-top:0">
+        <span class="section-label">Month:</span>
+        <button class="month-btn" onclick="filterMonth('all')">All</button>
+        <button class="month-btn" onclick="filterMonth('01')">Jan</button>
+        <button class="month-btn" onclick="filterMonth('02')">Feb</button>
+        <button class="month-btn" onclick="filterMonth('03')">Mar</button>
+        <button class="month-btn" onclick="filterMonth('04')">Apr</button>
+        <button class="month-btn" onclick="filterMonth('05')">May</button>
+        <button class="month-btn" onclick="filterMonth('06')">Jun</button>
+        <button class="month-btn" onclick="filterMonth('07')">Jul</button>
+        <button class="month-btn" onclick="filterMonth('08')">Aug</button>
+        <button class="month-btn" onclick="filterMonth('09')">Sep</button>
+        <button class="month-btn" onclick="filterMonth('10')">Oct</button>
+        <button class="month-btn" onclick="filterMonth('11')">Nov</button>
+        <button class="month-btn" onclick="filterMonth('12')">Dec</button>
+    </div>
+
+    <div id="prompts-container">
+
+        <div class="prompt-card" id="card-February_29th" data-completed="false" data-month="Fe">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">February_29th.png</div>
+                    <div class="date">February 29th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('February_29th')">
+            </div>
+            <div class="prompt-text" id="prompt-February_29th">Leap Day space-time illustration: bee leaping through calendar portal, sci-fi concept art style, time warp effects, cosmic background, "FEBRUARY 29TH" glowing in space, high quality, detailed, Japanese woodblock print</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('February_29th', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('February_29th')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('February_29th')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('February_29th')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-03-29" data-completed="false" data-month="03">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">03-29.png</div>
+                    <div class="date">March 29th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('03-29')">
+            </div>
+            <div class="prompt-text" id="prompt-03-29">Mom and Pop Business Owners Day: bee shopkeepers in front of small store, nostalgic small-town America, Norman Rockwell painting style, "MARCH 29TH" on store sign, high quality, detailed, studio ghibli style</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('03-29', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('03-29')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('03-29')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('03-29')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-03-30" data-completed="false" data-month="03">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">03-30.png</div>
+                    <div class="date">March 30th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('03-30')">
+            </div>
+            <div class="prompt-text" id="prompt-03-30">Take A Walk In The Park Day: bee strolling through park path, peaceful nature photography, cherry blossoms, park bench, "March 30th" carved in tree, high quality, detailed, digital illustration</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('03-30', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('03-30')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('03-30')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('03-30')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-20" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-20.png</div>
+                    <div class="date">April 20th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-20')">
+            </div>
+            <div class="prompt-text" id="prompt-04-20">Look Alike Day mirror image symmetrical digital art: two identical bees facing each other creating Rorschach test pattern, perfect bilateral symmetry, "APRIL 20TH" reflected in center, high quality, detailed, pop art</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-20', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-20')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-20')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-20')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-21" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-21.png</div>
+                    <div class="date">April 21st</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-21')">
+            </div>
+            <div class="prompt-text" id="prompt-04-21">Tea Day delicate Chinese porcelain painting style: bee hovering over steaming teacup, blue and white ceramics aesthetic, elegant flowing lines, "April 21st" in decorative tea tin label, high quality, detailed, linocut print</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-21', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-21')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-21')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-21')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-22" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-22.png</div>
+                    <div class="date">April 22nd</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-22')">
+            </div>
+            <div class="prompt-text" id="prompt-04-22">Earth Day environmental poster art: bee as planet Earth protector with recycling symbol, bold graphic design, green activism style, powerful message, "APRIL 22ND" in eco-friendly font, high quality, detailed, comic book style</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-22', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-22')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-22')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-22')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-23" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-23.png</div>
+                    <div class="date">April 23rd</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-23')">
+            </div>
+            <div class="prompt-text" id="prompt-04-23">Take A Chance Day Las Vegas neon sign style: bee with dice and playing cards, glowing neon tubes, retro casino aesthetic, electric colors, "April 23rd" in vintage Vegas lettering, high quality, detailed, flat design vector art</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-23', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-23')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-23')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-23')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-24" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-24.png</div>
+                    <div class="date">April 24th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-24')">
+            </div>
+            <div class="prompt-text" id="prompt-04-24">Pigs In A Blanket Day cozy hygge photography: bee wrapped in tiny knitted blanket by fireplace, warm candlelight, Danish comfort aesthetic, "APRIL 24TH" on wooden sign, high quality, detailed, comic book style</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-24', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-24')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-24')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-24')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-25" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-25.png</div>
+                    <div class="date">April 25th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-25')">
+            </div>
+            <div class="prompt-text" id="prompt-04-25">Penguin Day children's cartoon animation cel: bee and penguin as best friends, Disney classic 2D animation style, bright cheerful colors, "April 25th" on Antarctica sign, high quality, detailed, vintage botanical illustration</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-25', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-25')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-25')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-25')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-26" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-26.png</div>
+                    <div class="date">April 26th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-26')">
+            </div>
+            <div class="prompt-text" id="prompt-04-26">Pretzel Day Bavarian folk art: bee in lederhosen serving giant pretzel, German decorative painting style, alpine flowers, "APRIL 26TH" in Gothic blackletter font, high quality, detailed, impressionist painting</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-26', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-26')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-26')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-26')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-27" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-27.png</div>
+                    <div class="date">April 27th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-27')">
+            </div>
+            <div class="prompt-text" id="prompt-04-27">Tell A Story Day storybook spread illustration: bee as storyteller to young bees around campfire, Arthur Rackham fairy tale style, magical twilight atmosphere, "April 27th" as chapter heading, high quality, detailed, flat design vector art</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-27', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-27')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-27')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-27')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-28" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-28.png</div>
+                    <div class="date">April 28th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-28')">
+            </div>
+            <div class="prompt-text" id="prompt-04-28">Superhero Day comic book cover art: bee superhero flying over city, dynamic action pose, bold outlines, vintage Marvel Comics style, "APRIL 28TH ISSUE #1" in corner box, high quality, detailed, pencil sketch</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-28', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-28')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-28')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-28')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-29" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-29.png</div>
+                    <div class="date">April 29th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-29')">
+            </div>
+            <div class="prompt-text" id="prompt-04-29">Shrimp Scampi Day upscale restaurant photography: bee as food critic with shrimp scampi plate, Michelin-star presentation, dramatic side lighting, "April 29th" on elegant menu, high quality, detailed, pixel art</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-29', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-29')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-29')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-29')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-04-30" data-completed="false" data-month="04">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">04-30.png</div>
+                    <div class="date">April 30th</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('04-30')">
+            </div>
+            <div class="prompt-text" id="prompt-04-30">Honesty Day transparent layered illustration: bee with visible internal organs and honey stomach, medical cross-section style, educational transparency, "APRIL 30TH" in honest handwriting, high quality, detailed, digital illustration</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('04-30', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('04-30')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('04-30')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('04-30')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+        <div class="prompt-card" id="card-05-02" data-completed="false" data-month="05">
+            <div class="prompt-header">
+                <div>
+                    <div class="filename">05-02.png</div>
+                    <div class="date">May 2nd</div>
+                </div>
+                <input type="checkbox" class="checkbox" onchange="toggleComplete('05-02')">
+            </div>
+            <div class="prompt-text" id="prompt-05-02">Baby Day soft focus photography: newborn bee emerging from honeycomb, macro lens shallow depth of field, warm golden hour light, tender moment, "May 2nd" whispered in corner, high quality, detailed, professional photography</div>
+            <div class="actions">
+                <button class="copy-btn" onclick="copyPrompt('05-02', this)">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" onclick="markDone('05-02')">&#x2713; Mark Done</button>
+                <button class="undo-btn" onclick="markUndone('05-02')" style="display:none;">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="markDoneAndNext('05-02')">&#x2713; Done &amp; Next &#x27A1;</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'bee-prompts-completed';
+        let currentFilter = 'all';
+        let currentMonth = 'all';
+
+        function getCompletedPrompts() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function saveCompletedPrompts(completed) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+        }
+
+        function loadCompletionState() {
+            const completed = getCompletedPrompts();
+            Object.keys(completed).forEach(filename => {
+                if (completed[filename]) {
+                    const card = document.getElementById('card-' + filename);
+                    if (card) {
+                        card.classList.add('completed');
+                        card.dataset.completed = 'true';
+                        card.querySelector('.checkbox').checked = true;
+                        card.querySelector('.done-btn').style.display = 'none';
+                        card.querySelector('.undo-btn').style.display = 'inline-block';
+                    }
+                }
+            });
+            updateStats();
+        }
+
+        function toggleComplete(filename) {
+            const card = document.getElementById('card-' + filename);
+            if (card.querySelector('.checkbox').checked) markDone(filename);
+            else markUndone(filename);
+        }
+
+        function markDone(filename) {
+            const card = document.getElementById('card-' + filename);
+            card.classList.add('completed');
+            card.dataset.completed = 'true';
+            card.querySelector('.checkbox').checked = true;
+            card.querySelector('.done-btn').style.display = 'none';
+            card.querySelector('.undo-btn').style.display = 'inline-block';
+            const completed = getCompletedPrompts();
+            completed[filename] = true;
+            saveCompletedPrompts(completed);
+            updateStats();
+        }
+
+        function markDoneAndNext(filename) {
+            markDone(filename);
+            jumpToNext();
+        }
+
+        function markUndone(filename) {
+            const card = document.getElementById('card-' + filename);
+            card.classList.remove('completed');
+            card.dataset.completed = 'false';
+            card.querySelector('.checkbox').checked = false;
+            card.querySelector('.done-btn').style.display = 'inline-block';
+            card.querySelector('.undo-btn').style.display = 'none';
+            const completed = getCompletedPrompts();
+            delete completed[filename];
+            saveCompletedPrompts(completed);
+            updateStats();
+        }
+
+        function copyPrompt(filename, btn) {
+            const promptText = document.getElementById('prompt-' + filename).textContent.trim();
+            const url = 'https://chatgpt.com/?q=' + encodeURIComponent(promptText);
+            window.open(url, '_blank');
+        }
+
+        function jumpToNext() {
+            document.querySelectorAll('.prompt-card.current-prompt').forEach(c => c.classList.remove('current-prompt'));
+            const cards = document.querySelectorAll('.prompt-card');
+            for (const card of cards) {
+                if (card.dataset.completed !== 'true' && card.style.display !== 'none') {
+                    card.classList.add('current-prompt');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+            }
+            alert('All prompts are done! Great work!');
+        }
+
+        function updateStats() {
+            const cards = document.querySelectorAll('.prompt-card');
+            const total = cards.length;
+            const completed = document.querySelectorAll('.prompt-card.completed').length;
+            const remaining = total - completed;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('remaining-count').textContent = remaining;
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-bar').textContent = pct + '%';
+        }
+
+        function applyFilters() {
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                const done = card.dataset.completed === 'true';
+                const month = card.dataset.month;
+                const matchesStatus = currentFilter === 'all' || (currentFilter === 'todo' && !done) || (currentFilter === 'completed' && done);
+                const matchesMonth = currentMonth === 'all' || month === currentMonth;
+                card.style.display = (matchesStatus && matchesMonth) ? 'block' : 'none';
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('fb-' + (filter === 'completed' ? 'done' : filter)).classList.add('active');
+            applyFilters();
+        }
+
+        function filterMonth(month) {
+            currentMonth = month;
+            document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            applyFilters();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCompletionState();
+        });
+    </script>
+</body>
+</html>

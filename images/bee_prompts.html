@@ -1,0 +1,3173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bee Image Prompts Batch Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #FFC107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0; color: #333; }
+        .stats { margin-top: 10px; color: #666; }
+        .prompt-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s;
+        }
+        .prompt-card.current-prompt {
+            box-shadow: 0 0 0 3px #FFC107, 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .prompt-card.completed {
+            opacity: 0.6;
+            background: #e8f5e9;
+        }
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .filename { font-weight: bold; color: #1976D2; font-size: 18px; }
+        .date { color: #666; font-size: 14px; }
+        .prompt-text {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .copy-btn { background: #4CAF50; color: white; }
+        .copy-btn:hover { background: #45a049; }
+        .done-btn { background: #2196F3; color: white; }
+        .done-btn:hover { background: #0b7dda; }
+        .undo-btn { background: #FF9800; color: white; }
+        .undo-btn:hover { background: #e68900; }
+        .next-btn { background: #9C27B0; color: white; font-weight: bold; }
+        .next-btn:hover { background: #7B1FA2; }
+        .progress {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-bar {
+            background: #4CAF50;
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            min-width: 40px;
+        }
+        .checkbox { width: 24px; height: 24px; cursor: pointer; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+            align-items: center;
+        }
+        .filter-btn { background: #9E9E9E; color: white; }
+        .filter-btn:hover { background: #757575; }
+        .filter-btn.active { background: #424242; }
+        .month-btn { background: #5C6BC0; color: white; font-size: 12px; padding: 6px 10px; }
+        .month-btn:hover { background: #3949AB; }
+        .month-btn.active { background: #1A237E; }
+        .jump-next-btn {
+            background: #9C27B0;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 10px 20px;
+        }
+        .jump-next-btn:hover { background: #7B1FA2; }
+        .section-label {
+            font-size: 12px;
+            color: #888;
+            margin-right: 4px;
+            align-self: center;
+        }
+
+        /* ── Calendar grid ──────────────────────────────────────── */
+        #prompts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 0;
+            align-items: flex-start;
+        }
+        .cal-card {
+            width: 90px;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.12s, box-shadow 0.12s;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .cal-card:hover {
+            transform: scale(1.07);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 1;
+        }
+        .cal-card img {
+            width: 90px;
+            height: 82px;
+            object-fit: cover;
+            display: block;
+        }
+        .cal-x {
+            width: 90px;
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #E53935;
+            background: #FFEBEE;
+        }
+        .cal-label {
+            font-size: 9px;
+            color: #999;
+            text-align: center;
+            padding: 3px 2px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .cal-card.missing .cal-label { color: #C62828; font-weight: bold; }
+        .cal-card.holiday {
+            box-shadow: 0 0 0 2px #E53935, 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .cal-card.holiday:hover {
+            box-shadow: 0 0 0 2px #E53935, 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .cal-card.missing[data-completed="true"] .cal-x {
+            background: #E8F5E9;
+            color: #4CAF50;
+        }
+        .cal-card.current-prompt { outline: 3px solid #FFC107; }
+
+        /* ── Modal ───────────────────────────────────────────────── */
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        #modal-overlay.open { display: flex; }
+        #modal-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px;
+            max-width: 620px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        #modal-close {
+            position: absolute;
+            top: 12px; right: 14px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #888;
+            padding: 2px 6px;
+            line-height: 1;
+        }
+        #modal-close:hover { color: #333; }
+        #modal-title { font-size: 19px; font-weight: bold; color: #1976D2; margin-bottom: 8px; }
+        #modal-holiday {
+            background: #E53935;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        #modal-prompt {
+            background: #f9f9f9;
+            padding: 14px;
+            border-radius: 6px;
+            font-family: monospace;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        #modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        #modal-img { width: 100%; border-radius: 6px; margin-bottom: 10px; display: block; }
+        .fname-btn { background: #546E7A; color: white; font-family: monospace; }
+        .fname-btn:hover { background: #37474F; }
+        .fname-btn.copied { background: #4CAF50; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>&#x1F41D; 365 Bee Image Prompts</h1>
+        <div class="stats">
+            <strong id="total-count">0</strong> total |
+            <strong id="completed-count">0</strong> done |
+            <strong id="remaining-count">0</strong> remaining
+        </div>
+        <div class="progress">
+            <div class="progress-bar" id="progress-bar" style="width:0%">0%</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="jump-next-btn" onclick="jumpToNext()">&#x27A1;&#xFE0F; Next Prompt</button>
+        <span style="flex:1"></span>
+        <span class="section-label">Filter:</span>
+        <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" id="fb-todo" onclick="setFilter('todo')">To-Do</button>
+        <button class="filter-btn" id="fb-done" onclick="setFilter('completed')">Done</button>
+    </div>
+
+    <div class="controls" style="margin-top:0">
+        <span class="section-label">Month:</span>
+        <button class="month-btn" onclick="filterMonth('all')">All</button>
+        <button class="month-btn" onclick="filterMonth('01')">Jan</button>
+        <button class="month-btn" onclick="filterMonth('02')">Feb</button>
+        <button class="month-btn" onclick="filterMonth('03')">Mar</button>
+        <button class="month-btn" onclick="filterMonth('04')">Apr</button>
+        <button class="month-btn" onclick="filterMonth('05')">May</button>
+        <button class="month-btn" onclick="filterMonth('06')">Jun</button>
+        <button class="month-btn" onclick="filterMonth('07')">Jul</button>
+        <button class="month-btn" onclick="filterMonth('08')">Aug</button>
+        <button class="month-btn" onclick="filterMonth('09')">Sep</button>
+        <button class="month-btn" onclick="filterMonth('10')">Oct</button>
+        <button class="month-btn" onclick="filterMonth('11')">Nov</button>
+        <button class="month-btn" onclick="filterMonth('12')">Dec</button>
+    </div>
+
+    <div id="prompts-container">
+        <div class="cal-card holiday" id="card-01-01"
+             data-stem="01-01" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-01" data-holiday="2025; 2026; 2027 · New Year&#x27;s Day"
+             onclick="openModal('01-01')">
+            <img src="01-01.png" alt="01-01" loading="lazy">
+            <div class="cal-label">01-01</div>
+        </div>
+        <div class="cal-card" id="card-01-02"
+             data-stem="01-02" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-02"
+             onclick="openModal('01-02')">
+            <img src="01-02.png" alt="01-02" loading="lazy">
+            <div class="cal-label">01-02</div>
+        </div>
+        <div class="cal-card" id="card-01-03"
+             data-stem="01-03" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-03"
+             onclick="openModal('01-03')">
+            <img src="01-03.png" alt="01-03" loading="lazy">
+            <div class="cal-label">01-03</div>
+        </div>
+        <div class="cal-card" id="card-01-04"
+             data-stem="01-04" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-04"
+             onclick="openModal('01-04')">
+            <img src="01-04.png" alt="01-04" loading="lazy">
+            <div class="cal-label">01-04</div>
+        </div>
+        <div class="cal-card" id="card-01-05"
+             data-stem="01-05" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-05"
+             onclick="openModal('01-05')">
+            <img src="01-05.png" alt="01-05" loading="lazy">
+            <div class="cal-label">01-05</div>
+        </div>
+        <div class="cal-card" id="card-01-06"
+             data-stem="01-06" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-06"
+             onclick="openModal('01-06')">
+            <img src="01-06.png" alt="01-06" loading="lazy">
+            <div class="cal-label">01-06</div>
+        </div>
+        <div class="cal-card" id="card-01-07"
+             data-stem="01-07" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-07"
+             onclick="openModal('01-07')">
+            <img src="01-07.png" alt="01-07" loading="lazy">
+            <div class="cal-label">01-07</div>
+        </div>
+        <div class="cal-card" id="card-01-08"
+             data-stem="01-08" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-08"
+             onclick="openModal('01-08')">
+            <img src="01-08.png" alt="01-08" loading="lazy">
+            <div class="cal-label">01-08</div>
+        </div>
+        <div class="cal-card" id="card-01-09"
+             data-stem="01-09" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-09"
+             onclick="openModal('01-09')">
+            <img src="01-09.png" alt="01-09" loading="lazy">
+            <div class="cal-label">01-09</div>
+        </div>
+        <div class="cal-card" id="card-01-10"
+             data-stem="01-10" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-10"
+             onclick="openModal('01-10')">
+            <img src="01-10.png" alt="01-10" loading="lazy">
+            <div class="cal-label">01-10</div>
+        </div>
+        <div class="cal-card" id="card-01-11"
+             data-stem="01-11" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-11"
+             onclick="openModal('01-11')">
+            <img src="01-11.png" alt="01-11" loading="lazy">
+            <div class="cal-label">01-11</div>
+        </div>
+        <div class="cal-card" id="card-01-12"
+             data-stem="01-12" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-12"
+             onclick="openModal('01-12')">
+            <img src="01-12.png" alt="01-12" loading="lazy">
+            <div class="cal-label">01-12</div>
+        </div>
+        <div class="cal-card" id="card-01-13"
+             data-stem="01-13" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-13"
+             onclick="openModal('01-13')">
+            <img src="01-13.png" alt="01-13" loading="lazy">
+            <div class="cal-label">01-13</div>
+        </div>
+        <div class="cal-card" id="card-01-14"
+             data-stem="01-14" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-14"
+             onclick="openModal('01-14')">
+            <img src="01-14.png" alt="01-14" loading="lazy">
+            <div class="cal-label">01-14</div>
+        </div>
+        <div class="cal-card" id="card-01-15"
+             data-stem="01-15" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-15"
+             onclick="openModal('01-15')">
+            <img src="01-15.png" alt="01-15" loading="lazy">
+            <div class="cal-label">01-15</div>
+        </div>
+        <div class="cal-card" id="card-01-16"
+             data-stem="01-16" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-16"
+             onclick="openModal('01-16')">
+            <img src="01-16.png" alt="01-16" loading="lazy">
+            <div class="cal-label">01-16</div>
+        </div>
+        <div class="cal-card" id="card-01-17"
+             data-stem="01-17" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-17"
+             onclick="openModal('01-17')">
+            <img src="01-17.png" alt="01-17" loading="lazy">
+            <div class="cal-label">01-17</div>
+        </div>
+        <div class="cal-card holiday" id="card-01-18"
+             data-stem="01-18" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-18" data-holiday="2027 · MLK Day · Floating"
+             onclick="openModal('01-18')">
+            <img src="01-18.png" alt="01-18" loading="lazy">
+            <div class="cal-label">01-18</div>
+        </div>
+        <div class="cal-card holiday" id="card-01-19"
+             data-stem="01-19" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-19" data-holiday="2026 · MLK Day · Floating"
+             onclick="openModal('01-19')">
+            <img src="01-19.png" alt="01-19" loading="lazy">
+            <div class="cal-label">01-19</div>
+        </div>
+        <div class="cal-card holiday" id="card-01-20"
+             data-stem="01-20" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-20" data-holiday="2025 · MLK Day · Floating"
+             onclick="openModal('01-20')">
+            <img src="01-20.png" alt="01-20" loading="lazy">
+            <div class="cal-label">01-20</div>
+        </div>
+        <div class="cal-card" id="card-01-21"
+             data-stem="01-21" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-21"
+             onclick="openModal('01-21')">
+            <img src="01-21.png" alt="01-21" loading="lazy">
+            <div class="cal-label">01-21</div>
+        </div>
+        <div class="cal-card" id="card-01-22"
+             data-stem="01-22" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-22"
+             onclick="openModal('01-22')">
+            <img src="01-22.png" alt="01-22" loading="lazy">
+            <div class="cal-label">01-22</div>
+        </div>
+        <div class="cal-card" id="card-01-23"
+             data-stem="01-23" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-23"
+             onclick="openModal('01-23')">
+            <img src="01-23.png" alt="01-23" loading="lazy">
+            <div class="cal-label">01-23</div>
+        </div>
+        <div class="cal-card" id="card-01-24"
+             data-stem="01-24" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-24"
+             onclick="openModal('01-24')">
+            <img src="01-24.png" alt="01-24" loading="lazy">
+            <div class="cal-label">01-24</div>
+        </div>
+        <div class="cal-card" id="card-01-25"
+             data-stem="01-25" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-25"
+             onclick="openModal('01-25')">
+            <img src="01-25.png" alt="01-25" loading="lazy">
+            <div class="cal-label">01-25</div>
+        </div>
+        <div class="cal-card" id="card-01-26"
+             data-stem="01-26" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-26"
+             onclick="openModal('01-26')">
+            <img src="01-26.png" alt="01-26" loading="lazy">
+            <div class="cal-label">01-26</div>
+        </div>
+        <div class="cal-card" id="card-01-27"
+             data-stem="01-27" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-27"
+             onclick="openModal('01-27')">
+            <img src="01-27.png" alt="01-27" loading="lazy">
+            <div class="cal-label">01-27</div>
+        </div>
+        <div class="cal-card" id="card-01-28"
+             data-stem="01-28" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-28"
+             onclick="openModal('01-28')">
+            <img src="01-28.png" alt="01-28" loading="lazy">
+            <div class="cal-label">01-28</div>
+        </div>
+        <div class="cal-card" id="card-01-29"
+             data-stem="01-29" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-29"
+             onclick="openModal('01-29')">
+            <img src="01-29.png" alt="01-29" loading="lazy">
+            <div class="cal-label">01-29</div>
+        </div>
+        <div class="cal-card" id="card-01-30"
+             data-stem="01-30" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-30"
+             onclick="openModal('01-30')">
+            <img src="01-30.png" alt="01-30" loading="lazy">
+            <div class="cal-label">01-30</div>
+        </div>
+        <div class="cal-card" id="card-01-31"
+             data-stem="01-31" data-month="01" data-completed="true"
+             data-prompt="" data-date="01-31"
+             onclick="openModal('01-31')">
+            <img src="01-31.png" alt="01-31" loading="lazy">
+            <div class="cal-label">01-31</div>
+        </div>
+        <div class="cal-card" id="card-02-01"
+             data-stem="02-01" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-01"
+             onclick="openModal('02-01')">
+            <img src="02-01.png" alt="02-01" loading="lazy">
+            <div class="cal-label">02-01</div>
+        </div>
+        <div class="cal-card holiday" id="card-02-02"
+             data-stem="02-02" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-02" data-holiday="2025; 2026; 2027 · Groundhog Day"
+             onclick="openModal('02-02')">
+            <img src="02-02.png" alt="02-02" loading="lazy">
+            <div class="cal-label">02-02</div>
+        </div>
+        <div class="cal-card" id="card-02-03"
+             data-stem="02-03" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-03"
+             onclick="openModal('02-03')">
+            <img src="02-03.png" alt="02-03" loading="lazy">
+            <div class="cal-label">02-03</div>
+        </div>
+        <div class="cal-card" id="card-02-04"
+             data-stem="02-04" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-04"
+             onclick="openModal('02-04')">
+            <img src="02-04.png" alt="02-04" loading="lazy">
+            <div class="cal-label">02-04</div>
+        </div>
+        <div class="cal-card" id="card-02-05"
+             data-stem="02-05" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-05"
+             onclick="openModal('02-05')">
+            <img src="02-05.png" alt="02-05" loading="lazy">
+            <div class="cal-label">02-05</div>
+        </div>
+        <div class="cal-card" id="card-02-06"
+             data-stem="02-06" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-06"
+             onclick="openModal('02-06')">
+            <img src="02-06.png" alt="02-06" loading="lazy">
+            <div class="cal-label">02-06</div>
+        </div>
+        <div class="cal-card" id="card-02-07"
+             data-stem="02-07" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-07"
+             onclick="openModal('02-07')">
+            <img src="02-07.png" alt="02-07" loading="lazy">
+            <div class="cal-label">02-07</div>
+        </div>
+        <div class="cal-card" id="card-02-08"
+             data-stem="02-08" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-08"
+             onclick="openModal('02-08')">
+            <img src="02-08.png" alt="02-08" loading="lazy">
+            <div class="cal-label">02-08</div>
+        </div>
+        <div class="cal-card" id="card-02-09"
+             data-stem="02-09" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-09"
+             onclick="openModal('02-09')">
+            <img src="02-09.png" alt="02-09" loading="lazy">
+            <div class="cal-label">02-09</div>
+        </div>
+        <div class="cal-card" id="card-02-10"
+             data-stem="02-10" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-10"
+             onclick="openModal('02-10')">
+            <img src="02-10.png" alt="02-10" loading="lazy">
+            <div class="cal-label">02-10</div>
+        </div>
+        <div class="cal-card" id="card-02-11"
+             data-stem="02-11" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-11"
+             onclick="openModal('02-11')">
+            <img src="02-11.png" alt="02-11" loading="lazy">
+            <div class="cal-label">02-11</div>
+        </div>
+        <div class="cal-card" id="card-02-12"
+             data-stem="02-12" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-12"
+             onclick="openModal('02-12')">
+            <img src="02-12.png" alt="02-12" loading="lazy">
+            <div class="cal-label">02-12</div>
+        </div>
+        <div class="cal-card" id="card-02-13"
+             data-stem="02-13" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-13"
+             onclick="openModal('02-13')">
+            <img src="02-13.png" alt="02-13" loading="lazy">
+            <div class="cal-label">02-13</div>
+        </div>
+        <div class="cal-card holiday" id="card-02-14"
+             data-stem="02-14" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-14" data-holiday="2025; 2026; 2027 · Valentine&#x27;s Day"
+             onclick="openModal('02-14')">
+            <img src="02-14.png" alt="02-14" loading="lazy">
+            <div class="cal-label">02-14</div>
+        </div>
+        <div class="cal-card holiday" id="card-02-15"
+             data-stem="02-15" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-15" data-holiday="2027 · Presidents&#x27; Day · Floating"
+             onclick="openModal('02-15')">
+            <img src="02-15.png" alt="02-15" loading="lazy">
+            <div class="cal-label">02-15</div>
+        </div>
+        <div class="cal-card holiday" id="card-02-16"
+             data-stem="02-16" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-16" data-holiday="2026 · Presidents&#x27; Day · Floating"
+             onclick="openModal('02-16')">
+            <img src="02-16.png" alt="02-16" loading="lazy">
+            <div class="cal-label">02-16</div>
+        </div>
+        <div class="cal-card holiday" id="card-02-17"
+             data-stem="02-17" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-17" data-holiday="2025 · Presidents&#x27; Day · Floating"
+             onclick="openModal('02-17')">
+            <img src="02-17.png" alt="02-17" loading="lazy">
+            <div class="cal-label">02-17</div>
+        </div>
+        <div class="cal-card" id="card-02-18"
+             data-stem="02-18" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-18"
+             onclick="openModal('02-18')">
+            <img src="02-18.png" alt="02-18" loading="lazy">
+            <div class="cal-label">02-18</div>
+        </div>
+        <div class="cal-card" id="card-02-19"
+             data-stem="02-19" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-19"
+             onclick="openModal('02-19')">
+            <img src="02-19.png" alt="02-19" loading="lazy">
+            <div class="cal-label">02-19</div>
+        </div>
+        <div class="cal-card" id="card-02-20"
+             data-stem="02-20" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-20"
+             onclick="openModal('02-20')">
+            <img src="02-20.png" alt="02-20" loading="lazy">
+            <div class="cal-label">02-20</div>
+        </div>
+        <div class="cal-card" id="card-02-21"
+             data-stem="02-21" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-21"
+             onclick="openModal('02-21')">
+            <img src="02-21.png" alt="02-21" loading="lazy">
+            <div class="cal-label">02-21</div>
+        </div>
+        <div class="cal-card" id="card-02-22"
+             data-stem="02-22" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-22"
+             onclick="openModal('02-22')">
+            <img src="02-22.png" alt="02-22" loading="lazy">
+            <div class="cal-label">02-22</div>
+        </div>
+        <div class="cal-card" id="card-02-23"
+             data-stem="02-23" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-23"
+             onclick="openModal('02-23')">
+            <img src="02-23.png" alt="02-23" loading="lazy">
+            <div class="cal-label">02-23</div>
+        </div>
+        <div class="cal-card" id="card-02-24"
+             data-stem="02-24" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-24"
+             onclick="openModal('02-24')">
+            <img src="02-24.png" alt="02-24" loading="lazy">
+            <div class="cal-label">02-24</div>
+        </div>
+        <div class="cal-card" id="card-02-25"
+             data-stem="02-25" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-25"
+             onclick="openModal('02-25')">
+            <img src="02-25.png" alt="02-25" loading="lazy">
+            <div class="cal-label">02-25</div>
+        </div>
+        <div class="cal-card" id="card-02-26"
+             data-stem="02-26" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-26"
+             onclick="openModal('02-26')">
+            <img src="02-26.png" alt="02-26" loading="lazy">
+            <div class="cal-label">02-26</div>
+        </div>
+        <div class="cal-card" id="card-02-27"
+             data-stem="02-27" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-27"
+             onclick="openModal('02-27')">
+            <img src="02-27.png" alt="02-27" loading="lazy">
+            <div class="cal-label">02-27</div>
+        </div>
+        <div class="cal-card" id="card-02-28"
+             data-stem="02-28" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-28"
+             onclick="openModal('02-28')">
+            <img src="02-28.png" alt="02-28" loading="lazy">
+            <div class="cal-label">02-28</div>
+        </div>
+        <div class="cal-card" id="card-02-29"
+             data-stem="02-29" data-month="02" data-completed="true"
+             data-prompt="" data-date="02-29"
+             onclick="openModal('02-29')">
+            <img src="02-29.png" alt="02-29" loading="lazy">
+            <div class="cal-label">02-29</div>
+        </div>
+        <div class="cal-card" id="card-03-01"
+             data-stem="03-01" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-01"
+             onclick="openModal('03-01')">
+            <img src="03-01.png" alt="03-01" loading="lazy">
+            <div class="cal-label">03-01</div>
+        </div>
+        <div class="cal-card" id="card-03-02"
+             data-stem="03-02" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-02"
+             onclick="openModal('03-02')">
+            <img src="03-02.png" alt="03-02" loading="lazy">
+            <div class="cal-label">03-02</div>
+        </div>
+        <div class="cal-card" id="card-03-03"
+             data-stem="03-03" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-03"
+             onclick="openModal('03-03')">
+            <img src="03-03.png" alt="03-03" loading="lazy">
+            <div class="cal-label">03-03</div>
+        </div>
+        <div class="cal-card" id="card-03-04"
+             data-stem="03-04" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-04"
+             onclick="openModal('03-04')">
+            <img src="03-04.png" alt="03-04" loading="lazy">
+            <div class="cal-label">03-04</div>
+        </div>
+        <div class="cal-card" id="card-03-05"
+             data-stem="03-05" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-05"
+             onclick="openModal('03-05')">
+            <img src="03-05.png" alt="03-05" loading="lazy">
+            <div class="cal-label">03-05</div>
+        </div>
+        <div class="cal-card" id="card-03-06"
+             data-stem="03-06" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-06"
+             onclick="openModal('03-06')">
+            <img src="03-06.png" alt="03-06" loading="lazy">
+            <div class="cal-label">03-06</div>
+        </div>
+        <div class="cal-card" id="card-03-07"
+             data-stem="03-07" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-07"
+             onclick="openModal('03-07')">
+            <img src="03-07.png" alt="03-07" loading="lazy">
+            <div class="cal-label">03-07</div>
+        </div>
+        <div class="cal-card holiday" id="card-03-08"
+             data-stem="03-08" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-08" data-holiday="2026 · Daylight Saving Starts · Floating"
+             onclick="openModal('03-08')">
+            <img src="03-08.png" alt="03-08" loading="lazy">
+            <div class="cal-label">03-08</div>
+        </div>
+        <div class="cal-card holiday" id="card-03-09"
+             data-stem="03-09" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-09" data-holiday="2025 · Daylight Saving Starts · Floating"
+             onclick="openModal('03-09')">
+            <img src="03-09.png" alt="03-09" loading="lazy">
+            <div class="cal-label">03-09</div>
+        </div>
+        <div class="cal-card" id="card-03-10"
+             data-stem="03-10" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-10"
+             onclick="openModal('03-10')">
+            <img src="03-10.png" alt="03-10" loading="lazy">
+            <div class="cal-label">03-10</div>
+        </div>
+        <div class="cal-card" id="card-03-11"
+             data-stem="03-11" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-11"
+             onclick="openModal('03-11')">
+            <img src="03-11.png" alt="03-11" loading="lazy">
+            <div class="cal-label">03-11</div>
+        </div>
+        <div class="cal-card" id="card-03-12"
+             data-stem="03-12" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-12"
+             onclick="openModal('03-12')">
+            <img src="03-12.png" alt="03-12" loading="lazy">
+            <div class="cal-label">03-12</div>
+        </div>
+        <div class="cal-card" id="card-03-13"
+             data-stem="03-13" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-13"
+             onclick="openModal('03-13')">
+            <img src="03-13.png" alt="03-13" loading="lazy">
+            <div class="cal-label">03-13</div>
+        </div>
+        <div class="cal-card holiday" id="card-03-14"
+             data-stem="03-14" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-14" data-holiday="2027 · Daylight Saving Starts · Floating"
+             onclick="openModal('03-14')">
+            <img src="03-14.png" alt="03-14" loading="lazy">
+            <div class="cal-label">03-14</div>
+        </div>
+        <div class="cal-card" id="card-03-15"
+             data-stem="03-15" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-15"
+             onclick="openModal('03-15')">
+            <img src="03-15.png" alt="03-15" loading="lazy">
+            <div class="cal-label">03-15</div>
+        </div>
+        <div class="cal-card" id="card-03-16"
+             data-stem="03-16" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-16"
+             onclick="openModal('03-16')">
+            <img src="03-16.png" alt="03-16" loading="lazy">
+            <div class="cal-label">03-16</div>
+        </div>
+        <div class="cal-card holiday" id="card-03-17"
+             data-stem="03-17" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-17" data-holiday="2025; 2026; 2027 · St. Patrick&#x27;s Day"
+             onclick="openModal('03-17')">
+            <img src="03-17.png" alt="03-17" loading="lazy">
+            <div class="cal-label">03-17</div>
+        </div>
+        <div class="cal-card" id="card-03-18"
+             data-stem="03-18" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-18"
+             onclick="openModal('03-18')">
+            <img src="03-18.png" alt="03-18" loading="lazy">
+            <div class="cal-label">03-18</div>
+        </div>
+        <div class="cal-card" id="card-03-19"
+             data-stem="03-19" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-19"
+             onclick="openModal('03-19')">
+            <img src="03-19.png" alt="03-19" loading="lazy">
+            <div class="cal-label">03-19</div>
+        </div>
+        <div class="cal-card" id="card-03-20"
+             data-stem="03-20" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-20"
+             onclick="openModal('03-20')">
+            <img src="03-20.png" alt="03-20" loading="lazy">
+            <div class="cal-label">03-20</div>
+        </div>
+        <div class="cal-card" id="card-03-21"
+             data-stem="03-21" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-21"
+             onclick="openModal('03-21')">
+            <img src="03-21.png" alt="03-21" loading="lazy">
+            <div class="cal-label">03-21</div>
+        </div>
+        <div class="cal-card" id="card-03-22"
+             data-stem="03-22" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-22"
+             onclick="openModal('03-22')">
+            <img src="03-22.png" alt="03-22" loading="lazy">
+            <div class="cal-label">03-22</div>
+        </div>
+        <div class="cal-card" id="card-03-23"
+             data-stem="03-23" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-23"
+             onclick="openModal('03-23')">
+            <img src="03-23.png" alt="03-23" loading="lazy">
+            <div class="cal-label">03-23</div>
+        </div>
+        <div class="cal-card" id="card-03-24"
+             data-stem="03-24" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-24"
+             onclick="openModal('03-24')">
+            <img src="03-24.png" alt="03-24" loading="lazy">
+            <div class="cal-label">03-24</div>
+        </div>
+        <div class="cal-card" id="card-03-25"
+             data-stem="03-25" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-25"
+             onclick="openModal('03-25')">
+            <img src="03-25.png" alt="03-25" loading="lazy">
+            <div class="cal-label">03-25</div>
+        </div>
+        <div class="cal-card holiday" id="card-03-26"
+             data-stem="03-26" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-26" data-holiday="2027 · Good Friday · Floating"
+             onclick="openModal('03-26')">
+            <img src="03-26.png" alt="03-26" loading="lazy">
+            <div class="cal-label">03-26</div>
+        </div>
+        <div class="cal-card" id="card-03-27"
+             data-stem="03-27" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-27"
+             onclick="openModal('03-27')">
+            <img src="03-27.png" alt="03-27" loading="lazy">
+            <div class="cal-label">03-27</div>
+        </div>
+        <div class="cal-card holiday" id="card-03-28"
+             data-stem="03-28" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-28" data-holiday="2027 · Easter · Floating"
+             onclick="openModal('03-28')">
+            <img src="03-28.png" alt="03-28" loading="lazy">
+            <div class="cal-label">03-28</div>
+        </div>
+        <div class="cal-card" id="card-03-29"
+             data-stem="03-29" data-month="03" data-completed="true"
+             data-prompt="Mom and Pop Business Owners Day: bee shopkeepers in front of small store, nostalgic small-town America, Norman Rockwell painting style, &quot;MARCH 29TH&quot; on store sign, high quality, detailed, studio ghibli style" data-date="March 29th"
+             onclick="openModal('03-29')">
+            <img src="03-29.png" alt="03-29" loading="lazy">
+            <div class="cal-label">03-29</div>
+        </div>
+        <div class="cal-card" id="card-03-30"
+             data-stem="03-30" data-month="03" data-completed="true"
+             data-prompt="Take A Walk In The Park Day: bee strolling through park path, peaceful nature photography, cherry blossoms, park bench, &quot;March 30th&quot; carved in tree, high quality, detailed, digital illustration" data-date="March 30th"
+             onclick="openModal('03-30')">
+            <img src="03-30.png" alt="03-30" loading="lazy">
+            <div class="cal-label">03-30</div>
+        </div>
+        <div class="cal-card" id="card-03-31"
+             data-stem="03-31" data-month="03" data-completed="true"
+             data-prompt="" data-date="03-31"
+             onclick="openModal('03-31')">
+            <img src="03-31.png" alt="03-31" loading="lazy">
+            <div class="cal-label">03-31</div>
+        </div>
+        <div class="cal-card holiday" id="card-04-01"
+             data-stem="04-01" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-01" data-holiday="2025; 2026; 2027 · April Fools&#x27; Day"
+             onclick="openModal('04-01')">
+            <img src="04-01.png" alt="04-01" loading="lazy">
+            <div class="cal-label">04-01</div>
+        </div>
+        <div class="cal-card" id="card-04-02"
+             data-stem="04-02" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-02"
+             onclick="openModal('04-02')">
+            <img src="04-02.png" alt="04-02" loading="lazy">
+            <div class="cal-label">04-02</div>
+        </div>
+        <div class="cal-card holiday" id="card-04-03"
+             data-stem="04-03" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-03" data-holiday="2026 · Good Friday · Floating"
+             onclick="openModal('04-03')">
+            <img src="04-03.png" alt="04-03" loading="lazy">
+            <div class="cal-label">04-03</div>
+        </div>
+        <div class="cal-card" id="card-04-04"
+             data-stem="04-04" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-04"
+             onclick="openModal('04-04')">
+            <img src="04-04.png" alt="04-04" loading="lazy">
+            <div class="cal-label">04-04</div>
+        </div>
+        <div class="cal-card holiday" id="card-04-05"
+             data-stem="04-05" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-05" data-holiday="2026 · Easter · Floating"
+             onclick="openModal('04-05')">
+            <img src="04-05.png" alt="04-05" loading="lazy">
+            <div class="cal-label">04-05</div>
+        </div>
+        <div class="cal-card" id="card-04-06"
+             data-stem="04-06" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-06"
+             onclick="openModal('04-06')">
+            <img src="04-06.png" alt="04-06" loading="lazy">
+            <div class="cal-label">04-06</div>
+        </div>
+        <div class="cal-card" id="card-04-07"
+             data-stem="04-07" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-07"
+             onclick="openModal('04-07')">
+            <img src="04-07.png" alt="04-07" loading="lazy">
+            <div class="cal-label">04-07</div>
+        </div>
+        <div class="cal-card" id="card-04-08"
+             data-stem="04-08" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-08"
+             onclick="openModal('04-08')">
+            <img src="04-08.png" alt="04-08" loading="lazy">
+            <div class="cal-label">04-08</div>
+        </div>
+        <div class="cal-card" id="card-04-09"
+             data-stem="04-09" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-09"
+             onclick="openModal('04-09')">
+            <img src="04-09.png" alt="04-09" loading="lazy">
+            <div class="cal-label">04-09</div>
+        </div>
+        <div class="cal-card" id="card-04-10"
+             data-stem="04-10" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-10"
+             onclick="openModal('04-10')">
+            <img src="04-10.png" alt="04-10" loading="lazy">
+            <div class="cal-label">04-10</div>
+        </div>
+        <div class="cal-card" id="card-04-11"
+             data-stem="04-11" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-11"
+             onclick="openModal('04-11')">
+            <img src="04-11.png" alt="04-11" loading="lazy">
+            <div class="cal-label">04-11</div>
+        </div>
+        <div class="cal-card" id="card-04-12"
+             data-stem="04-12" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-12"
+             onclick="openModal('04-12')">
+            <img src="04-12.png" alt="04-12" loading="lazy">
+            <div class="cal-label">04-12</div>
+        </div>
+        <div class="cal-card" id="card-04-13"
+             data-stem="04-13" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-13"
+             onclick="openModal('04-13')">
+            <img src="04-13.png" alt="04-13" loading="lazy">
+            <div class="cal-label">04-13</div>
+        </div>
+        <div class="cal-card" id="card-04-14"
+             data-stem="04-14" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-14"
+             onclick="openModal('04-14')">
+            <img src="04-14.png" alt="04-14" loading="lazy">
+            <div class="cal-label">04-14</div>
+        </div>
+        <div class="cal-card holiday" id="card-04-15"
+             data-stem="04-15" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-15" data-holiday="2025; 2026; 2027 · Tax Day"
+             onclick="openModal('04-15')">
+            <img src="04-15.png" alt="04-15" loading="lazy">
+            <div class="cal-label">04-15</div>
+        </div>
+        <div class="cal-card" id="card-04-16"
+             data-stem="04-16" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-16"
+             onclick="openModal('04-16')">
+            <img src="04-16.png" alt="04-16" loading="lazy">
+            <div class="cal-label">04-16</div>
+        </div>
+        <div class="cal-card" id="card-04-17"
+             data-stem="04-17" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-17"
+             onclick="openModal('04-17')">
+            <img src="04-17.png" alt="04-17" loading="lazy">
+            <div class="cal-label">04-17</div>
+        </div>
+        <div class="cal-card holiday" id="card-04-18"
+             data-stem="04-18" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-18" data-holiday="2025 · Good Friday · Floating"
+             onclick="openModal('04-18')">
+            <img src="04-18.png" alt="04-18" loading="lazy">
+            <div class="cal-label">04-18</div>
+        </div>
+        <div class="cal-card" id="card-04-19"
+             data-stem="04-19" data-month="04" data-completed="true"
+             data-prompt="" data-date="04-19"
+             onclick="openModal('04-19')">
+            <img src="04-19.png" alt="04-19" loading="lazy">
+            <div class="cal-label">04-19</div>
+        </div>
+        <div class="cal-card holiday" id="card-04-20"
+             data-stem="04-20" data-month="04" data-completed="true"
+             data-prompt="Look Alike Day mirror image symmetrical digital art: two identical bees facing each other creating Rorschach test pattern, perfect bilateral symmetry, &quot;APRIL 20TH&quot; reflected in center, high quality, detailed, pop art" data-date="April 20th" data-holiday="2025 · Easter · Floating"
+             onclick="openModal('04-20')">
+            <img src="04-20.png" alt="04-20" loading="lazy">
+            <div class="cal-label">04-20</div>
+        </div>
+        <div class="cal-card missing" id="card-04-21"
+             data-stem="04-21" data-month="04" data-completed="false"
+             data-prompt="Tea Day delicate Chinese porcelain painting style: bee hovering over steaming teacup, blue and white ceramics aesthetic, elegant flowing lines, &quot;April 21st&quot; in decorative tea tin label, high quality, detailed, linocut print" data-date="April 21st"
+             onclick="openModal('04-21')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-21</div>
+        </div>
+        <div class="cal-card missing" id="card-04-22"
+             data-stem="04-22" data-month="04" data-completed="false"
+             data-prompt="Earth Day environmental poster art: bee as planet Earth protector with recycling symbol, bold graphic design, green activism style, powerful message, &quot;APRIL 22ND&quot; in eco-friendly font, high quality, detailed, comic book style" data-date="April 22nd"
+             onclick="openModal('04-22')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-22</div>
+        </div>
+        <div class="cal-card missing" id="card-04-23"
+             data-stem="04-23" data-month="04" data-completed="false"
+             data-prompt="Take A Chance Day Las Vegas neon sign style: bee with dice and playing cards, glowing neon tubes, retro casino aesthetic, electric colors, &quot;April 23rd&quot; in vintage Vegas lettering, high quality, detailed, flat design vector art" data-date="April 23rd"
+             onclick="openModal('04-23')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-23</div>
+        </div>
+        <div class="cal-card missing" id="card-04-24"
+             data-stem="04-24" data-month="04" data-completed="false"
+             data-prompt="Pigs In A Blanket Day cozy hygge photography: bee wrapped in tiny knitted blanket by fireplace, warm candlelight, Danish comfort aesthetic, &quot;APRIL 24TH&quot; on wooden sign, high quality, detailed, comic book style" data-date="April 24th"
+             onclick="openModal('04-24')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-24</div>
+        </div>
+        <div class="cal-card missing" id="card-04-25"
+             data-stem="04-25" data-month="04" data-completed="false"
+             data-prompt="Penguin Day children&#x27;s cartoon animation cel: bee and penguin as best friends, Disney classic 2D animation style, bright cheerful colors, &quot;April 25th&quot; on Antarctica sign, high quality, detailed, vintage botanical illustration" data-date="April 25th"
+             onclick="openModal('04-25')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-25</div>
+        </div>
+        <div class="cal-card missing" id="card-04-26"
+             data-stem="04-26" data-month="04" data-completed="false"
+             data-prompt="Pretzel Day Bavarian folk art: bee in lederhosen serving giant pretzel, German decorative painting style, alpine flowers, &quot;APRIL 26TH&quot; in Gothic blackletter font, high quality, detailed, impressionist painting" data-date="April 26th"
+             onclick="openModal('04-26')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-26</div>
+        </div>
+        <div class="cal-card missing" id="card-04-27"
+             data-stem="04-27" data-month="04" data-completed="false"
+             data-prompt="Tell A Story Day storybook spread illustration: bee as storyteller to young bees around campfire, Arthur Rackham fairy tale style, magical twilight atmosphere, &quot;April 27th&quot; as chapter heading, high quality, detailed, flat design vector art" data-date="April 27th"
+             onclick="openModal('04-27')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-27</div>
+        </div>
+        <div class="cal-card missing" id="card-04-28"
+             data-stem="04-28" data-month="04" data-completed="false"
+             data-prompt="Superhero Day comic book cover art: bee superhero flying over city, dynamic action pose, bold outlines, vintage Marvel Comics style, &quot;APRIL 28TH ISSUE #1&quot; in corner box, high quality, detailed, pencil sketch" data-date="April 28th"
+             onclick="openModal('04-28')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-28</div>
+        </div>
+        <div class="cal-card missing" id="card-04-29"
+             data-stem="04-29" data-month="04" data-completed="false"
+             data-prompt="Shrimp Scampi Day upscale restaurant photography: bee as food critic with shrimp scampi plate, Michelin-star presentation, dramatic side lighting, &quot;April 29th&quot; on elegant menu, high quality, detailed, pixel art" data-date="April 29th"
+             onclick="openModal('04-29')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-29</div>
+        </div>
+        <div class="cal-card missing" id="card-04-30"
+             data-stem="04-30" data-month="04" data-completed="false"
+             data-prompt="Honesty Day transparent layered illustration: bee with visible internal organs and honey stomach, medical cross-section style, educational transparency, &quot;APRIL 30TH&quot; in honest handwriting, high quality, detailed, digital illustration" data-date="April 30th"
+             onclick="openModal('04-30')">
+            <div class="cal-x">✕</div>
+            <div class="cal-label">04-30</div>
+        </div>
+        <div class="cal-card" id="card-05-01"
+             data-stem="05-01" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-01"
+             onclick="openModal('05-01')">
+            <img src="05-01.png" alt="05-01" loading="lazy">
+            <div class="cal-label">05-01</div>
+        </div>
+        <div class="cal-card" id="card-05-02"
+             data-stem="05-02" data-month="05" data-completed="true"
+             data-prompt="Baby Day soft focus photography: newborn bee emerging from honeycomb, macro lens shallow depth of field, warm golden hour light, tender moment, &quot;May 2nd&quot; whispered in corner, high quality, detailed, professional photography" data-date="May 2nd"
+             onclick="openModal('05-02')">
+            <img src="05-02.png" alt="05-02" loading="lazy">
+            <div class="cal-label">05-02</div>
+        </div>
+        <div class="cal-card" id="card-05-04"
+             data-stem="05-04" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-04"
+             onclick="openModal('05-04')">
+            <img src="05-04.png" alt="05-04" loading="lazy">
+            <div class="cal-label">05-04</div>
+        </div>
+        <div class="cal-card" id="card-05-05"
+             data-stem="05-05" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-05"
+             onclick="openModal('05-05')">
+            <img src="05-05.png" alt="05-05" loading="lazy">
+            <div class="cal-label">05-05</div>
+        </div>
+        <div class="cal-card" id="card-05-06"
+             data-stem="05-06" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-06"
+             onclick="openModal('05-06')">
+            <img src="05-06.png" alt="05-06" loading="lazy">
+            <div class="cal-label">05-06</div>
+        </div>
+        <div class="cal-card" id="card-05-07"
+             data-stem="05-07" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-07"
+             onclick="openModal('05-07')">
+            <img src="05-07.png" alt="05-07" loading="lazy">
+            <div class="cal-label">05-07</div>
+        </div>
+        <div class="cal-card" id="card-05-08"
+             data-stem="05-08" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-08"
+             onclick="openModal('05-08')">
+            <img src="05-08.png" alt="05-08" loading="lazy">
+            <div class="cal-label">05-08</div>
+        </div>
+        <div class="cal-card holiday" id="card-05-09"
+             data-stem="05-09" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-09" data-holiday="2027 · Mother&#x27;s Day · Floating"
+             onclick="openModal('05-09')">
+            <img src="05-09.png" alt="05-09" loading="lazy">
+            <div class="cal-label">05-09</div>
+        </div>
+        <div class="cal-card holiday" id="card-05-10"
+             data-stem="05-10" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-10" data-holiday="2026 · Mother&#x27;s Day · Floating"
+             onclick="openModal('05-10')">
+            <img src="05-10.png" alt="05-10" loading="lazy">
+            <div class="cal-label">05-10</div>
+        </div>
+        <div class="cal-card holiday" id="card-05-11"
+             data-stem="05-11" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-11" data-holiday="2025 · Mother&#x27;s Day · Floating"
+             onclick="openModal('05-11')">
+            <img src="05-11.png" alt="05-11" loading="lazy">
+            <div class="cal-label">05-11</div>
+        </div>
+        <div class="cal-card" id="card-05-12"
+             data-stem="05-12" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-12"
+             onclick="openModal('05-12')">
+            <img src="05-12.png" alt="05-12" loading="lazy">
+            <div class="cal-label">05-12</div>
+        </div>
+        <div class="cal-card" id="card-05-13"
+             data-stem="05-13" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-13"
+             onclick="openModal('05-13')">
+            <img src="05-13.png" alt="05-13" loading="lazy">
+            <div class="cal-label">05-13</div>
+        </div>
+        <div class="cal-card" id="card-05-14"
+             data-stem="05-14" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-14"
+             onclick="openModal('05-14')">
+            <img src="05-14.png" alt="05-14" loading="lazy">
+            <div class="cal-label">05-14</div>
+        </div>
+        <div class="cal-card" id="card-05-15"
+             data-stem="05-15" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-15"
+             onclick="openModal('05-15')">
+            <img src="05-15.png" alt="05-15" loading="lazy">
+            <div class="cal-label">05-15</div>
+        </div>
+        <div class="cal-card" id="card-05-16"
+             data-stem="05-16" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-16"
+             onclick="openModal('05-16')">
+            <img src="05-16.png" alt="05-16" loading="lazy">
+            <div class="cal-label">05-16</div>
+        </div>
+        <div class="cal-card" id="card-05-17"
+             data-stem="05-17" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-17"
+             onclick="openModal('05-17')">
+            <img src="05-17.png" alt="05-17" loading="lazy">
+            <div class="cal-label">05-17</div>
+        </div>
+        <div class="cal-card" id="card-05-18"
+             data-stem="05-18" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-18"
+             onclick="openModal('05-18')">
+            <img src="05-18.png" alt="05-18" loading="lazy">
+            <div class="cal-label">05-18</div>
+        </div>
+        <div class="cal-card" id="card-05-19"
+             data-stem="05-19" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-19"
+             onclick="openModal('05-19')">
+            <img src="05-19.png" alt="05-19" loading="lazy">
+            <div class="cal-label">05-19</div>
+        </div>
+        <div class="cal-card" id="card-05-20"
+             data-stem="05-20" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-20"
+             onclick="openModal('05-20')">
+            <img src="05-20.png" alt="05-20" loading="lazy">
+            <div class="cal-label">05-20</div>
+        </div>
+        <div class="cal-card" id="card-05-21"
+             data-stem="05-21" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-21"
+             onclick="openModal('05-21')">
+            <img src="05-21.png" alt="05-21" loading="lazy">
+            <div class="cal-label">05-21</div>
+        </div>
+        <div class="cal-card" id="card-05-22"
+             data-stem="05-22" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-22"
+             onclick="openModal('05-22')">
+            <img src="05-22.png" alt="05-22" loading="lazy">
+            <div class="cal-label">05-22</div>
+        </div>
+        <div class="cal-card" id="card-05-23"
+             data-stem="05-23" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-23"
+             onclick="openModal('05-23')">
+            <img src="05-23.png" alt="05-23" loading="lazy">
+            <div class="cal-label">05-23</div>
+        </div>
+        <div class="cal-card" id="card-05-24"
+             data-stem="05-24" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-24"
+             onclick="openModal('05-24')">
+            <img src="05-24.png" alt="05-24" loading="lazy">
+            <div class="cal-label">05-24</div>
+        </div>
+        <div class="cal-card holiday" id="card-05-25"
+             data-stem="05-25" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-25" data-holiday="2026 · Memorial Day · Floating"
+             onclick="openModal('05-25')">
+            <img src="05-25.png" alt="05-25" loading="lazy">
+            <div class="cal-label">05-25</div>
+        </div>
+        <div class="cal-card holiday" id="card-05-26"
+             data-stem="05-26" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-26" data-holiday="2025 · Memorial Day · Floating"
+             onclick="openModal('05-26')">
+            <img src="05-26.png" alt="05-26" loading="lazy">
+            <div class="cal-label">05-26</div>
+        </div>
+        <div class="cal-card" id="card-05-27"
+             data-stem="05-27" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-27"
+             onclick="openModal('05-27')">
+            <img src="05-27.png" alt="05-27" loading="lazy">
+            <div class="cal-label">05-27</div>
+        </div>
+        <div class="cal-card" id="card-05-28"
+             data-stem="05-28" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-28"
+             onclick="openModal('05-28')">
+            <img src="05-28.png" alt="05-28" loading="lazy">
+            <div class="cal-label">05-28</div>
+        </div>
+        <div class="cal-card" id="card-05-29"
+             data-stem="05-29" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-29"
+             onclick="openModal('05-29')">
+            <img src="05-29.png" alt="05-29" loading="lazy">
+            <div class="cal-label">05-29</div>
+        </div>
+        <div class="cal-card" id="card-05-30"
+             data-stem="05-30" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-30"
+             onclick="openModal('05-30')">
+            <img src="05-30.png" alt="05-30" loading="lazy">
+            <div class="cal-label">05-30</div>
+        </div>
+        <div class="cal-card holiday" id="card-05-31"
+             data-stem="05-31" data-month="05" data-completed="true"
+             data-prompt="" data-date="05-31" data-holiday="2027 · Memorial Day · Floating"
+             onclick="openModal('05-31')">
+            <img src="05-31.png" alt="05-31" loading="lazy">
+            <div class="cal-label">05-31</div>
+        </div>
+        <div class="cal-card" id="card-06-01"
+             data-stem="06-01" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-01"
+             onclick="openModal('06-01')">
+            <img src="06-01.png" alt="06-01" loading="lazy">
+            <div class="cal-label">06-01</div>
+        </div>
+        <div class="cal-card" id="card-06-02"
+             data-stem="06-02" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-02"
+             onclick="openModal('06-02')">
+            <img src="06-02.png" alt="06-02" loading="lazy">
+            <div class="cal-label">06-02</div>
+        </div>
+        <div class="cal-card" id="card-06-03"
+             data-stem="06-03" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-03"
+             onclick="openModal('06-03')">
+            <img src="06-03.png" alt="06-03" loading="lazy">
+            <div class="cal-label">06-03</div>
+        </div>
+        <div class="cal-card" id="card-06-04"
+             data-stem="06-04" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-04"
+             onclick="openModal('06-04')">
+            <img src="06-04.png" alt="06-04" loading="lazy">
+            <div class="cal-label">06-04</div>
+        </div>
+        <div class="cal-card" id="card-06-05"
+             data-stem="06-05" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-05"
+             onclick="openModal('06-05')">
+            <img src="06-05.png" alt="06-05" loading="lazy">
+            <div class="cal-label">06-05</div>
+        </div>
+        <div class="cal-card" id="card-06-06"
+             data-stem="06-06" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-06"
+             onclick="openModal('06-06')">
+            <img src="06-06.png" alt="06-06" loading="lazy">
+            <div class="cal-label">06-06</div>
+        </div>
+        <div class="cal-card" id="card-06-07"
+             data-stem="06-07" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-07"
+             onclick="openModal('06-07')">
+            <img src="06-07.png" alt="06-07" loading="lazy">
+            <div class="cal-label">06-07</div>
+        </div>
+        <div class="cal-card" id="card-06-08"
+             data-stem="06-08" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-08"
+             onclick="openModal('06-08')">
+            <img src="06-08.png" alt="06-08" loading="lazy">
+            <div class="cal-label">06-08</div>
+        </div>
+        <div class="cal-card" id="card-06-09"
+             data-stem="06-09" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-09"
+             onclick="openModal('06-09')">
+            <img src="06-09.png" alt="06-09" loading="lazy">
+            <div class="cal-label">06-09</div>
+        </div>
+        <div class="cal-card" id="card-06-10"
+             data-stem="06-10" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-10"
+             onclick="openModal('06-10')">
+            <img src="06-10.png" alt="06-10" loading="lazy">
+            <div class="cal-label">06-10</div>
+        </div>
+        <div class="cal-card" id="card-06-11"
+             data-stem="06-11" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-11"
+             onclick="openModal('06-11')">
+            <img src="06-11.png" alt="06-11" loading="lazy">
+            <div class="cal-label">06-11</div>
+        </div>
+        <div class="cal-card" id="card-06-12"
+             data-stem="06-12" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-12"
+             onclick="openModal('06-12')">
+            <img src="06-12.png" alt="06-12" loading="lazy">
+            <div class="cal-label">06-12</div>
+        </div>
+        <div class="cal-card" id="card-06-13"
+             data-stem="06-13" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-13"
+             onclick="openModal('06-13')">
+            <img src="06-13.png" alt="06-13" loading="lazy">
+            <div class="cal-label">06-13</div>
+        </div>
+        <div class="cal-card" id="card-06-14"
+             data-stem="06-14" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-14"
+             onclick="openModal('06-14')">
+            <img src="06-14.png" alt="06-14" loading="lazy">
+            <div class="cal-label">06-14</div>
+        </div>
+        <div class="cal-card holiday" id="card-06-15"
+             data-stem="06-15" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-15" data-holiday="2025 · Father&#x27;s Day · Floating"
+             onclick="openModal('06-15')">
+            <img src="06-15.png" alt="06-15" loading="lazy">
+            <div class="cal-label">06-15</div>
+        </div>
+        <div class="cal-card" id="card-06-16"
+             data-stem="06-16" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-16"
+             onclick="openModal('06-16')">
+            <img src="06-16.png" alt="06-16" loading="lazy">
+            <div class="cal-label">06-16</div>
+        </div>
+        <div class="cal-card" id="card-06-17"
+             data-stem="06-17" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-17"
+             onclick="openModal('06-17')">
+            <img src="06-17.png" alt="06-17" loading="lazy">
+            <div class="cal-label">06-17</div>
+        </div>
+        <div class="cal-card" id="card-06-18"
+             data-stem="06-18" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-18"
+             onclick="openModal('06-18')">
+            <img src="06-18.png" alt="06-18" loading="lazy">
+            <div class="cal-label">06-18</div>
+        </div>
+        <div class="cal-card holiday" id="card-06-19"
+             data-stem="06-19" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-19" data-holiday="2025; 2026; 2027 · Juneteenth"
+             onclick="openModal('06-19')">
+            <img src="06-19.png" alt="06-19" loading="lazy">
+            <div class="cal-label">06-19</div>
+        </div>
+        <div class="cal-card holiday" id="card-06-20"
+             data-stem="06-20" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-20" data-holiday="2027 · Father&#x27;s Day · Floating"
+             onclick="openModal('06-20')">
+            <img src="06-20.png" alt="06-20" loading="lazy">
+            <div class="cal-label">06-20</div>
+        </div>
+        <div class="cal-card holiday" id="card-06-21"
+             data-stem="06-21" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-21" data-holiday="2026 · Father&#x27;s Day · Floating"
+             onclick="openModal('06-21')">
+            <img src="06-21.png" alt="06-21" loading="lazy">
+            <div class="cal-label">06-21</div>
+        </div>
+        <div class="cal-card" id="card-06-22"
+             data-stem="06-22" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-22"
+             onclick="openModal('06-22')">
+            <img src="06-22.png" alt="06-22" loading="lazy">
+            <div class="cal-label">06-22</div>
+        </div>
+        <div class="cal-card" id="card-06-23"
+             data-stem="06-23" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-23"
+             onclick="openModal('06-23')">
+            <img src="06-23.png" alt="06-23" loading="lazy">
+            <div class="cal-label">06-23</div>
+        </div>
+        <div class="cal-card" id="card-06-24"
+             data-stem="06-24" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-24"
+             onclick="openModal('06-24')">
+            <img src="06-24.png" alt="06-24" loading="lazy">
+            <div class="cal-label">06-24</div>
+        </div>
+        <div class="cal-card" id="card-06-25"
+             data-stem="06-25" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-25"
+             onclick="openModal('06-25')">
+            <img src="06-25.png" alt="06-25" loading="lazy">
+            <div class="cal-label">06-25</div>
+        </div>
+        <div class="cal-card" id="card-06-26"
+             data-stem="06-26" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-26"
+             onclick="openModal('06-26')">
+            <img src="06-26.png" alt="06-26" loading="lazy">
+            <div class="cal-label">06-26</div>
+        </div>
+        <div class="cal-card" id="card-06-27"
+             data-stem="06-27" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-27"
+             onclick="openModal('06-27')">
+            <img src="06-27.png" alt="06-27" loading="lazy">
+            <div class="cal-label">06-27</div>
+        </div>
+        <div class="cal-card" id="card-06-28"
+             data-stem="06-28" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-28"
+             onclick="openModal('06-28')">
+            <img src="06-28.png" alt="06-28" loading="lazy">
+            <div class="cal-label">06-28</div>
+        </div>
+        <div class="cal-card" id="card-06-29"
+             data-stem="06-29" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-29"
+             onclick="openModal('06-29')">
+            <img src="06-29.png" alt="06-29" loading="lazy">
+            <div class="cal-label">06-29</div>
+        </div>
+        <div class="cal-card" id="card-06-30"
+             data-stem="06-30" data-month="06" data-completed="true"
+             data-prompt="" data-date="06-30"
+             onclick="openModal('06-30')">
+            <img src="06-30.png" alt="06-30" loading="lazy">
+            <div class="cal-label">06-30</div>
+        </div>
+        <div class="cal-card" id="card-07-01"
+             data-stem="07-01" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-01"
+             onclick="openModal('07-01')">
+            <img src="07-01.png" alt="07-01" loading="lazy">
+            <div class="cal-label">07-01</div>
+        </div>
+        <div class="cal-card" id="card-07-02"
+             data-stem="07-02" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-02"
+             onclick="openModal('07-02')">
+            <img src="07-02.png" alt="07-02" loading="lazy">
+            <div class="cal-label">07-02</div>
+        </div>
+        <div class="cal-card" id="card-07-03"
+             data-stem="07-03" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-03"
+             onclick="openModal('07-03')">
+            <img src="07-03.png" alt="07-03" loading="lazy">
+            <div class="cal-label">07-03</div>
+        </div>
+        <div class="cal-card holiday" id="card-07-04"
+             data-stem="07-04" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-04" data-holiday="2025; 2026; 2027 · Independence Day"
+             onclick="openModal('07-04')">
+            <img src="07-04.png" alt="07-04" loading="lazy">
+            <div class="cal-label">07-04</div>
+        </div>
+        <div class="cal-card" id="card-07-05"
+             data-stem="07-05" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-05"
+             onclick="openModal('07-05')">
+            <img src="07-05.png" alt="07-05" loading="lazy">
+            <div class="cal-label">07-05</div>
+        </div>
+        <div class="cal-card" id="card-07-06"
+             data-stem="07-06" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-06"
+             onclick="openModal('07-06')">
+            <img src="07-06.png" alt="07-06" loading="lazy">
+            <div class="cal-label">07-06</div>
+        </div>
+        <div class="cal-card" id="card-07-07"
+             data-stem="07-07" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-07"
+             onclick="openModal('07-07')">
+            <img src="07-07.png" alt="07-07" loading="lazy">
+            <div class="cal-label">07-07</div>
+        </div>
+        <div class="cal-card" id="card-07-08"
+             data-stem="07-08" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-08"
+             onclick="openModal('07-08')">
+            <img src="07-08.png" alt="07-08" loading="lazy">
+            <div class="cal-label">07-08</div>
+        </div>
+        <div class="cal-card" id="card-07-09"
+             data-stem="07-09" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-09"
+             onclick="openModal('07-09')">
+            <img src="07-09.png" alt="07-09" loading="lazy">
+            <div class="cal-label">07-09</div>
+        </div>
+        <div class="cal-card" id="card-07-10"
+             data-stem="07-10" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-10"
+             onclick="openModal('07-10')">
+            <img src="07-10.png" alt="07-10" loading="lazy">
+            <div class="cal-label">07-10</div>
+        </div>
+        <div class="cal-card" id="card-07-11"
+             data-stem="07-11" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-11"
+             onclick="openModal('07-11')">
+            <img src="07-11.png" alt="07-11" loading="lazy">
+            <div class="cal-label">07-11</div>
+        </div>
+        <div class="cal-card" id="card-07-12"
+             data-stem="07-12" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-12"
+             onclick="openModal('07-12')">
+            <img src="07-12.png" alt="07-12" loading="lazy">
+            <div class="cal-label">07-12</div>
+        </div>
+        <div class="cal-card" id="card-07-13"
+             data-stem="07-13" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-13"
+             onclick="openModal('07-13')">
+            <img src="07-13.png" alt="07-13" loading="lazy">
+            <div class="cal-label">07-13</div>
+        </div>
+        <div class="cal-card" id="card-07-14"
+             data-stem="07-14" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-14"
+             onclick="openModal('07-14')">
+            <img src="07-14.png" alt="07-14" loading="lazy">
+            <div class="cal-label">07-14</div>
+        </div>
+        <div class="cal-card" id="card-07-15"
+             data-stem="07-15" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-15"
+             onclick="openModal('07-15')">
+            <img src="07-15.png" alt="07-15" loading="lazy">
+            <div class="cal-label">07-15</div>
+        </div>
+        <div class="cal-card" id="card-07-16"
+             data-stem="07-16" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-16"
+             onclick="openModal('07-16')">
+            <img src="07-16.png" alt="07-16" loading="lazy">
+            <div class="cal-label">07-16</div>
+        </div>
+        <div class="cal-card" id="card-07-17"
+             data-stem="07-17" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-17"
+             onclick="openModal('07-17')">
+            <img src="07-17.png" alt="07-17" loading="lazy">
+            <div class="cal-label">07-17</div>
+        </div>
+        <div class="cal-card" id="card-07-18"
+             data-stem="07-18" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-18"
+             onclick="openModal('07-18')">
+            <img src="07-18.png" alt="07-18" loading="lazy">
+            <div class="cal-label">07-18</div>
+        </div>
+        <div class="cal-card" id="card-07-19"
+             data-stem="07-19" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-19"
+             onclick="openModal('07-19')">
+            <img src="07-19.png" alt="07-19" loading="lazy">
+            <div class="cal-label">07-19</div>
+        </div>
+        <div class="cal-card" id="card-07-20"
+             data-stem="07-20" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-20"
+             onclick="openModal('07-20')">
+            <img src="07-20.png" alt="07-20" loading="lazy">
+            <div class="cal-label">07-20</div>
+        </div>
+        <div class="cal-card" id="card-07-21"
+             data-stem="07-21" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-21"
+             onclick="openModal('07-21')">
+            <img src="07-21.png" alt="07-21" loading="lazy">
+            <div class="cal-label">07-21</div>
+        </div>
+        <div class="cal-card" id="card-07-22"
+             data-stem="07-22" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-22"
+             onclick="openModal('07-22')">
+            <img src="07-22.png" alt="07-22" loading="lazy">
+            <div class="cal-label">07-22</div>
+        </div>
+        <div class="cal-card" id="card-07-23"
+             data-stem="07-23" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-23"
+             onclick="openModal('07-23')">
+            <img src="07-23.png" alt="07-23" loading="lazy">
+            <div class="cal-label">07-23</div>
+        </div>
+        <div class="cal-card" id="card-07-24"
+             data-stem="07-24" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-24"
+             onclick="openModal('07-24')">
+            <img src="07-24.png" alt="07-24" loading="lazy">
+            <div class="cal-label">07-24</div>
+        </div>
+        <div class="cal-card" id="card-07-25"
+             data-stem="07-25" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-25"
+             onclick="openModal('07-25')">
+            <img src="07-25.png" alt="07-25" loading="lazy">
+            <div class="cal-label">07-25</div>
+        </div>
+        <div class="cal-card" id="card-07-26"
+             data-stem="07-26" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-26"
+             onclick="openModal('07-26')">
+            <img src="07-26.png" alt="07-26" loading="lazy">
+            <div class="cal-label">07-26</div>
+        </div>
+        <div class="cal-card" id="card-07-27"
+             data-stem="07-27" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-27"
+             onclick="openModal('07-27')">
+            <img src="07-27.png" alt="07-27" loading="lazy">
+            <div class="cal-label">07-27</div>
+        </div>
+        <div class="cal-card" id="card-07-28"
+             data-stem="07-28" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-28"
+             onclick="openModal('07-28')">
+            <img src="07-28.png" alt="07-28" loading="lazy">
+            <div class="cal-label">07-28</div>
+        </div>
+        <div class="cal-card" id="card-07-29"
+             data-stem="07-29" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-29"
+             onclick="openModal('07-29')">
+            <img src="07-29.png" alt="07-29" loading="lazy">
+            <div class="cal-label">07-29</div>
+        </div>
+        <div class="cal-card" id="card-07-30"
+             data-stem="07-30" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-30"
+             onclick="openModal('07-30')">
+            <img src="07-30.png" alt="07-30" loading="lazy">
+            <div class="cal-label">07-30</div>
+        </div>
+        <div class="cal-card" id="card-07-31"
+             data-stem="07-31" data-month="07" data-completed="true"
+             data-prompt="" data-date="07-31"
+             onclick="openModal('07-31')">
+            <img src="07-31.png" alt="07-31" loading="lazy">
+            <div class="cal-label">07-31</div>
+        </div>
+        <div class="cal-card" id="card-08-01"
+             data-stem="08-01" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-01"
+             onclick="openModal('08-01')">
+            <img src="08-01.png" alt="08-01" loading="lazy">
+            <div class="cal-label">08-01</div>
+        </div>
+        <div class="cal-card" id="card-08-02"
+             data-stem="08-02" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-02"
+             onclick="openModal('08-02')">
+            <img src="08-02.png" alt="08-02" loading="lazy">
+            <div class="cal-label">08-02</div>
+        </div>
+        <div class="cal-card" id="card-08-03"
+             data-stem="08-03" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-03"
+             onclick="openModal('08-03')">
+            <img src="08-03.png" alt="08-03" loading="lazy">
+            <div class="cal-label">08-03</div>
+        </div>
+        <div class="cal-card" id="card-08-04"
+             data-stem="08-04" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-04"
+             onclick="openModal('08-04')">
+            <img src="08-04.png" alt="08-04" loading="lazy">
+            <div class="cal-label">08-04</div>
+        </div>
+        <div class="cal-card" id="card-08-05"
+             data-stem="08-05" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-05"
+             onclick="openModal('08-05')">
+            <img src="08-05.png" alt="08-05" loading="lazy">
+            <div class="cal-label">08-05</div>
+        </div>
+        <div class="cal-card" id="card-08-06"
+             data-stem="08-06" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-06"
+             onclick="openModal('08-06')">
+            <img src="08-06.png" alt="08-06" loading="lazy">
+            <div class="cal-label">08-06</div>
+        </div>
+        <div class="cal-card" id="card-08-07"
+             data-stem="08-07" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-07"
+             onclick="openModal('08-07')">
+            <img src="08-07.png" alt="08-07" loading="lazy">
+            <div class="cal-label">08-07</div>
+        </div>
+        <div class="cal-card" id="card-08-08"
+             data-stem="08-08" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-08"
+             onclick="openModal('08-08')">
+            <img src="08-08.png" alt="08-08" loading="lazy">
+            <div class="cal-label">08-08</div>
+        </div>
+        <div class="cal-card" id="card-08-09"
+             data-stem="08-09" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-09"
+             onclick="openModal('08-09')">
+            <img src="08-09.png" alt="08-09" loading="lazy">
+            <div class="cal-label">08-09</div>
+        </div>
+        <div class="cal-card" id="card-08-10"
+             data-stem="08-10" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-10"
+             onclick="openModal('08-10')">
+            <img src="08-10.png" alt="08-10" loading="lazy">
+            <div class="cal-label">08-10</div>
+        </div>
+        <div class="cal-card" id="card-08-11"
+             data-stem="08-11" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-11"
+             onclick="openModal('08-11')">
+            <img src="08-11.png" alt="08-11" loading="lazy">
+            <div class="cal-label">08-11</div>
+        </div>
+        <div class="cal-card" id="card-08-12"
+             data-stem="08-12" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-12"
+             onclick="openModal('08-12')">
+            <img src="08-12.png" alt="08-12" loading="lazy">
+            <div class="cal-label">08-12</div>
+        </div>
+        <div class="cal-card" id="card-08-13"
+             data-stem="08-13" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-13"
+             onclick="openModal('08-13')">
+            <img src="08-13.png" alt="08-13" loading="lazy">
+            <div class="cal-label">08-13</div>
+        </div>
+        <div class="cal-card" id="card-08-14"
+             data-stem="08-14" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-14"
+             onclick="openModal('08-14')">
+            <img src="08-14.png" alt="08-14" loading="lazy">
+            <div class="cal-label">08-14</div>
+        </div>
+        <div class="cal-card" id="card-08-15"
+             data-stem="08-15" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-15"
+             onclick="openModal('08-15')">
+            <img src="08-15.png" alt="08-15" loading="lazy">
+            <div class="cal-label">08-15</div>
+        </div>
+        <div class="cal-card" id="card-08-16"
+             data-stem="08-16" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-16"
+             onclick="openModal('08-16')">
+            <img src="08-16.png" alt="08-16" loading="lazy">
+            <div class="cal-label">08-16</div>
+        </div>
+        <div class="cal-card" id="card-08-17"
+             data-stem="08-17" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-17"
+             onclick="openModal('08-17')">
+            <img src="08-17.png" alt="08-17" loading="lazy">
+            <div class="cal-label">08-17</div>
+        </div>
+        <div class="cal-card" id="card-08-18"
+             data-stem="08-18" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-18"
+             onclick="openModal('08-18')">
+            <img src="08-18.png" alt="08-18" loading="lazy">
+            <div class="cal-label">08-18</div>
+        </div>
+        <div class="cal-card" id="card-08-19"
+             data-stem="08-19" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-19"
+             onclick="openModal('08-19')">
+            <img src="08-19.png" alt="08-19" loading="lazy">
+            <div class="cal-label">08-19</div>
+        </div>
+        <div class="cal-card" id="card-08-20"
+             data-stem="08-20" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-20"
+             onclick="openModal('08-20')">
+            <img src="08-20.png" alt="08-20" loading="lazy">
+            <div class="cal-label">08-20</div>
+        </div>
+        <div class="cal-card" id="card-08-21"
+             data-stem="08-21" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-21"
+             onclick="openModal('08-21')">
+            <img src="08-21.png" alt="08-21" loading="lazy">
+            <div class="cal-label">08-21</div>
+        </div>
+        <div class="cal-card" id="card-08-22"
+             data-stem="08-22" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-22"
+             onclick="openModal('08-22')">
+            <img src="08-22.png" alt="08-22" loading="lazy">
+            <div class="cal-label">08-22</div>
+        </div>
+        <div class="cal-card" id="card-08-23"
+             data-stem="08-23" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-23"
+             onclick="openModal('08-23')">
+            <img src="08-23.png" alt="08-23" loading="lazy">
+            <div class="cal-label">08-23</div>
+        </div>
+        <div class="cal-card" id="card-08-24"
+             data-stem="08-24" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-24"
+             onclick="openModal('08-24')">
+            <img src="08-24.png" alt="08-24" loading="lazy">
+            <div class="cal-label">08-24</div>
+        </div>
+        <div class="cal-card" id="card-08-25"
+             data-stem="08-25" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-25"
+             onclick="openModal('08-25')">
+            <img src="08-25.png" alt="08-25" loading="lazy">
+            <div class="cal-label">08-25</div>
+        </div>
+        <div class="cal-card" id="card-08-26"
+             data-stem="08-26" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-26"
+             onclick="openModal('08-26')">
+            <img src="08-26.png" alt="08-26" loading="lazy">
+            <div class="cal-label">08-26</div>
+        </div>
+        <div class="cal-card" id="card-08-27"
+             data-stem="08-27" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-27"
+             onclick="openModal('08-27')">
+            <img src="08-27.png" alt="08-27" loading="lazy">
+            <div class="cal-label">08-27</div>
+        </div>
+        <div class="cal-card" id="card-08-28"
+             data-stem="08-28" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-28"
+             onclick="openModal('08-28')">
+            <img src="08-28.png" alt="08-28" loading="lazy">
+            <div class="cal-label">08-28</div>
+        </div>
+        <div class="cal-card" id="card-08-29"
+             data-stem="08-29" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-29"
+             onclick="openModal('08-29')">
+            <img src="08-29.png" alt="08-29" loading="lazy">
+            <div class="cal-label">08-29</div>
+        </div>
+        <div class="cal-card" id="card-08-30"
+             data-stem="08-30" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-30"
+             onclick="openModal('08-30')">
+            <img src="08-30.png" alt="08-30" loading="lazy">
+            <div class="cal-label">08-30</div>
+        </div>
+        <div class="cal-card" id="card-08-31"
+             data-stem="08-31" data-month="08" data-completed="true"
+             data-prompt="" data-date="08-31"
+             onclick="openModal('08-31')">
+            <img src="08-31.png" alt="08-31" loading="lazy">
+            <div class="cal-label">08-31</div>
+        </div>
+        <div class="cal-card holiday" id="card-09-01"
+             data-stem="09-01" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-01" data-holiday="2025 · Labor Day · Floating"
+             onclick="openModal('09-01')">
+            <img src="09-01.png" alt="09-01" loading="lazy">
+            <div class="cal-label">09-01</div>
+        </div>
+        <div class="cal-card" id="card-09-02"
+             data-stem="09-02" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-02"
+             onclick="openModal('09-02')">
+            <img src="09-02.png" alt="09-02" loading="lazy">
+            <div class="cal-label">09-02</div>
+        </div>
+        <div class="cal-card" id="card-09-03"
+             data-stem="09-03" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-03"
+             onclick="openModal('09-03')">
+            <img src="09-03.png" alt="09-03" loading="lazy">
+            <div class="cal-label">09-03</div>
+        </div>
+        <div class="cal-card" id="card-09-04"
+             data-stem="09-04" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-04"
+             onclick="openModal('09-04')">
+            <img src="09-04.png" alt="09-04" loading="lazy">
+            <div class="cal-label">09-04</div>
+        </div>
+        <div class="cal-card" id="card-09-05"
+             data-stem="09-05" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-05"
+             onclick="openModal('09-05')">
+            <img src="09-05.png" alt="09-05" loading="lazy">
+            <div class="cal-label">09-05</div>
+        </div>
+        <div class="cal-card holiday" id="card-09-06"
+             data-stem="09-06" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-06" data-holiday="2027 · Labor Day · Floating"
+             onclick="openModal('09-06')">
+            <img src="09-06.png" alt="09-06" loading="lazy">
+            <div class="cal-label">09-06</div>
+        </div>
+        <div class="cal-card holiday" id="card-09-07"
+             data-stem="09-07" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-07" data-holiday="2026 · Labor Day · Floating"
+             onclick="openModal('09-07')">
+            <img src="09-07.png" alt="09-07" loading="lazy">
+            <div class="cal-label">09-07</div>
+        </div>
+        <div class="cal-card" id="card-09-08"
+             data-stem="09-08" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-08"
+             onclick="openModal('09-08')">
+            <img src="09-08.png" alt="09-08" loading="lazy">
+            <div class="cal-label">09-08</div>
+        </div>
+        <div class="cal-card" id="card-09-09"
+             data-stem="09-09" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-09"
+             onclick="openModal('09-09')">
+            <img src="09-09.png" alt="09-09" loading="lazy">
+            <div class="cal-label">09-09</div>
+        </div>
+        <div class="cal-card" id="card-09-10"
+             data-stem="09-10" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-10"
+             onclick="openModal('09-10')">
+            <img src="09-10.png" alt="09-10" loading="lazy">
+            <div class="cal-label">09-10</div>
+        </div>
+        <div class="cal-card" id="card-09-11"
+             data-stem="09-11" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-11"
+             onclick="openModal('09-11')">
+            <img src="09-11.png" alt="09-11" loading="lazy">
+            <div class="cal-label">09-11</div>
+        </div>
+        <div class="cal-card" id="card-09-12"
+             data-stem="09-12" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-12"
+             onclick="openModal('09-12')">
+            <img src="09-12.png" alt="09-12" loading="lazy">
+            <div class="cal-label">09-12</div>
+        </div>
+        <div class="cal-card" id="card-09-13"
+             data-stem="09-13" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-13"
+             onclick="openModal('09-13')">
+            <img src="09-13.png" alt="09-13" loading="lazy">
+            <div class="cal-label">09-13</div>
+        </div>
+        <div class="cal-card" id="card-09-14"
+             data-stem="09-14" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-14"
+             onclick="openModal('09-14')">
+            <img src="09-14.png" alt="09-14" loading="lazy">
+            <div class="cal-label">09-14</div>
+        </div>
+        <div class="cal-card" id="card-09-15"
+             data-stem="09-15" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-15"
+             onclick="openModal('09-15')">
+            <img src="09-15.png" alt="09-15" loading="lazy">
+            <div class="cal-label">09-15</div>
+        </div>
+        <div class="cal-card" id="card-09-16"
+             data-stem="09-16" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-16"
+             onclick="openModal('09-16')">
+            <img src="09-16.png" alt="09-16" loading="lazy">
+            <div class="cal-label">09-16</div>
+        </div>
+        <div class="cal-card" id="card-09-17"
+             data-stem="09-17" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-17"
+             onclick="openModal('09-17')">
+            <img src="09-17.png" alt="09-17" loading="lazy">
+            <div class="cal-label">09-17</div>
+        </div>
+        <div class="cal-card" id="card-09-18"
+             data-stem="09-18" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-18"
+             onclick="openModal('09-18')">
+            <img src="09-18.png" alt="09-18" loading="lazy">
+            <div class="cal-label">09-18</div>
+        </div>
+        <div class="cal-card" id="card-09-19"
+             data-stem="09-19" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-19"
+             onclick="openModal('09-19')">
+            <img src="09-19.png" alt="09-19" loading="lazy">
+            <div class="cal-label">09-19</div>
+        </div>
+        <div class="cal-card" id="card-09-20"
+             data-stem="09-20" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-20"
+             onclick="openModal('09-20')">
+            <img src="09-20.png" alt="09-20" loading="lazy">
+            <div class="cal-label">09-20</div>
+        </div>
+        <div class="cal-card" id="card-09-21"
+             data-stem="09-21" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-21"
+             onclick="openModal('09-21')">
+            <img src="09-21.png" alt="09-21" loading="lazy">
+            <div class="cal-label">09-21</div>
+        </div>
+        <div class="cal-card" id="card-09-22"
+             data-stem="09-22" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-22"
+             onclick="openModal('09-22')">
+            <img src="09-22.png" alt="09-22" loading="lazy">
+            <div class="cal-label">09-22</div>
+        </div>
+        <div class="cal-card" id="card-09-23"
+             data-stem="09-23" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-23"
+             onclick="openModal('09-23')">
+            <img src="09-23.png" alt="09-23" loading="lazy">
+            <div class="cal-label">09-23</div>
+        </div>
+        <div class="cal-card" id="card-09-24"
+             data-stem="09-24" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-24"
+             onclick="openModal('09-24')">
+            <img src="09-24.png" alt="09-24" loading="lazy">
+            <div class="cal-label">09-24</div>
+        </div>
+        <div class="cal-card" id="card-09-25"
+             data-stem="09-25" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-25"
+             onclick="openModal('09-25')">
+            <img src="09-25.png" alt="09-25" loading="lazy">
+            <div class="cal-label">09-25</div>
+        </div>
+        <div class="cal-card" id="card-09-26"
+             data-stem="09-26" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-26"
+             onclick="openModal('09-26')">
+            <img src="09-26.png" alt="09-26" loading="lazy">
+            <div class="cal-label">09-26</div>
+        </div>
+        <div class="cal-card" id="card-09-27"
+             data-stem="09-27" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-27"
+             onclick="openModal('09-27')">
+            <img src="09-27.png" alt="09-27" loading="lazy">
+            <div class="cal-label">09-27</div>
+        </div>
+        <div class="cal-card" id="card-09-28"
+             data-stem="09-28" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-28"
+             onclick="openModal('09-28')">
+            <img src="09-28.png" alt="09-28" loading="lazy">
+            <div class="cal-label">09-28</div>
+        </div>
+        <div class="cal-card" id="card-09-29"
+             data-stem="09-29" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-29"
+             onclick="openModal('09-29')">
+            <img src="09-29.png" alt="09-29" loading="lazy">
+            <div class="cal-label">09-29</div>
+        </div>
+        <div class="cal-card" id="card-09-30"
+             data-stem="09-30" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-30"
+             onclick="openModal('09-30')">
+            <img src="09-30.png" alt="09-30" loading="lazy">
+            <div class="cal-label">09-30</div>
+        </div>
+        <div class="cal-card" id="card-09-31"
+             data-stem="09-31" data-month="09" data-completed="true"
+             data-prompt="" data-date="09-31"
+             onclick="openModal('09-31')">
+            <img src="09-31.png" alt="09-31" loading="lazy">
+            <div class="cal-label">09-31</div>
+        </div>
+        <div class="cal-card" id="card-10-01"
+             data-stem="10-01" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-01"
+             onclick="openModal('10-01')">
+            <img src="10-01.png" alt="10-01" loading="lazy">
+            <div class="cal-label">10-01</div>
+        </div>
+        <div class="cal-card" id="card-10-02"
+             data-stem="10-02" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-02"
+             onclick="openModal('10-02')">
+            <img src="10-02.png" alt="10-02" loading="lazy">
+            <div class="cal-label">10-02</div>
+        </div>
+        <div class="cal-card" id="card-10-03"
+             data-stem="10-03" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-03"
+             onclick="openModal('10-03')">
+            <img src="10-03.png" alt="10-03" loading="lazy">
+            <div class="cal-label">10-03</div>
+        </div>
+        <div class="cal-card" id="card-10-04"
+             data-stem="10-04" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-04"
+             onclick="openModal('10-04')">
+            <img src="10-04.png" alt="10-04" loading="lazy">
+            <div class="cal-label">10-04</div>
+        </div>
+        <div class="cal-card" id="card-10-05"
+             data-stem="10-05" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-05"
+             onclick="openModal('10-05')">
+            <img src="10-05.png" alt="10-05" loading="lazy">
+            <div class="cal-label">10-05</div>
+        </div>
+        <div class="cal-card" id="card-10-06"
+             data-stem="10-06" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-06"
+             onclick="openModal('10-06')">
+            <img src="10-06.png" alt="10-06" loading="lazy">
+            <div class="cal-label">10-06</div>
+        </div>
+        <div class="cal-card" id="card-10-07"
+             data-stem="10-07" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-07"
+             onclick="openModal('10-07')">
+            <img src="10-07.png" alt="10-07" loading="lazy">
+            <div class="cal-label">10-07</div>
+        </div>
+        <div class="cal-card" id="card-10-08"
+             data-stem="10-08" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-08"
+             onclick="openModal('10-08')">
+            <img src="10-08.png" alt="10-08" loading="lazy">
+            <div class="cal-label">10-08</div>
+        </div>
+        <div class="cal-card" id="card-10-09"
+             data-stem="10-09" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-09"
+             onclick="openModal('10-09')">
+            <img src="10-09.png" alt="10-09" loading="lazy">
+            <div class="cal-label">10-09</div>
+        </div>
+        <div class="cal-card" id="card-10-10"
+             data-stem="10-10" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-10"
+             onclick="openModal('10-10')">
+            <img src="10-10.png" alt="10-10" loading="lazy">
+            <div class="cal-label">10-10</div>
+        </div>
+        <div class="cal-card holiday" id="card-10-11"
+             data-stem="10-11" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-11" data-holiday="2027 · Columbus Day · Floating"
+             onclick="openModal('10-11')">
+            <img src="10-11.png" alt="10-11" loading="lazy">
+            <div class="cal-label">10-11</div>
+        </div>
+        <div class="cal-card holiday" id="card-10-12"
+             data-stem="10-12" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-12" data-holiday="2026 · Columbus Day · Floating"
+             onclick="openModal('10-12')">
+            <img src="10-12.png" alt="10-12" loading="lazy">
+            <div class="cal-label">10-12</div>
+        </div>
+        <div class="cal-card holiday" id="card-10-13"
+             data-stem="10-13" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-13" data-holiday="2025 · Columbus Day · Floating"
+             onclick="openModal('10-13')">
+            <img src="10-13.png" alt="10-13" loading="lazy">
+            <div class="cal-label">10-13</div>
+        </div>
+        <div class="cal-card" id="card-10-14"
+             data-stem="10-14" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-14"
+             onclick="openModal('10-14')">
+            <img src="10-14.png" alt="10-14" loading="lazy">
+            <div class="cal-label">10-14</div>
+        </div>
+        <div class="cal-card" id="card-10-15"
+             data-stem="10-15" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-15"
+             onclick="openModal('10-15')">
+            <img src="10-15.png" alt="10-15" loading="lazy">
+            <div class="cal-label">10-15</div>
+        </div>
+        <div class="cal-card" id="card-10-16"
+             data-stem="10-16" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-16"
+             onclick="openModal('10-16')">
+            <img src="10-16.png" alt="10-16" loading="lazy">
+            <div class="cal-label">10-16</div>
+        </div>
+        <div class="cal-card" id="card-10-17"
+             data-stem="10-17" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-17"
+             onclick="openModal('10-17')">
+            <img src="10-17.png" alt="10-17" loading="lazy">
+            <div class="cal-label">10-17</div>
+        </div>
+        <div class="cal-card" id="card-10-18"
+             data-stem="10-18" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-18"
+             onclick="openModal('10-18')">
+            <img src="10-18.png" alt="10-18" loading="lazy">
+            <div class="cal-label">10-18</div>
+        </div>
+        <div class="cal-card" id="card-10-19"
+             data-stem="10-19" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-19"
+             onclick="openModal('10-19')">
+            <img src="10-19.png" alt="10-19" loading="lazy">
+            <div class="cal-label">10-19</div>
+        </div>
+        <div class="cal-card" id="card-10-20"
+             data-stem="10-20" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-20"
+             onclick="openModal('10-20')">
+            <img src="10-20.png" alt="10-20" loading="lazy">
+            <div class="cal-label">10-20</div>
+        </div>
+        <div class="cal-card" id="card-10-21"
+             data-stem="10-21" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-21"
+             onclick="openModal('10-21')">
+            <img src="10-21.png" alt="10-21" loading="lazy">
+            <div class="cal-label">10-21</div>
+        </div>
+        <div class="cal-card" id="card-10-22"
+             data-stem="10-22" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-22"
+             onclick="openModal('10-22')">
+            <img src="10-22.png" alt="10-22" loading="lazy">
+            <div class="cal-label">10-22</div>
+        </div>
+        <div class="cal-card" id="card-10-23"
+             data-stem="10-23" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-23"
+             onclick="openModal('10-23')">
+            <img src="10-23.png" alt="10-23" loading="lazy">
+            <div class="cal-label">10-23</div>
+        </div>
+        <div class="cal-card" id="card-10-24"
+             data-stem="10-24" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-24"
+             onclick="openModal('10-24')">
+            <img src="10-24.png" alt="10-24" loading="lazy">
+            <div class="cal-label">10-24</div>
+        </div>
+        <div class="cal-card" id="card-10-25"
+             data-stem="10-25" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-25"
+             onclick="openModal('10-25')">
+            <img src="10-25.png" alt="10-25" loading="lazy">
+            <div class="cal-label">10-25</div>
+        </div>
+        <div class="cal-card" id="card-10-26"
+             data-stem="10-26" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-26"
+             onclick="openModal('10-26')">
+            <img src="10-26.png" alt="10-26" loading="lazy">
+            <div class="cal-label">10-26</div>
+        </div>
+        <div class="cal-card" id="card-10-27"
+             data-stem="10-27" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-27"
+             onclick="openModal('10-27')">
+            <img src="10-27.png" alt="10-27" loading="lazy">
+            <div class="cal-label">10-27</div>
+        </div>
+        <div class="cal-card" id="card-10-28"
+             data-stem="10-28" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-28"
+             onclick="openModal('10-28')">
+            <img src="10-28.png" alt="10-28" loading="lazy">
+            <div class="cal-label">10-28</div>
+        </div>
+        <div class="cal-card" id="card-10-29"
+             data-stem="10-29" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-29"
+             onclick="openModal('10-29')">
+            <img src="10-29.png" alt="10-29" loading="lazy">
+            <div class="cal-label">10-29</div>
+        </div>
+        <div class="cal-card" id="card-10-30"
+             data-stem="10-30" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-30"
+             onclick="openModal('10-30')">
+            <img src="10-30.png" alt="10-30" loading="lazy">
+            <div class="cal-label">10-30</div>
+        </div>
+        <div class="cal-card holiday" id="card-10-31"
+             data-stem="10-31" data-month="10" data-completed="true"
+             data-prompt="" data-date="10-31" data-holiday="2025; 2026; 2027 · Halloween"
+             onclick="openModal('10-31')">
+            <img src="10-31.png" alt="10-31" loading="lazy">
+            <div class="cal-label">10-31</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-01"
+             data-stem="11-01" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-01" data-holiday="2026 · Daylight Saving Ends · Floating"
+             onclick="openModal('11-01')">
+            <img src="11-01.png" alt="11-01" loading="lazy">
+            <div class="cal-label">11-01</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-02"
+             data-stem="11-02" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-02" data-holiday="2025 · Daylight Saving Ends · Floating"
+             onclick="openModal('11-02')">
+            <img src="11-02.png" alt="11-02" loading="lazy">
+            <div class="cal-label">11-02</div>
+        </div>
+        <div class="cal-card" id="card-11-03"
+             data-stem="11-03" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-03"
+             onclick="openModal('11-03')">
+            <img src="11-03.png" alt="11-03" loading="lazy">
+            <div class="cal-label">11-03</div>
+        </div>
+        <div class="cal-card" id="card-11-04"
+             data-stem="11-04" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-04"
+             onclick="openModal('11-04')">
+            <img src="11-04.png" alt="11-04" loading="lazy">
+            <div class="cal-label">11-04</div>
+        </div>
+        <div class="cal-card" id="card-11-05"
+             data-stem="11-05" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-05"
+             onclick="openModal('11-05')">
+            <img src="11-05.png" alt="11-05" loading="lazy">
+            <div class="cal-label">11-05</div>
+        </div>
+        <div class="cal-card" id="card-11-06"
+             data-stem="11-06" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-06"
+             onclick="openModal('11-06')">
+            <img src="11-06.png" alt="11-06" loading="lazy">
+            <div class="cal-label">11-06</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-07"
+             data-stem="11-07" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-07" data-holiday="2027 · Daylight Saving Ends · Floating"
+             onclick="openModal('11-07')">
+            <img src="11-07.png" alt="11-07" loading="lazy">
+            <div class="cal-label">11-07</div>
+        </div>
+        <div class="cal-card" id="card-11-08"
+             data-stem="11-08" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-08"
+             onclick="openModal('11-08')">
+            <img src="11-08.png" alt="11-08" loading="lazy">
+            <div class="cal-label">11-08</div>
+        </div>
+        <div class="cal-card" id="card-11-09"
+             data-stem="11-09" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-09"
+             onclick="openModal('11-09')">
+            <img src="11-09.png" alt="11-09" loading="lazy">
+            <div class="cal-label">11-09</div>
+        </div>
+        <div class="cal-card" id="card-11-10"
+             data-stem="11-10" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-10"
+             onclick="openModal('11-10')">
+            <img src="11-10.png" alt="11-10" loading="lazy">
+            <div class="cal-label">11-10</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-11"
+             data-stem="11-11" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-11" data-holiday="2025; 2026; 2027 · Veterans Day"
+             onclick="openModal('11-11')">
+            <img src="11-11.png" alt="11-11" loading="lazy">
+            <div class="cal-label">11-11</div>
+        </div>
+        <div class="cal-card" id="card-11-12"
+             data-stem="11-12" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-12"
+             onclick="openModal('11-12')">
+            <img src="11-12.png" alt="11-12" loading="lazy">
+            <div class="cal-label">11-12</div>
+        </div>
+        <div class="cal-card" id="card-11-13"
+             data-stem="11-13" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-13"
+             onclick="openModal('11-13')">
+            <img src="11-13.png" alt="11-13" loading="lazy">
+            <div class="cal-label">11-13</div>
+        </div>
+        <div class="cal-card" id="card-11-14"
+             data-stem="11-14" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-14"
+             onclick="openModal('11-14')">
+            <img src="11-14.png" alt="11-14" loading="lazy">
+            <div class="cal-label">11-14</div>
+        </div>
+        <div class="cal-card" id="card-11-15"
+             data-stem="11-15" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-15"
+             onclick="openModal('11-15')">
+            <img src="11-15.png" alt="11-15" loading="lazy">
+            <div class="cal-label">11-15</div>
+        </div>
+        <div class="cal-card" id="card-11-16"
+             data-stem="11-16" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-16"
+             onclick="openModal('11-16')">
+            <img src="11-16.png" alt="11-16" loading="lazy">
+            <div class="cal-label">11-16</div>
+        </div>
+        <div class="cal-card" id="card-11-17"
+             data-stem="11-17" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-17"
+             onclick="openModal('11-17')">
+            <img src="11-17.png" alt="11-17" loading="lazy">
+            <div class="cal-label">11-17</div>
+        </div>
+        <div class="cal-card" id="card-11-18"
+             data-stem="11-18" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-18"
+             onclick="openModal('11-18')">
+            <img src="11-18.png" alt="11-18" loading="lazy">
+            <div class="cal-label">11-18</div>
+        </div>
+        <div class="cal-card" id="card-11-19"
+             data-stem="11-19" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-19"
+             onclick="openModal('11-19')">
+            <img src="11-19.png" alt="11-19" loading="lazy">
+            <div class="cal-label">11-19</div>
+        </div>
+        <div class="cal-card" id="card-11-20"
+             data-stem="11-20" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-20"
+             onclick="openModal('11-20')">
+            <img src="11-20.png" alt="11-20" loading="lazy">
+            <div class="cal-label">11-20</div>
+        </div>
+        <div class="cal-card" id="card-11-21"
+             data-stem="11-21" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-21"
+             onclick="openModal('11-21')">
+            <img src="11-21.png" alt="11-21" loading="lazy">
+            <div class="cal-label">11-21</div>
+        </div>
+        <div class="cal-card" id="card-11-22"
+             data-stem="11-22" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-22"
+             onclick="openModal('11-22')">
+            <img src="11-22.png" alt="11-22" loading="lazy">
+            <div class="cal-label">11-22</div>
+        </div>
+        <div class="cal-card" id="card-11-23"
+             data-stem="11-23" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-23"
+             onclick="openModal('11-23')">
+            <img src="11-23.png" alt="11-23" loading="lazy">
+            <div class="cal-label">11-23</div>
+        </div>
+        <div class="cal-card" id="card-11-24"
+             data-stem="11-24" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-24"
+             onclick="openModal('11-24')">
+            <img src="11-24.png" alt="11-24" loading="lazy">
+            <div class="cal-label">11-24</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-25"
+             data-stem="11-25" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-25" data-holiday="2027 · Thanksgiving · Floating"
+             onclick="openModal('11-25')">
+            <img src="11-25.png" alt="11-25" loading="lazy">
+            <div class="cal-label">11-25</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-26"
+             data-stem="11-26" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-26" data-holiday="2026 · Thanksgiving · Floating | 2027 · Hanukkah · Floating"
+             onclick="openModal('11-26')">
+            <img src="11-26.png" alt="11-26" loading="lazy">
+            <div class="cal-label">11-26</div>
+        </div>
+        <div class="cal-card holiday" id="card-11-27"
+             data-stem="11-27" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-27" data-holiday="2025 · Thanksgiving · Floating"
+             onclick="openModal('11-27')">
+            <img src="11-27.png" alt="11-27" loading="lazy">
+            <div class="cal-label">11-27</div>
+        </div>
+        <div class="cal-card" id="card-11-28"
+             data-stem="11-28" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-28"
+             onclick="openModal('11-28')">
+            <img src="11-28.png" alt="11-28" loading="lazy">
+            <div class="cal-label">11-28</div>
+        </div>
+        <div class="cal-card" id="card-11-29"
+             data-stem="11-29" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-29"
+             onclick="openModal('11-29')">
+            <img src="11-29.png" alt="11-29" loading="lazy">
+            <div class="cal-label">11-29</div>
+        </div>
+        <div class="cal-card" id="card-11-30"
+             data-stem="11-30" data-month="11" data-completed="true"
+             data-prompt="" data-date="11-30"
+             onclick="openModal('11-30')">
+            <img src="11-30.png" alt="11-30" loading="lazy">
+            <div class="cal-label">11-30</div>
+        </div>
+        <div class="cal-card" id="card-12-01"
+             data-stem="12-01" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-01"
+             onclick="openModal('12-01')">
+            <img src="12-01.png" alt="12-01" loading="lazy">
+            <div class="cal-label">12-01</div>
+        </div>
+        <div class="cal-card" id="card-12-02"
+             data-stem="12-02" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-02"
+             onclick="openModal('12-02')">
+            <img src="12-02.png" alt="12-02" loading="lazy">
+            <div class="cal-label">12-02</div>
+        </div>
+        <div class="cal-card" id="card-12-03"
+             data-stem="12-03" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-03"
+             onclick="openModal('12-03')">
+            <img src="12-03.png" alt="12-03" loading="lazy">
+            <div class="cal-label">12-03</div>
+        </div>
+        <div class="cal-card holiday" id="card-12-04"
+             data-stem="12-04" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-04" data-holiday="2026 · Hanukkah · Floating"
+             onclick="openModal('12-04')">
+            <img src="12-04.png" alt="12-04" loading="lazy">
+            <div class="cal-label">12-04</div>
+        </div>
+        <div class="cal-card" id="card-12-05"
+             data-stem="12-05" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-05"
+             onclick="openModal('12-05')">
+            <img src="12-05.png" alt="12-05" loading="lazy">
+            <div class="cal-label">12-05</div>
+        </div>
+        <div class="cal-card" id="card-12-06"
+             data-stem="12-06" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-06"
+             onclick="openModal('12-06')">
+            <img src="12-06.png" alt="12-06" loading="lazy">
+            <div class="cal-label">12-06</div>
+        </div>
+        <div class="cal-card" id="card-12-07"
+             data-stem="12-07" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-07"
+             onclick="openModal('12-07')">
+            <img src="12-07.png" alt="12-07" loading="lazy">
+            <div class="cal-label">12-07</div>
+        </div>
+        <div class="cal-card" id="card-12-08"
+             data-stem="12-08" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-08"
+             onclick="openModal('12-08')">
+            <img src="12-08.png" alt="12-08" loading="lazy">
+            <div class="cal-label">12-08</div>
+        </div>
+        <div class="cal-card" id="card-12-09"
+             data-stem="12-09" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-09"
+             onclick="openModal('12-09')">
+            <img src="12-09.png" alt="12-09" loading="lazy">
+            <div class="cal-label">12-09</div>
+        </div>
+        <div class="cal-card" id="card-12-10"
+             data-stem="12-10" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-10"
+             onclick="openModal('12-10')">
+            <img src="12-10.png" alt="12-10" loading="lazy">
+            <div class="cal-label">12-10</div>
+        </div>
+        <div class="cal-card" id="card-12-11"
+             data-stem="12-11" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-11"
+             onclick="openModal('12-11')">
+            <img src="12-11.png" alt="12-11" loading="lazy">
+            <div class="cal-label">12-11</div>
+        </div>
+        <div class="cal-card" id="card-12-12"
+             data-stem="12-12" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-12"
+             onclick="openModal('12-12')">
+            <img src="12-12.png" alt="12-12" loading="lazy">
+            <div class="cal-label">12-12</div>
+        </div>
+        <div class="cal-card" id="card-12-13"
+             data-stem="12-13" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-13"
+             onclick="openModal('12-13')">
+            <img src="12-13.png" alt="12-13" loading="lazy">
+            <div class="cal-label">12-13</div>
+        </div>
+        <div class="cal-card holiday" id="card-12-14"
+             data-stem="12-14" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-14" data-holiday="2025 · Hanukkah · Floating"
+             onclick="openModal('12-14')">
+            <img src="12-14.png" alt="12-14" loading="lazy">
+            <div class="cal-label">12-14</div>
+        </div>
+        <div class="cal-card" id="card-12-15"
+             data-stem="12-15" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-15"
+             onclick="openModal('12-15')">
+            <img src="12-15.png" alt="12-15" loading="lazy">
+            <div class="cal-label">12-15</div>
+        </div>
+        <div class="cal-card" id="card-12-16"
+             data-stem="12-16" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-16"
+             onclick="openModal('12-16')">
+            <img src="12-16.png" alt="12-16" loading="lazy">
+            <div class="cal-label">12-16</div>
+        </div>
+        <div class="cal-card" id="card-12-17"
+             data-stem="12-17" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-17"
+             onclick="openModal('12-17')">
+            <img src="12-17.png" alt="12-17" loading="lazy">
+            <div class="cal-label">12-17</div>
+        </div>
+        <div class="cal-card" id="card-12-18"
+             data-stem="12-18" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-18"
+             onclick="openModal('12-18')">
+            <img src="12-18.png" alt="12-18" loading="lazy">
+            <div class="cal-label">12-18</div>
+        </div>
+        <div class="cal-card" id="card-12-19"
+             data-stem="12-19" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-19"
+             onclick="openModal('12-19')">
+            <img src="12-19.png" alt="12-19" loading="lazy">
+            <div class="cal-label">12-19</div>
+        </div>
+        <div class="cal-card" id="card-12-20"
+             data-stem="12-20" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-20"
+             onclick="openModal('12-20')">
+            <img src="12-20.png" alt="12-20" loading="lazy">
+            <div class="cal-label">12-20</div>
+        </div>
+        <div class="cal-card" id="card-12-21"
+             data-stem="12-21" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-21"
+             onclick="openModal('12-21')">
+            <img src="12-21.png" alt="12-21" loading="lazy">
+            <div class="cal-label">12-21</div>
+        </div>
+        <div class="cal-card" id="card-12-22"
+             data-stem="12-22" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-22"
+             onclick="openModal('12-22')">
+            <img src="12-22.png" alt="12-22" loading="lazy">
+            <div class="cal-label">12-22</div>
+        </div>
+        <div class="cal-card" id="card-12-23"
+             data-stem="12-23" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-23"
+             onclick="openModal('12-23')">
+            <img src="12-23.png" alt="12-23" loading="lazy">
+            <div class="cal-label">12-23</div>
+        </div>
+        <div class="cal-card holiday" id="card-12-24"
+             data-stem="12-24" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-24" data-holiday="2025; 2026; 2027 · Christmas Eve"
+             onclick="openModal('12-24')">
+            <img src="12-24.png" alt="12-24" loading="lazy">
+            <div class="cal-label">12-24</div>
+        </div>
+        <div class="cal-card holiday" id="card-12-25"
+             data-stem="12-25" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-25" data-holiday="2025; 2026; 2027 · Christmas Day"
+             onclick="openModal('12-25')">
+            <img src="12-25.png" alt="12-25" loading="lazy">
+            <div class="cal-label">12-25</div>
+        </div>
+        <div class="cal-card" id="card-12-26"
+             data-stem="12-26" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-26"
+             onclick="openModal('12-26')">
+            <img src="12-26.png" alt="12-26" loading="lazy">
+            <div class="cal-label">12-26</div>
+        </div>
+        <div class="cal-card" id="card-12-27"
+             data-stem="12-27" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-27"
+             onclick="openModal('12-27')">
+            <img src="12-27.png" alt="12-27" loading="lazy">
+            <div class="cal-label">12-27</div>
+        </div>
+        <div class="cal-card" id="card-12-28"
+             data-stem="12-28" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-28"
+             onclick="openModal('12-28')">
+            <img src="12-28.png" alt="12-28" loading="lazy">
+            <div class="cal-label">12-28</div>
+        </div>
+        <div class="cal-card" id="card-12-29"
+             data-stem="12-29" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-29"
+             onclick="openModal('12-29')">
+            <img src="12-29.png" alt="12-29" loading="lazy">
+            <div class="cal-label">12-29</div>
+        </div>
+        <div class="cal-card" id="card-12-30"
+             data-stem="12-30" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-30"
+             onclick="openModal('12-30')">
+            <img src="12-30.png" alt="12-30" loading="lazy">
+            <div class="cal-label">12-30</div>
+        </div>
+        <div class="cal-card holiday" id="card-12-31"
+             data-stem="12-31" data-month="12" data-completed="true"
+             data-prompt="" data-date="12-31" data-holiday="2025; 2026; 2027 · New Year&#x27;s Eve"
+             onclick="openModal('12-31')">
+            <img src="12-31.png" alt="12-31" loading="lazy">
+            <div class="cal-label">12-31</div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'bee-prompts-completed';
+        let currentFilter = 'all';
+        let currentMonth = 'all';
+
+        function getCompletedPrompts() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function saveCompletedPrompts(completed) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+        }
+
+        function loadCompletionState() {
+            const completed = getCompletedPrompts();
+            Object.keys(completed).forEach(filename => {
+                if (completed[filename]) {
+                    const card = document.getElementById('card-' + filename);
+                    if (card) {
+                        card.classList.add('completed');
+                        card.dataset.completed = 'true';
+                        card.querySelector('.checkbox').checked = true;
+                        card.querySelector('.done-btn').style.display = 'none';
+                        card.querySelector('.undo-btn').style.display = 'inline-block';
+                    }
+                }
+            });
+            updateStats();
+        }
+
+        function toggleComplete(filename) {
+            const card = document.getElementById('card-' + filename);
+            if (card.querySelector('.checkbox').checked) markDone(filename);
+            else markUndone(filename);
+        }
+
+        function markDone(filename) {
+            const card = document.getElementById('card-' + filename);
+            card.classList.add('completed');
+            card.dataset.completed = 'true';
+            card.querySelector('.checkbox').checked = true;
+            card.querySelector('.done-btn').style.display = 'none';
+            card.querySelector('.undo-btn').style.display = 'inline-block';
+            const completed = getCompletedPrompts();
+            completed[filename] = true;
+            saveCompletedPrompts(completed);
+            updateStats();
+        }
+
+        function markDoneAndNext(filename) {
+            markDone(filename);
+            jumpToNext();
+        }
+
+        function markUndone(filename) {
+            const card = document.getElementById('card-' + filename);
+            card.classList.remove('completed');
+            card.dataset.completed = 'false';
+            card.querySelector('.checkbox').checked = false;
+            card.querySelector('.done-btn').style.display = 'inline-block';
+            card.querySelector('.undo-btn').style.display = 'none';
+            const completed = getCompletedPrompts();
+            delete completed[filename];
+            saveCompletedPrompts(completed);
+            updateStats();
+        }
+
+        function copyPrompt(filename, btn) {
+            const promptText = document.getElementById('prompt-' + filename).textContent.trim();
+            const url = 'https://chatgpt.com/?q=' + encodeURIComponent(promptText);
+            window.open(url, '_blank');
+        }
+
+        function jumpToNext() {
+            document.querySelectorAll('.prompt-card.current-prompt').forEach(c => c.classList.remove('current-prompt'));
+            const cards = document.querySelectorAll('.prompt-card');
+            for (const card of cards) {
+                if (card.dataset.completed !== 'true' && card.style.display !== 'none') {
+                    card.classList.add('current-prompt');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+            }
+            alert('All prompts are done! Great work!');
+        }
+
+        function updateStats() {
+            const cards = document.querySelectorAll('.prompt-card');
+            const total = cards.length;
+            const completed = document.querySelectorAll('.prompt-card.completed').length;
+            const remaining = total - completed;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('remaining-count').textContent = remaining;
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-bar').textContent = pct + '%';
+        }
+
+        function applyFilters() {
+            document.querySelectorAll('.prompt-card').forEach(card => {
+                const done = card.dataset.completed === 'true';
+                const month = card.dataset.month;
+                const matchesStatus = currentFilter === 'all' || (currentFilter === 'todo' && !done) || (currentFilter === 'completed' && done);
+                const matchesMonth = currentMonth === 'all' || month === currentMonth;
+                card.style.display = (matchesStatus && matchesMonth) ? 'block' : 'none';
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('fb-' + (filter === 'completed' ? 'done' : filter)).classList.add('active');
+            applyFilters();
+        }
+
+        function filterMonth(month) {
+            currentMonth = month;
+            document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            applyFilters();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCompletionState();
+        });
+    </script>
+
+    <div id="modal-overlay" onclick="overlayClick(event)">
+        <div id="modal-box">
+            <button id="modal-close" onclick="closeModal()">&#x2715;</button>
+            <div id="modal-title"></div>
+            <div id="modal-holiday" style="display:none;"></div>
+            <img id="modal-img" style="display:none;" alt="">
+            <div id="modal-prompt"></div>
+            <div id="modal-actions">
+                <button class="copy-btn" onclick="modalCopy()">&#x1F916; Open in ChatGPT</button>
+                <button class="done-btn" id="modal-done-btn" onclick="modalDone()">&#x2713; Mark Done</button>
+                <button class="undo-btn" id="modal-undo-btn" onclick="modalUndo()">&#x21B6; Undo</button>
+                <button class="next-btn" onclick="modalDoneAndNext()">&#x2713; Done &amp; Next &#x27A1;</button>
+                <button class="fname-btn" id="modal-fname-btn" onclick="modalCopyFilename()">&#x1F4CB; 03-29.png</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let _modalStem = null;
+
+        function openModal(stem) {
+            const card = document.getElementById('card-' + stem);
+            if (!card) return;
+            _modalStem = stem;
+            const isMissing = card.classList.contains('missing');
+            const isDone    = card.dataset.completed === 'true';
+            const holiday   = card.dataset.holiday || '';
+            const prompt    = card.dataset.prompt  || '';
+            const dateLabel = card.dataset.date    || stem;
+            const imgSrc    = isMissing ? '' : card.querySelector('img')?.src || '';
+
+            document.getElementById('modal-title').textContent = dateLabel + ' (' + stem + ')';
+
+            const hEl = document.getElementById('modal-holiday');
+            hEl.textContent   = holiday;
+            hEl.style.display = holiday ? 'inline-block' : 'none';
+
+            const imgEl = document.getElementById('modal-img');
+            imgEl.src          = imgSrc;
+            imgEl.style.display = imgSrc ? 'block' : 'none';
+
+            document.getElementById('modal-prompt').textContent = prompt;
+            document.getElementById('modal-prompt').style.display = prompt ? 'block' : 'none';
+
+            const fnBtn = document.getElementById('modal-fname-btn');
+            fnBtn.textContent = '📋 ' + stem + '.png';
+            fnBtn.classList.remove('copied');
+
+            const actions = document.getElementById('modal-actions');
+            actions.style.display = isMissing ? 'flex' : 'none';
+            if (isMissing) {
+                document.getElementById('modal-done-btn').style.display = isDone ? 'none'         : 'inline-block';
+                document.getElementById('modal-undo-btn').style.display = isDone ? 'inline-block' : 'none';
+            }
+
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        function overlayClick(e) {
+            if (e.target === document.getElementById('modal-overlay')) closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('open');
+            _modalStem = null;
+        }
+
+        function modalCopy() {
+            if (!_modalStem) return;
+            const card = document.getElementById('card-' + _modalStem);
+            window.open('https://chatgpt.com/?q=' + encodeURIComponent(card.dataset.prompt || ''), '_blank');
+        }
+
+        function modalDone() {
+            if (!_modalStem) return;
+            markDone(_modalStem);
+            document.getElementById('modal-done-btn').style.display = 'none';
+            document.getElementById('modal-undo-btn').style.display = 'inline-block';
+        }
+
+        function modalUndo() {
+            if (!_modalStem) return;
+            markUndone(_modalStem);
+            document.getElementById('modal-done-btn').style.display = 'inline-block';
+            document.getElementById('modal-undo-btn').style.display = 'none';
+        }
+
+        function modalCopyFilename() {
+            if (!_modalStem) return;
+            const fname = _modalStem + '.png';
+            navigator.clipboard.writeText(fname).then(() => {
+                const btn = document.getElementById('modal-fname-btn');
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 ' + fname;
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+
+        function modalDoneAndNext() {
+            if (!_modalStem) return;
+            markDone(_modalStem);
+            closeModal();
+            jumpToNext();
+        }
+
+        function checkMissingFiles() {
+            document.querySelectorAll('.cal-card.missing').forEach(card => {
+                const stem = card.dataset.stem;
+                const img = new Image();
+                img.onload = () => {
+                    card.classList.remove('missing');
+                    card.dataset.completed = 'true';
+                    const xEl = card.querySelector('.cal-x');
+                    if (xEl) {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = stem + '.png';
+                        imgEl.alt = stem;
+                        imgEl.loading = 'lazy';
+                        card.replaceChild(imgEl, xEl);
+                    }
+                    updateStats();
+                };
+                img.src = stem + '.png?' + Date.now();
+            });
+        }
+
+        // Override template functions to work with .cal-card
+
+        function markDone(stem) {
+            const card = document.getElementById('card-' + stem);
+            if (!card) return;
+            card.dataset.completed = 'true';
+            const completed = getCompletedPrompts();
+            completed[stem] = true;
+            saveCompletedPrompts(completed);
+            updateStats();
+        }
+
+        function markUndone(stem) {
+            const card = document.getElementById('card-' + stem);
+            if (!card) return;
+            card.dataset.completed = 'false';
+            const completed = getCompletedPrompts();
+            delete completed[stem];
+            saveCompletedPrompts(completed);
+            updateStats();
+        }
+
+        function loadCompletionState() {
+            const completed = getCompletedPrompts();
+            document.querySelectorAll('.cal-card.missing').forEach(card => {
+                if (completed[card.dataset.stem]) card.dataset.completed = 'true';
+            });
+            updateStats();
+            checkMissingFiles();
+        }
+
+        function updateStats() {
+            const total = document.querySelectorAll('.cal-card').length;
+            const done  = document.querySelectorAll('.cal-card[data-completed="true"]').length;
+            document.getElementById('total-count').textContent     = total;
+            document.getElementById('completed-count').textContent = done;
+            document.getElementById('remaining-count').textContent = total - done;
+            const pct = total > 0 ? Math.round(done / total * 100) : 0;
+            const bar = document.getElementById('progress-bar');
+            bar.style.width = pct + '%';
+            bar.textContent = pct + '%';
+        }
+
+        function applyFilters() {
+            document.querySelectorAll('.cal-card').forEach(card => {
+                const done  = card.dataset.completed === 'true';
+                const month = card.dataset.month;
+                const okStatus = currentFilter === 'all'
+                    || (currentFilter === 'todo'      && !done)
+                    || (currentFilter === 'completed' && done);
+                const okMonth = currentMonth === 'all' || month === currentMonth;
+                card.style.display = (okStatus && okMonth) ? '' : 'none';
+            });
+        }
+
+        function jumpToNext() {
+            document.querySelectorAll('.cal-card.current-prompt').forEach(c => c.classList.remove('current-prompt'));
+            for (const card of document.querySelectorAll('.cal-card.missing')) {
+                if (card.dataset.completed !== 'true' && card.style.display !== 'none') {
+                    card.classList.add('current-prompt');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+            }
+            alert('All prompts are done! Great work! 🐝');
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    </script>
+
+</body>
+</html>

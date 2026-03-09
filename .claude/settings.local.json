@@ -12,7 +12,11 @@
       "Bash(dir:*)",
       "Bash(chcp:*)",
       "Bash(cat:*)",
-      "Bash(del \\.c:Codebee-boxnul)"
+      "Bash(del \\.c:Codebee-boxnul)",
+      "Bash(grep -v '^\\\\d\\\\d-\\\\d\\\\d\\\\.png$')",
+      "Bash(grep -vE '^[0-9]{2}-[0-9]{2}\\\\.png$')",
+      "Bash(ls c:/Code/bee-box/images/*.html)",
+      "Bash(grep -v '\\\\.png$\\\\|\\\\.jpg$\\\\|\\\\.html$\\\\|\\\\.py$')"
     ],
     "deny": [],
     "ask": []
