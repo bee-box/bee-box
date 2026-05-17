@@ -9687,3 +9687,15 @@ TIMESTAMP,STATUS,MESSAGE
 [2026-05-17 04:09:18] ⚠️ Puzzle for 2026-05-14 already populated. Skipping.
 [2026-05-17 04:09:18] ⚠️ Puzzle for 2026-05-13 already populated. Skipping.
 [2026-05-17 04:09:19] ✅ Wax complete.
+2026-05-17 09:48:06 UTC,START,"Workflow started"
+2026-05-17 04:48:07 AM CDT,START,"Harvest process started"
+2026-05-17 04:48:07 AM CDT,INFO,"No existing backup found - creating new backup (2412127 bytes)"
+2026-05-17 04:48:07 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2026-05-17 04:48:07 AM CDT,SUCCESS,"Harvest process completed - puzzle already exists"
+[2026-05-17 04:48:07] 🕯 Starting waxer process...
+[2026-05-17 04:48:08] ⚠️ Puzzle for 2026-05-17 already populated. Skipping.
+[2026-05-17 04:48:08] ⚠️ Puzzle for 2026-05-16 already populated. Skipping.
+[2026-05-17 04:48:08] ⚠️ Puzzle for 2026-05-15 already populated. Skipping.
+[2026-05-17 04:48:08] ⚠️ Puzzle for 2026-05-14 already populated. Skipping.
+[2026-05-17 04:48:08] ⚠️ Puzzle for 2026-05-13 already populated. Skipping.
+[2026-05-17 04:48:09] ✅ Wax complete.
