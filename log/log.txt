@@ -10827,3 +10827,21 @@ TIMESTAMP,STATUS,MESSAGE
 [2026-06-25 05:43:36] ⚠️ Puzzle for 2026-06-22 already populated. Skipping.
 [2026-06-25 05:43:36] ⚠️ Puzzle for 2026-06-21 already populated. Skipping.
 [2026-06-25 05:43:37] ✅ Wax complete.
+2026-06-26 10:25:58 UTC,START,"Workflow started"
+2026-06-26 05:25:59 AM CDT,START,"Harvest process started"
+2026-06-26 05:25:59 AM CDT,INFO,"No existing backup found - creating new backup (2443774 bytes)"
+2026-06-26 05:25:59 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2026-06-26 05:26:00 AM CDT,INFO,"Fetching puzzle from NYT (attempt 1/3)"
+2026-06-26 05:26:00 AM CDT,INFO,"Successfully fetched puzzle for 2026-06-26 with 33 words"
+2026-06-26 05:26:00 AM CDT,INFO,"Successfully loaded existing words.xml with 2969 puzzles"
+2026-06-26 05:26:00 AM CDT,INFO,"Successfully wrote 2444404 bytes to words.xml"
+2026-06-26 05:26:00 AM CDT,INFO,"Current file (2444404 bytes) is larger than backup (2443774 bytes) - updating backup"
+2026-06-26 05:26:00 AM CDT,INFO,"Successfully backed up words.xml to xml/backups/words.xml.bak"
+2026-06-26 05:26:00 AM CDT,SUCCESS,"Harvest process completed successfully"
+[2026-06-26 05:26:00] 🕯 Starting waxer process...
+[2026-06-26 05:26:00] 🔄 Filled placeholder puzzle for 2026-06-26.
+[2026-06-26 05:26:00] ⚠️ Puzzle for 2026-06-25 already populated. Skipping.
+[2026-06-26 05:26:00] ⚠️ Puzzle for 2026-06-24 already populated. Skipping.
+[2026-06-26 05:26:00] ⚠️ Puzzle for 2026-06-23 already populated. Skipping.
+[2026-06-26 05:26:00] ⚠️ Puzzle for 2026-06-22 already populated. Skipping.
+[2026-06-26 05:26:02] ✅ Wax complete.
